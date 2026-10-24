@@ -84,3 +84,5 @@ El mensaje inicial incluye la zona que eligió la persona, para que el bot arran
 `... Vivo en {distrito}, {provincia}, {departamento} (ubigeo {código}).`
 
 El bot puede usar las mismas fuentes que la web (Open-Meteo, INDECI, Nominatim) y el mismo formato JSON de plan descrito arriba.
+
+**Estado actual:** el botón flotante de WhatsApp ya apunta al bot (número +591 68643730, definido por defecto en `waConfig()` de `index.html`). Abre el chat con el mensaje "Hola" para que arranque el flujo del bot. Para cambiar el número, el mensaje o enviar también la zona, define `window.WHATSAPP_BOT = { numero, mensaje, incluirLugar: true }`. Con `incluirLugar` el mensaje añade "Vivo en {distrito}, {provincia}, {departamento} (ubigeo {código})", pero el bot actual pregunta el nombre primero, así que conviene dejarlo apagado.
