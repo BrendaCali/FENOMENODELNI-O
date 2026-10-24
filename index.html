@@ -271,6 +271,9 @@ select:disabled{opacity:.5}
   .zoomctl button{width:40px;height:40px;font-size:18px}
 }
 #to2:disabled{display:none}
+.stabs{padding:0!important}
+.hist{display:block;width:100%;max-width:380px;height:auto;color:var(--muted)}
+.histbox{margin-top:8px}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:12px;font-weight:700;z-index:20}
 footer{font-size:13px;color:var(--muted);display:flex;flex-direction:column;gap:6px}
 @media (min-width:640px){.facts{grid-template-columns:1fr 1fr}.plan.two{grid-template-columns:1fr 1fr}}
@@ -298,23 +301,24 @@ footer{font-size:13px;color:var(--muted);display:flex;flex-direction:column;gap:
 </aside>
 <div class="wrap">
 <section id="mapSlot" class="card" aria-label="Mapa del Perú">
-<div class="sem" id="semaforo"><div class="sem-h"><h3>Semáforo por zona</h3><span class="liveb" id="semBadge">EJEMPLO</span></div><p class="note" id="semNote"></p><div id="semList"></div></div>
-<p class="mapcap">Los puntos marcan zonas con riesgo alto o muy alto (datos de ejemplo del prototipo); se conectarán a los avisos de SENAMHI y ENFEN en tiempo real. En una emergencia llama a INDECI al 119.</p></section>
+<div class="sem" id="semaforo"><div class="sem-h"><h3>Semáforo por zona</h3><span class="liveb" id="semBadge">EJEMPLO</span></div>
+  <div class="modes stabs" id="stabs" role="group" aria-label="Qué datos ver"><button type="button" data-t="zonas" aria-pressed="true">Lluvia</button><button type="button" data-t="mar" aria-pressed="false">Mar</button><button type="button" data-t="rios" aria-pressed="false">Ríos</button></div><p class="note" id="semNote"></p><div id="semList"></div></div>
+<p class="mapcap">Riesgo histórico: base real de INDECI 2003-2020. Lluvia, mar y ríos: pronóstico en vivo de Open-Meteo. Estado de El Niño: ENFEN (resumen de prensa). No reemplaza a las autoridades; en una emergencia llama a INDECI al 119.</p></section>
 
 
 <!-- PASO 1 -->
 <section id="s1" class="card" aria-labelledby="t1">
   <h2 id="t1">¿Dónde vives?</h2>
-  <p class="lead">Toca tu departamento en el mapa y baja por secciones: provincia y luego distrito. En este prototipo hay datos de ejemplo para algunos distritos de Tumbes, Piura y Lambayeque.</p>
+  <p class="lead">Toca tu departamento en el mapa y baja por secciones: provincia y luego distrito. Hay detalle por distrito en Tumbes, Piura y Lambayeque.</p>
   <div class="mapbox">
     <div class="crumbs" id="crumbs" aria-label="Dónde estás"></div>
-    <div class="modes" id="modes" role="group" aria-label="Qué mostrar en el mapa"><button type="button" data-m="riesgo" aria-pressed="true">Riesgo de la zona</button><button type="button" data-m="vivo" aria-pressed="false" disabled><i class="live"></i>Lluvia en vivo</button></div>
+    <div class="modes" id="modes" role="group" aria-label="Qué mostrar en el mapa"><button type="button" data-m="riesgo" aria-pressed="true">Riesgo histórico</button><button type="button" data-m="vivo" aria-pressed="false" disabled><i class="live"></i>Lluvia en vivo</button></div>
     <svg class="map" id="map" viewBox="0 0 500 732" role="group" aria-label="Mapa de los departamentos del Perú"></svg>
     <div class="alertas" id="alertas" aria-live="polite"></div>
     <div class="zoomctl"><button type="button" id="zIn" aria-label="Acercar">+</button><button type="button" id="zOut" aria-label="Alejar">−</button><button type="button" id="zAll" class="all" aria-label="Ver todo el Perú">Perú</button></div>
     <div class="tip" id="tip" aria-live="polite">Pasa el dedo o el mouse sobre el mapa</div>
     <div class="sw" aria-label="Leyenda de niveles de riesgo"><span><i style="background:var(--r-bajo)"></i>Bajo</span><span><i style="background:var(--r-medio)"></i>Medio</span><span><i style="background:var(--r-alto)"></i>Alto</span><span><i style="background:var(--r-muy)"></i>Muy alto</span></div>
-    <div class="legend" id="lg">Los colores son niveles de riesgo de ejemplo, no probabilidades. Pellizca para acercar, arrastra para mover y toca para elegir.</div>
+    <div class="legend" id="lg">Los colores son el riesgo histórico según INDECI 2003-2020, no probabilidades. Pellizca para acercar, arrastra para mover y toca para elegir.</div>
   </div>
   <div class="field"><label for="selDep">Departamento</label><select id="selDep"></select></div>
   <div class="field"><label for="selProv">Provincia</label><select id="selProv" disabled></select></div>
@@ -344,7 +348,7 @@ footer{font-size:13px;color:var(--muted);display:flex;flex-direction:column;gap:
 </section>
 
 <footer>
-  <span>Este prototipo usa datos de ejemplo y no reemplaza a las autoridades. En una emergencia llama a INDECI al 119 y sigue sus indicaciones.</span>
+  <span>El riesgo histórico viene de INDECI 2003-2020 y el pronóstico de Open-Meteo; no reemplazan a las autoridades. En una emergencia llama a INDECI al 119 y sigue sus indicaciones.</span>
   <span>Fuentes que se conectarán: ENFEN-IMARPE, CENEPRED (SIGRID), INDECI, SENAMHI y ubigeo INEI.</span>
 </footer>
 </div>
@@ -363,57 +367,27 @@ const GEO_DIST={"140101":{"n":"Chiclayo","p":"1401","d":"M60.3 271.6L59.3 271.8L
 const HAS_DEP=["14","20","24"];
 
 const F_EJ = "dato de ejemplo (prototipo)";
-const R = (nivel,peligro,hist,aviso,secundario)=>({nivel,peligro,secundario,
-  historial:{texto:hist,fuente:"INDECI - base de emergencias 2003-2020",fecha:F_EJ},
-  aviso:{texto:aviso,fuente:"SENAMHI - avisos meteorológicos",fecha:F_EJ},
-  escenario:{fuente:"CENEPRED - SIGRID",fecha:F_EJ}});
-const RIESGO = {
- "240101":R("alto","Inundación","Zona con emergencias por lluvias y desborde del río en temporadas de El Niño costero.","Ejemplo: lluvias moderadas a fuertes en los próximos días.","Lluvias intensas"),
- "240102":R("medio","Lluvias intensas","Registros de anegamiento de calles y daños en viviendas de material frágil.","Ejemplo: lluvias moderadas.","Inundación"),
- "240301":R("alto","Inundación","Zona fronteriza con antecedentes de desborde en la temporada de lluvias.","Ejemplo: lluvias fuertes en la zona.","Lluvias intensas"),
- "240302":R("alto","Inundación","Barrios cercanos al río con antecedentes de inundación.","Ejemplo: lluvias fuertes en la zona.","Lluvias intensas"),
- "200101":R("alto","Inundación","Antecedentes de desborde del río y calles inundadas en episodios de El Niño costero.","Ejemplo: lluvias fuertes y aumento del caudal del río.","Lluvias intensas"),
- "200104":R("muy-alto","Inundación","Sectores bajos con inundaciones prolongadas en episodios pasados.","Ejemplo: lluvias fuertes, vigilar el nivel del río.","Huaico"),
- "200105":R("muy-alto","Inundación","Zona baja junto al río con daños repetidos en viviendas y cultivos.","Ejemplo: lluvias fuertes, vigilar el nivel del río.","Huaico"),
- "200601":R("alto","Huaico","Quebradas que se activan con lluvias fuertes y afectan calles y viviendas.","Ejemplo: lluvias intensas aisladas.","Inundación"),
- "200605":R("medio","Inundación","Sectores cercanos al río con antecedentes de anegamiento.","Ejemplo: lluvias moderadas.","Lluvias intensas"),
- "140101":R("medio","Lluvias intensas","Calles anegadas y techos dañados en temporadas de lluvias extraordinarias.","Ejemplo: lluvias ligeras a moderadas.","Inundación"),
- "140105":R("alto","Inundación","Zonas bajas con acumulación de agua y desagües que colapsan con lluvia fuerte.","Ejemplo: lluvias moderadas a fuertes.","Lluvias intensas"),
- "140112":R("medio","Lluvias intensas","Zona costera con daños en viviendas por lluvias y oleaje en episodios pasados.","Ejemplo: lluvias moderadas.","Inundación"),
- "140301":R("alto","Huaico","Antecedentes de huaicos y desborde de canales en lluvias extraordinarias.","Ejemplo: lluvias moderadas a fuertes.","Inundación")
-};
 const ENFEN = {texto:"Estado de alerta y pronóstico de El Niño costero",valor:"Alerta de El Niño costero (Comunicado Oficial ENFEN N° 18-2026). Se esperan lluvias sobre lo normal en costa norte y centro.",fuente:"ENFEN-IMARPE (resumen de prensa; verificar en el comunicado)",fecha:"16 oct 2026"};
-
-/* Datos de ejemplo a nivel de departamento (orientativos, por el pronóstico regional de ENFEN). No son el escenario oficial de CENEPRED. */
 const AV_GEN={texto:"Hay avisos de precipitaciones vigentes del 22 al 25 de octubre de 2026 en costa y sierra. Revisa el aviso de tu zona en SENAMHI.",fuente:"SENAMHI - avisos meteorológicos",fecha:"leído el 23 oct 2026"};
-const D=(nivel,peligro,secundario,hist)=>({...R(nivel,peligro,hist||"Zona con registro de emergencias por lluvias en temporadas anteriores.",AV_GEN.texto,secundario),aviso:AV_GEN});
-const RIESGO_DEP = {
- "01":D("medio","Huaico","Lluvias intensas"),
- "02":D("alto","Huaico","Inundación"),
- "03":D("bajo","Lluvias intensas","Huaico"),
- "04":D("medio","Huaico","Lluvias intensas"),
- "05":D("bajo","Lluvias intensas","Huaico"),
- "06":D("alto","Huaico","Inundación"),
- "07":D("medio","Lluvias intensas","Inundación"),
- "08":D("bajo","Huaico","Lluvias intensas"),
- "09":D("bajo","Huaico","Lluvias intensas"),
- "10":D("medio","Huaico","Inundación"),
- "11":D("medio","Huaico","Lluvias intensas"),
- "12":D("medio","Huaico","Inundación"),
- "13":D("alto","Inundación","Huaico"),
- "14":D("alto","Inundación","Huaico"),
- "15":D("alto","Huaico","Lluvias intensas"),
- "16":D("bajo","Inundación","Lluvias intensas"),
- "17":D("bajo","Inundación","Lluvias intensas"),
- "18":D("bajo","Huaico","Lluvias intensas"),
- "19":D("medio","Huaico","Inundación"),
- "20":D("alto","Inundación","Huaico"),
- "21":D("bajo","Lluvias intensas","Inundación"),
- "22":D("medio","Inundación","Huaico"),
- "23":D("bajo","Huaico","Lluvias intensas"),
- "24":D("alto","Inundación","Lluvias intensas"),
- "25":D("bajo","Inundación","Lluvias intensas")
-};
+
+/* Riesgo histórico REAL: base de emergencias y daños de INDECI 2003-2020 (inundaciones, huaicos, lluvias intensas y marejadas).
+   Nivel = ranking por índice de impacto (damnificados + afectados/10 + 3 x viviendas destruidas); lo calcula el prototipo, no INDECI. */
+const IND_DEP={"10":{"n":"alto","e":1833,"y":[26,41,63,176,114,159,80,151,208,119,91,38,21,26,53,57,190,220],"t":[521,168,1144,0],"f":28,"dam":20187,"af":508498,"viv":3519,"u":"2020-12"},"11":{"n":"medio","e":383,"y":[6,7,7,7,9,12,3,8,25,31,19,8,18,3,110,16,46,48],"t":[93,60,219,11],"f":6,"dam":15932,"af":249651,"viv":2158,"u":"2020-12"},"12":{"n":"medio","e":980,"y":[35,45,18,27,22,32,39,67,135,62,48,53,49,38,42,42,127,99],"t":[255,114,611,0],"f":42,"dam":28909,"af":56024,"viv":5578,"u":"2020-12"},"13":{"n":"muy-alto","e":1172,"y":[7,12,21,47,26,9,23,29,32,23,22,14,14,3,282,26,351,231],"t":[74,67,1006,25],"f":31,"dam":86598,"af":434495,"viv":13980,"u":"2020-12"},"14":{"n":"muy-alto","e":378,"y":[0,0,1,20,0,41,20,49,11,56,21,3,27,6,80,9,31,3],"t":[36,5,323,14],"f":13,"dam":56293,"af":242975,"viv":7320,"u":"2020-12"},"15":{"n":"medio","e":1626,"y":[19,17,8,24,12,16,15,8,12,55,35,10,37,41,868,86,215,148],"t":[256,590,762,18],"f":33,"dam":22990,"af":92001,"viv":2739,"u":"2020-12"},"16":{"n":"muy-alto","e":499,"y":[30,29,7,28,19,48,42,5,47,46,6,15,46,21,50,4,44,12],"t":[452,0,47,0],"f":22,"dam":335953,"af":1109256,"viv":6981,"u":"2020-12"},"17":{"n":"bajo","e":295,"y":[142,19,7,6,11,7,5,2,5,8,5,8,3,14,14,14,10,15],"t":[234,1,60,0],"f":14,"dam":9751,"af":57342,"viv":1491,"u":"2020-12"},"18":{"n":"medio","e":439,"y":[4,12,22,29,20,63,10,7,21,39,14,7,39,22,21,7,46,56],"t":[44,42,352,1],"f":4,"dam":17302,"af":130468,"viv":2337,"u":"2020-12"},"19":{"n":"bajo","e":1583,"y":[15,29,2,48,82,50,24,44,54,53,33,156,48,102,210,123,332,178],"t":[175,106,1302,0],"f":16,"dam":4577,"af":19529,"viv":914,"u":"2020-12"},"20":{"n":"muy-alto","e":1401,"y":[7,7,22,61,50,92,47,40,24,170,42,23,72,64,371,53,212,44],"t":[112,9,1265,15],"f":42,"dam":153912,"af":884311,"viv":22822,"u":"2020-12"},"21":{"n":"muy-alto","e":1311,"y":[113,144,40,57,91,36,19,43,72,102,30,10,46,53,36,72,45,302],"t":[686,37,588,0],"f":58,"dam":61199,"af":224356,"viv":7993,"u":"2020-12"},"22":{"n":"alto","e":940,"y":[67,35,42,28,65,52,77,69,96,107,46,41,66,14,31,35,35,34],"t":[651,20,269,0],"f":42,"dam":22862,"af":258763,"viv":4281,"u":"2020-12"},"23":{"n":"bajo","e":234,"y":[2,3,3,7,7,13,2,0,10,25,1,1,16,2,23,2,44,73],"t":[25,36,173,0],"f":6,"dam":9158,"af":70024,"viv":1672,"u":"2020-12"},"24":{"n":"bajo","e":626,"y":[6,4,3,18,3,43,40,79,10,80,14,7,49,58,129,8,57,18],"t":[68,0,549,9],"f":9,"dam":3154,"af":285001,"viv":573,"u":"2020-12"},"25":{"n":"medio","e":411,"y":[40,14,8,52,36,31,15,18,38,15,9,15,25,16,27,12,24,16],"t":[312,3,94,2],"f":8,"dam":18958,"af":114605,"viv":2839,"u":"2020-12"},"01":{"n":"bajo","e":1717,"y":[63,102,97,70,62,72,105,50,39,81,89,115,139,67,85,126,272,83],"t":[208,79,1430,0],"f":37,"dam":14037,"af":43101,"viv":1541,"u":"2020-12"},"02":{"n":"alto","e":2017,"y":[5,8,9,40,51,44,119,34,33,51,79,27,4,7,717,105,583,101],"t":[78,169,1766,4],"f":35,"dam":30818,"af":159037,"viv":4573,"u":"2020-12"},"03":{"n":"medio","e":3422,"y":[107,61,93,196,203,131,174,302,358,290,64,91,202,101,242,244,282,281],"t":[203,75,3144,0],"f":19,"dam":13042,"af":372059,"viv":2338,"u":"2020-12"},"04":{"n":"alto","e":1859,"y":[7,26,16,73,29,83,63,20,150,214,152,10,134,77,157,82,256,310],"t":[241,141,1462,15],"f":34,"dam":21632,"af":384101,"viv":3715,"u":"2020-12"},"05":{"n":"alto","e":2179,"y":[85,37,59,155,23,83,138,105,201,137,58,79,92,55,167,56,287,362],"t":[201,172,1806,0],"f":41,"dam":33080,"af":170256,"viv":6766,"u":"2020-12"},"06":{"n":"medio","e":2859,"y":[79,54,117,192,136,280,214,121,56,102,44,36,187,21,430,124,482,184],"t":[258,110,2491,0],"f":53,"dam":24195,"af":198835,"viv":3865,"u":"2020-12"},"07":{"n":"bajo","e":20,"y":[2,2,1,5,0,1,0,2,1,5,0,0,1,0,0,0,0,0],"t":[10,0,2,8],"f":0,"dam":65,"af":511,"viv":8,"u":"2015-05"},"08":{"n":"alto","e":1810,"y":[98,55,43,83,47,42,23,199,154,134,218,104,102,110,60,79,102,157],"t":[437,112,1261,0],"f":47,"dam":42430,"af":135231,"viv":5822,"u":"2020-12"},"09":{"n":"medio","e":3452,"y":[58,69,44,24,33,42,25,117,213,288,388,354,88,51,425,107,684,442],"t":[156,160,3136,0],"f":30,"dam":24085,"af":226042,"viv":3148,"u":"2020-12"}};
+const IND_DIST={"140101":{"n":"alto","e":21,"y":[0,0,0,1,0,2,3,6,0,2,1,0,1,1,3,0,1,0],"t":[7,0,14,0],"f":0,"dam":3472,"af":2255,"viv":199,"u":"2019-02"},"140102":{"n":"medio","e":7,"y":[0,0,0,0,0,1,0,1,0,2,0,0,0,0,2,0,1,0],"t":[0,0,7,0],"f":2,"dam":490,"af":2996,"viv":76,"u":"2019-03"},"140103":{"n":"alto","e":11,"y":[0,0,0,0,0,1,0,2,1,2,2,1,0,0,2,0,0,0],"t":[1,0,9,1],"f":0,"dam":1131,"af":5563,"viv":62,"u":"2017-03"},"140104":{"n":"bajo","e":7,"y":[0,0,0,1,0,0,0,1,1,0,0,0,0,0,2,0,1,1],"t":[0,0,5,2],"f":0,"dam":192,"af":2852,"viv":2,"u":"2020-12"},"140105":{"n":"muy-alto","e":14,"y":[0,0,0,0,0,3,1,3,0,1,1,0,0,1,2,1,1,0],"t":[2,0,12,0],"f":0,"dam":3822,"af":3239,"viv":326,"u":"2019-02"},"140106":{"n":"medio","e":7,"y":[0,0,0,1,0,1,1,0,0,2,0,0,0,0,2,0,0,0],"t":[0,0,7,0],"f":0,"dam":1077,"af":1417,"viv":14,"u":"2017-03"},"140107":{"n":"medio","e":10,"y":[0,0,0,0,0,0,0,0,1,1,1,1,0,1,2,0,2,1],"t":[0,0,8,2],"f":0,"dam":209,"af":4424,"viv":22,"u":"2020-12"},"140108":{"n":"medio","e":7,"y":[0,0,0,1,0,1,1,0,0,2,0,0,0,0,2,0,0,0],"t":[2,0,5,0],"f":0,"dam":896,"af":4198,"viv":27,"u":"2017-03"},"140109":{"n":"bajo","e":5,"y":[0,0,0,0,0,1,0,0,0,0,1,0,0,0,2,0,1,0],"t":[0,0,5,0],"f":0,"dam":40,"af":3354,"viv":15,"u":"2019-02"},"140110":{"n":"medio","e":6,"y":[0,0,0,0,0,1,1,0,0,0,1,0,0,0,2,0,1,0],"t":[1,0,5,0],"f":0,"dam":378,"af":8076,"viv":78,"u":"2019-02"},"140111":{"n":"medio","e":9,"y":[0,0,0,0,0,0,0,1,2,2,0,0,1,0,2,0,1,0],"t":[0,0,9,0],"f":0,"dam":187,"af":4120,"viv":41,"u":"2019-02"},"140112":{"n":"alto","e":13,"y":[0,0,0,1,0,1,1,2,2,1,1,0,1,0,3,0,0,0],"t":[1,0,9,3],"f":0,"dam":1521,"af":4984,"viv":304,"u":"2017-09"},"140113":{"n":"bajo","e":7,"y":[0,0,0,0,0,1,0,0,0,2,1,0,0,0,2,0,1,0],"t":[0,0,7,0],"f":2,"dam":194,"af":1340,"viv":8,"u":"2019-02"},"140114":{"n":"medio","e":9,"y":[0,0,0,1,0,1,0,0,1,1,1,0,1,0,2,0,1,0],"t":[0,0,7,2],"f":0,"dam":96,"af":5537,"viv":23,"u":"2019-02"},"140115":{"n":"bajo","e":9,"y":[0,0,0,0,0,1,0,1,0,1,0,0,1,1,2,1,1,0],"t":[1,0,8,0],"f":0,"dam":48,"af":1831,"viv":13,"u":"2019-02"},"140116":{"n":"medio","e":7,"y":[0,0,0,0,0,1,0,0,0,2,0,0,2,0,2,0,0,0],"t":[2,1,4,0],"f":0,"dam":421,"af":5203,"viv":102,"u":"2017-03"},"140117":{"n":"bajo","e":4,"y":[0,0,0,0,0,0,0,0,0,1,0,0,1,0,2,0,0,0],"t":[0,1,3,0],"f":0,"dam":95,"af":1773,"viv":21,"u":"2017-03"},"140118":{"n":"medio","e":11,"y":[0,0,0,2,0,1,0,2,0,1,0,0,2,0,2,0,1,0],"t":[0,0,11,0],"f":0,"dam":322,"af":1272,"viv":42,"u":"2019-02"},"140119":{"n":"medio","e":9,"y":[0,0,0,0,0,1,0,2,0,0,0,0,0,0,2,1,2,1],"t":[0,0,9,0],"f":0,"dam":406,"af":1627,"viv":91,"u":"2020-12"},"140120":{"n":"medio","e":11,"y":[0,0,0,0,0,2,0,2,0,1,1,0,1,1,2,0,1,0],"t":[2,0,9,0],"f":0,"dam":139,"af":5612,"viv":186,"u":"2019-02"},"140201":{"n":"medio","e":4,"y":[0,0,0,0,0,1,0,0,0,0,0,0,0,0,2,0,1,0],"t":[0,0,4,0],"f":0,"dam":266,"af":2750,"viv":26,"u":"2019-02"},"140202":{"n":"alto","e":18,"y":[0,0,0,3,0,3,1,1,0,3,1,1,1,1,2,1,0,0],"t":[0,1,17,0],"f":3,"dam":1452,"af":22080,"viv":273,"u":"2018-05"},"140203":{"n":"muy-alto","e":13,"y":[0,0,0,0,0,1,1,2,0,2,2,0,2,0,2,0,1,0],"t":[0,0,13,0],"f":0,"dam":5486,"af":22429,"viv":1013,"u":"2019-04"},"140204":{"n":"medio","e":5,"y":[0,0,0,0,0,0,0,0,0,1,0,0,1,0,2,0,1,0],"t":[0,0,5,0],"f":0,"dam":277,"af":1071,"viv":37,"u":"2019-02"},"140205":{"n":"alto","e":8,"y":[0,0,0,0,0,1,1,1,0,2,0,0,0,0,2,0,1,0],"t":[0,0,8,0],"f":1,"dam":1342,"af":10164,"viv":171,"u":"2019-02"},"140206":{"n":"alto","e":7,"y":[0,0,0,0,0,1,0,1,0,1,0,0,1,0,2,0,1,0],"t":[0,0,7,0],"f":0,"dam":795,"af":4749,"viv":151,"u":"2019-02"},"140301":{"n":"muy-alto","e":8,"y":[0,0,0,0,0,1,2,2,0,1,0,0,0,0,2,0,0,0],"t":[1,0,7,0],"f":0,"dam":4569,"af":5207,"viv":331,"u":"2017-03"},"140302":{"n":"bajo","e":6,"y":[0,0,0,0,0,1,0,1,0,1,0,0,0,0,2,0,1,0],"t":[0,0,6,0],"f":0,"dam":139,"af":1981,"viv":35,"u":"2019-03"},"140303":{"n":"muy-alto","e":14,"y":[0,0,0,1,0,1,1,2,0,3,1,0,1,0,3,0,1,0],"t":[8,0,6,0],"f":1,"dam":3509,"af":10497,"viv":517,"u":"2019-02"},"140304":{"n":"alto","e":15,"y":[0,0,0,0,0,1,3,3,0,2,0,0,2,0,2,1,1,0],"t":[1,0,14,0],"f":0,"dam":1926,"af":13064,"viv":324,"u":"2019-02"},"140305":{"n":"alto","e":14,"y":[0,0,0,0,0,1,0,3,0,2,0,0,3,0,2,2,1,0],"t":[0,0,14,0],"f":0,"dam":2831,"af":4082,"viv":294,"u":"2019-02"},"140306":{"n":"muy-alto","e":16,"y":[0,0,0,1,0,1,0,5,2,2,1,0,1,0,2,0,1,0],"t":[0,0,14,2],"f":2,"dam":5553,"af":16298,"viv":429,"u":"2019-03"},"140307":{"n":"alto","e":17,"y":[0,0,0,1,0,2,2,2,0,2,3,0,1,0,3,0,1,0],"t":[1,1,15,0],"f":0,"dam":884,"af":15204,"viv":106,"u":"2019-03"},"140308":{"n":"alto","e":8,"y":[0,0,1,0,0,1,0,0,0,2,0,0,1,0,2,0,1,0],"t":[0,0,8,0],"f":0,"dam":1955,"af":17194,"viv":433,"u":"2019-02"},"140309":{"n":"muy-alto","e":11,"y":[0,0,0,1,0,1,1,0,0,4,0,0,1,0,2,0,1,0],"t":[6,0,5,0],"f":0,"dam":4638,"af":7001,"viv":803,"u":"2019-06"},"140310":{"n":"alto","e":21,"y":[0,0,0,4,0,3,0,2,0,4,2,0,1,0,2,2,1,0],"t":[0,1,20,0],"f":0,"dam":1861,"af":9095,"viv":446,"u":"2019-02"},"140311":{"n":"medio","e":4,"y":[0,0,0,1,0,0,0,0,1,0,0,0,0,0,2,0,0,0],"t":[0,0,2,2],"f":0,"dam":170,"af":3818,"viv":20,"u":"2017-03"},"140312":{"n":"alto","e":5,"y":[0,0,0,0,0,1,0,1,0,0,0,0,0,0,2,0,1,0],"t":[0,0,5,0],"f":2,"dam":3504,"af":4618,"viv":259,"u":"2019-02"},"200101":{"n":"muy-alto","e":34,"y":[0,0,0,1,0,3,0,1,0,1,2,0,1,3,19,0,3,0],"t":[2,0,32,0],"f":6,"dam":7893,"af":51492,"viv":837,"u":"2019-02"},"200104":{"n":"muy-alto","e":21,"y":[0,0,0,0,0,2,1,1,0,2,1,0,2,3,9,0,0,0],"t":[4,0,17,0],"f":0,"dam":17631,"af":12294,"viv":665,"u":"2017-03"},"200105":{"n":"muy-alto","e":21,"y":[0,0,0,0,1,2,0,1,0,7,0,0,1,1,5,1,2,0],"t":[4,0,17,0],"f":0,"dam":29159,"af":48623,"viv":6841,"u":"2019-12"},"200107":{"n":"medio","e":15,"y":[0,0,0,3,2,1,0,0,0,3,0,1,0,0,3,0,2,0],"t":[2,0,13,0],"f":0,"dam":348,"af":2577,"viv":75,"u":"2019-02"},"200108":{"n":"medio","e":7,"y":[0,0,0,0,0,1,0,0,0,0,0,0,1,1,2,0,2,0],"t":[1,0,6,0],"f":0,"dam":460,"af":3792,"viv":107,"u":"2019-12"},"200109":{"n":"muy-alto","e":9,"y":[1,0,0,0,0,2,0,0,0,0,0,0,0,1,2,0,3,0],"t":[1,0,8,0],"f":0,"dam":1530,"af":27598,"viv":271,"u":"2019-12"},"200110":{"n":"muy-alto","e":12,"y":[0,0,0,0,0,1,1,0,0,0,0,0,1,1,3,0,5,0],"t":[1,0,11,0],"f":0,"dam":4640,"af":22200,"viv":354,"u":"2019-12"},"200111":{"n":"muy-alto","e":58,"y":[1,2,1,7,4,3,14,0,0,2,2,0,6,1,5,0,8,2],"t":[10,0,48,0],"f":0,"dam":1691,"af":40671,"viv":432,"u":"2020-04"},"200114":{"n":"muy-alto","e":100,"y":[0,0,2,5,0,3,2,0,0,21,1,0,1,1,54,1,8,1],"t":[5,0,95,0],"f":0,"dam":6188,"af":43946,"viv":351,"u":"2020-02"},"200115":{"n":"muy-alto","e":11,"y":[0,0,0,0,0,0,0,0,0,0,0,0,0,6,4,0,1,0],"t":[7,0,4,0],"f":0,"dam":4651,"af":14054,"viv":551,"u":"2019-02"},"200201":{"n":"alto","e":61,"y":[1,0,5,4,2,2,2,3,0,7,4,2,3,1,4,6,11,4],"t":[1,2,58,0],"f":0,"dam":2385,"af":6227,"viv":414,"u":"2020-03"},"200202":{"n":"alto","e":33,"y":[0,0,0,1,0,3,0,1,1,6,0,0,4,1,7,2,4,3],"t":[1,0,32,0],"f":1,"dam":1548,"af":11925,"viv":98,"u":"2020-12"},"200203":{"n":"alto","e":17,"y":[0,0,0,0,1,2,1,1,0,2,0,0,1,1,4,1,3,0],"t":[1,0,16,0],"f":0,"dam":1227,"af":6587,"viv":133,"u":"2019-03"},"200204":{"n":"alto","e":25,"y":[0,0,1,0,0,3,0,0,0,2,0,0,1,1,4,3,8,2],"t":[2,0,23,0],"f":0,"dam":2436,"af":6965,"viv":151,"u":"2020-02"},"200205":{"n":"muy-alto","e":19,"y":[1,0,0,1,1,1,1,1,0,1,0,0,1,1,3,1,6,0],"t":[2,0,17,0],"f":0,"dam":4494,"af":14111,"viv":198,"u":"2019-03"},"200206":{"n":"alto","e":25,"y":[0,0,0,0,1,2,1,0,0,2,2,0,0,1,4,2,8,2],"t":[3,0,22,0],"f":0,"dam":1280,"af":12020,"viv":14,"u":"2020-12"},"200207":{"n":"alto","e":16,"y":[0,0,0,0,0,1,0,0,0,2,0,0,1,1,4,1,5,1],"t":[0,1,15,0],"f":0,"dam":2251,"af":8207,"viv":213,"u":"2020-02"},"200208":{"n":"alto","e":15,"y":[0,0,0,1,0,2,0,0,1,2,0,0,0,0,4,3,1,1],"t":[2,1,12,0],"f":0,"dam":1763,"af":13366,"viv":116,"u":"2020-03"},"200209":{"n":"alto","e":24,"y":[1,0,0,0,0,1,2,1,0,2,3,1,2,1,3,1,5,1],"t":[0,0,24,0],"f":0,"dam":1534,"af":5550,"viv":83,"u":"2020-03"},"200210":{"n":"alto","e":10,"y":[0,0,0,0,0,2,0,0,1,1,0,0,1,1,1,0,2,1],"t":[2,0,8,0],"f":2,"dam":1389,"af":4498,"viv":47,"u":"2020-01"},"200301":{"n":"alto","e":70,"y":[0,0,7,0,19,1,1,1,1,16,4,4,6,2,1,0,5,2],"t":[5,0,65,0],"f":0,"dam":2279,"af":13827,"viv":334,"u":"2020-11"},"200302":{"n":"alto","e":37,"y":[0,0,0,1,2,2,4,2,0,4,1,1,2,1,9,0,6,2],"t":[2,0,35,0],"f":0,"dam":1898,"af":15147,"viv":114,"u":"2020-03"},"200303":{"n":"alto","e":54,"y":[1,0,1,4,1,2,1,2,5,3,6,4,1,1,7,8,5,2],"t":[0,2,52,0],"f":3,"dam":2835,"af":11756,"viv":118,"u":"2020-12"},"200304":{"n":"alto","e":46,"y":[1,0,2,3,0,3,4,5,1,3,2,4,1,1,9,2,3,2],"t":[4,1,41,0],"f":7,"dam":2150,"af":9399,"viv":219,"u":"2020-02"},"200305":{"n":"medio","e":16,"y":[0,0,0,2,0,2,0,0,0,2,1,0,1,1,2,0,4,1],"t":[1,0,15,0],"f":0,"dam":859,"af":3137,"viv":28,"u":"2020-03"},"200306":{"n":"medio","e":22,"y":[0,0,0,4,1,1,0,0,0,3,0,1,1,1,3,1,4,2],"t":[0,0,22,0],"f":2,"dam":526,"af":6985,"viv":78,"u":"2020-02"},"200307":{"n":"alto","e":25,"y":[0,0,0,0,0,1,0,8,0,3,1,1,1,2,3,0,4,1],"t":[5,2,18,0],"f":0,"dam":2346,"af":1418,"viv":335,"u":"2020-01"},"200308":{"n":"muy-alto","e":41,"y":[0,1,1,1,4,1,0,0,1,1,2,4,1,1,9,0,12,2],"t":[1,0,40,0],"f":0,"dam":3200,"af":10265,"viv":479,"u":"2020-12"},"200401":{"n":"muy-alto","e":46,"y":[0,2,1,3,8,2,7,4,2,4,1,0,2,1,4,0,5,0],"t":[8,0,38,0],"f":13,"dam":4057,"af":57285,"viv":742,"u":"2019-12"},"200402":{"n":"alto","e":15,"y":[0,0,0,0,0,1,0,0,0,3,0,0,1,1,4,0,5,0],"t":[0,0,15,0],"f":0,"dam":1611,"af":8625,"viv":215,"u":"2019-12"},"200403":{"n":"alto","e":22,"y":[0,0,0,0,0,1,0,0,0,2,0,0,1,1,12,2,3,0],"t":[0,0,22,0],"f":1,"dam":1678,"af":13488,"viv":219,"u":"2019-12"},"200404":{"n":"alto","e":20,"y":[0,0,0,1,0,2,0,0,0,4,0,0,1,1,5,0,4,2],"t":[0,0,20,0],"f":0,"dam":900,"af":11725,"viv":66,"u":"2020-12"},"200405":{"n":"alto","e":20,"y":[0,1,0,0,0,2,0,2,0,3,1,0,1,1,4,0,4,1],"t":[5,0,15,0],"f":0,"dam":1484,"af":8657,"viv":117,"u":"2020-01"},"200406":{"n":"alto","e":20,"y":[0,0,1,4,1,1,0,1,1,1,1,0,1,0,3,0,4,1],"t":[3,0,17,0],"f":0,"dam":602,"af":10313,"viv":100,"u":"2020-04"},"200407":{"n":"alto","e":18,"y":[0,0,0,3,0,2,0,0,0,2,1,0,1,2,4,1,2,0],"t":[3,0,15,0],"f":0,"dam":1092,"af":10684,"viv":276,"u":"2019-03"},"200408":{"n":"alto","e":26,"y":[0,0,0,0,0,1,1,1,0,3,0,0,1,1,2,2,12,2],"t":[1,0,25,0],"f":0,"dam":545,"af":8880,"viv":105,"u":"2020-12"},"200409":{"n":"alto","e":25,"y":[0,0,0,5,0,1,3,1,0,3,2,0,2,1,4,1,2,0],"t":[0,0,25,0],"f":0,"dam":1431,"af":10869,"viv":51,"u":"2019-03"},"200410":{"n":"alto","e":25,"y":[0,1,0,3,1,3,1,3,0,4,1,0,2,1,2,0,3,0],"t":[1,0,24,0],"f":2,"dam":957,"af":17760,"viv":77,"u":"2019-04"},"200501":{"n":"muy-alto","e":17,"y":[0,0,0,0,0,2,0,0,0,1,0,0,2,1,5,1,4,1],"t":[1,0,16,0],"f":3,"dam":4449,"af":88368,"viv":848,"u":"2020-12"},"200502":{"n":"alto","e":12,"y":[0,0,0,0,0,1,0,0,0,2,0,0,1,1,7,0,0,0],"t":[1,0,11,0],"f":0,"dam":1295,"af":5434,"viv":33,"u":"2017-07"},"200503":{"n":"medio","e":11,"y":[0,0,0,0,0,1,0,0,0,1,0,0,1,1,7,0,0,0],"t":[1,0,10,0],"f":0,"dam":620,"af":548,"viv":0,"u":"2017-06"},"200504":{"n":"muy-alto","e":16,"y":[0,0,0,0,0,1,0,0,0,5,0,0,2,1,5,1,0,1],"t":[1,0,14,1],"f":0,"dam":4673,"af":38933,"viv":52,"u":"2020-12"},"200505":{"n":"medio","e":12,"y":[0,0,0,0,0,1,0,0,0,3,1,0,3,0,3,0,0,1],"t":[0,0,12,0],"f":0,"dam":562,"af":6371,"viv":108,"u":"2020-12"},"200506":{"n":"medio","e":9,"y":[0,0,0,0,0,1,0,0,0,1,0,0,1,1,4,0,0,1],"t":[1,0,8,0],"f":0,"dam":323,"af":7690,"viv":10,"u":"2020-12"},"200507":{"n":"alto","e":12,"y":[0,0,0,0,0,1,0,0,1,2,0,0,1,1,5,1,0,0],"t":[2,0,10,0],"f":0,"dam":2112,"af":8663,"viv":222,"u":"2018-02"},"200601":{"n":"alto","e":15,"y":[0,0,0,0,0,2,0,0,0,2,0,0,1,1,6,2,1,0],"t":[1,0,14,0],"f":0,"dam":547,"af":5119,"viv":467,"u":"2019-02"},"200602":{"n":"medio","e":7,"y":[0,0,0,0,0,1,0,0,0,0,0,0,0,1,2,1,2,0],"t":[0,0,7,0],"f":1,"dam":324,"af":6337,"viv":80,"u":"2019-03"},"200603":{"n":"alto","e":9,"y":[0,0,0,0,0,1,0,0,0,1,0,0,0,1,6,0,0,0],"t":[0,0,9,0],"f":0,"dam":1500,"af":7400,"viv":280,"u":"2017-03"},"200604":{"n":"alto","e":20,"y":[0,0,0,0,0,2,0,0,0,0,2,0,5,0,3,0,7,1],"t":[3,0,17,0],"f":0,"dam":582,"af":10929,"viv":15,"u":"2020-03"},"200605":{"n":"medio","e":36,"y":[0,0,0,0,0,2,0,0,0,9,0,0,0,0,18,5,2,0],"t":[0,0,36,0],"f":1,"dam":0,"af":9574,"viv":141,"u":"2019-02"},"200606":{"n":"medio","e":5,"y":[0,0,0,0,0,1,0,0,0,0,0,0,0,0,4,0,0,0],"t":[0,0,5,0],"f":0,"dam":620,"af":3290,"viv":17,"u":"2017-02"},"200607":{"n":"medio","e":24,"y":[0,0,0,0,0,1,0,0,0,6,0,0,0,1,13,0,3,0],"t":[1,0,23,0],"f":0,"dam":223,"af":8206,"viv":55,"u":"2019-03"},"200608":{"n":"medio","e":6,"y":[0,0,0,0,0,0,0,0,0,0,0,0,0,1,4,0,1,0],"t":[0,0,6,0],"f":0,"dam":0,"af":8290,"viv":0,"u":"2019-02"},"200701":{"n":"muy-alto","e":9,"y":[0,0,0,0,0,1,0,0,0,1,0,0,0,1,6,0,0,0],"t":[0,0,9,0],"f":0,"dam":3150,"af":24450,"viv":4354,"u":"2017-03"},"200702":{"n":"bajo","e":6,"y":[0,0,0,0,0,0,0,0,0,1,0,0,0,0,3,0,2,0],"t":[1,0,5,0],"f":0,"dam":0,"af":130,"viv":0,"u":"2019-03"},"200703":{"n":"bajo","e":6,"y":[0,0,0,0,0,1,0,0,1,0,0,0,0,0,3,1,0,0],"t":[0,0,4,2],"f":0,"dam":116,"af":1350,"viv":10,"u":"2018-05"},"200704":{"n":"bajo","e":7,"y":[0,0,0,0,0,1,0,0,0,0,0,0,0,0,4,0,2,0],"t":[2,0,5,0],"f":0,"dam":245,"af":745,"viv":49,"u":"2019-03"},"200705":{"n":"medio","e":7,"y":[0,0,0,0,0,1,0,0,0,0,0,0,0,0,4,0,2,0],"t":[0,0,7,0],"f":0,"dam":46,"af":9934,"viv":2,"u":"2019-03"},"200706":{"n":"bajo","e":21,"y":[0,0,0,0,0,1,0,0,4,3,0,0,1,1,5,2,4,0],"t":[0,0,13,8],"f":0,"dam":5,"af":317,"viv":2,"u":"2019-12"},"200801":{"n":"muy-alto","e":20,"y":[0,0,0,2,1,1,0,0,4,3,0,0,0,1,6,0,2,0],"t":[2,0,14,4],"f":0,"dam":3555,"af":25141,"viv":337,"u":"2019-02"},"200802":{"n":"bajo","e":2,"y":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0],"t":[0,0,2,0],"f":0,"dam":114,"af":1973,"viv":29,"u":"2017-02"},"200803":{"n":"medio","e":12,"y":[0,0,0,2,0,1,0,0,0,1,0,0,0,0,2,0,5,1],"t":[3,0,9,0],"f":0,"dam":123,"af":3364,"viv":25,"u":"2020-02"},"200804":{"n":"alto","e":10,"y":[0,0,0,0,0,1,0,0,0,0,0,0,0,1,7,0,1,0],"t":[1,0,9,0],"f":0,"dam":2340,"af":7087,"viv":0,"u":"2019-02"},"200805":{"n":"alto","e":6,"y":[0,0,0,0,0,0,0,0,0,1,0,0,0,1,4,0,0,0],"t":[1,0,5,0],"f":0,"dam":1330,"af":4957,"viv":55,"u":"2017-03"},"200806":{"n":"bajo","e":3,"y":[0,0,0,0,0,0,0,0,0,0,0,0,0,1,2,0,0,0],"t":[0,0,3,0],"f":0,"dam":110,"af":2788,"viv":7,"u":"2017-02"},"240101":{"n":"muy-alto","e":162,"y":[4,2,2,2,1,21,8,20,1,40,9,0,15,12,13,2,7,3],"t":[25,0,132,5],"f":0,"dam":1240,"af":129999,"viv":160,"u":"2020-02"},"240102":{"n":"medio","e":48,"y":[0,0,0,1,0,1,1,9,0,4,1,0,6,9,11,0,5,0],"t":[12,0,36,0],"f":1,"dam":266,"af":10399,"viv":17,"u":"2019-04"},"240103":{"n":"alto","e":39,"y":[0,0,0,1,1,2,1,12,1,2,0,0,1,5,10,1,2,0],"t":[0,0,37,2],"f":1,"dam":683,"af":17504,"viv":15,"u":"2019-02"},"240104":{"n":"alto","e":49,"y":[1,0,0,1,0,1,3,7,2,2,1,2,1,3,15,0,8,2],"t":[5,0,44,0],"f":1,"dam":21,"af":24762,"viv":5,"u":"2020-03"},"240105":{"n":"alto","e":53,"y":[0,0,0,1,0,3,2,8,2,7,0,3,3,6,8,1,5,4],"t":[10,0,43,0],"f":0,"dam":112,"af":15515,"viv":33,"u":"2020-03"},"240106":{"n":"medio","e":31,"y":[0,0,0,1,0,1,0,0,0,1,0,1,3,2,13,1,8,0],"t":[6,0,25,0],"f":0,"dam":45,"af":11915,"viv":9,"u":"2019-04"},"240201":{"n":"medio","e":35,"y":[0,1,0,1,0,0,2,6,3,4,0,0,5,3,3,0,7,0],"t":[0,0,33,2],"f":0,"dam":74,"af":5782,"viv":4,"u":"2019-06"},"240202":{"n":"medio","e":52,"y":[0,0,1,3,1,4,10,11,0,9,2,0,1,4,6,0,0,0],"t":[1,0,51,0],"f":0,"dam":7,"af":11513,"viv":2,"u":"2017-03"},"240203":{"n":"medio","e":16,"y":[0,0,0,0,0,0,2,0,0,1,1,0,1,1,6,0,3,1],"t":[0,0,16,0],"f":0,"dam":36,"af":10071,"viv":7,"u":"2020-03"},"240301":{"n":"alto","e":46,"y":[1,0,0,3,0,6,3,3,1,2,0,1,4,4,9,0,3,6],"t":[0,0,46,0],"f":2,"dam":173,"af":13103,"viv":47,"u":"2020-12"},"240302":{"n":"alto","e":34,"y":[0,1,0,1,0,3,2,2,0,3,0,0,2,3,16,0,1,0],"t":[3,0,31,0],"f":3,"dam":274,"af":8303,"viv":232,"u":"2019-12"},"240303":{"n":"alto","e":37,"y":[0,0,0,1,0,1,6,1,0,3,0,0,3,5,8,2,6,1],"t":[3,0,34,0],"f":0,"dam":87,"af":15636,"viv":32,"u":"2020-02"},"240304":{"n":"medio","e":24,"y":[0,0,0,2,0,0,0,0,0,2,0,0,4,1,11,1,2,1],"t":[3,0,21,0],"f":1,"dam":136,"af":10499,"viv":10,"u":"2020-12"}};
+const PELIGROS=["Inundación","Huaico","Lluvias intensas"];
+const MESES_ES=["enero","febrero","marzo","abril","mayo","junio","julio","agosto","setiembre","octubre","noviembre","diciembre"];
+const mesAnio=u=>{if(!u)return "";const p=u.split("-");return MESES_ES[+p[1]-1]+" "+p[0];};
+function riesgoDeIndeci(x,donde){
+  const orden=x.t.slice(0,3).map((v,i)=>[v,i]).sort((a,b)=>b[0]-a[0]);
+  const pico=x.y.indexOf(Math.max(...x.y));
+  const texto="Entre 2003 y 2020 INDECI registró "+x.e+" emergencias por lluvias, huaicos, inundaciones y marejadas en "+donde+" ("+x.t[0]+" inundaciones, "+x.t[1]+" huaicos, "+x.t[2]+" lluvias intensas), con "+x.f+" fallecidos y "+x.dam.toLocaleString("es-PE")+" damnificados. El año con más casos fue "+(2003+pico)+" ("+x.y[pico]+")"+(x.u?"; la más reciente, en "+mesAnio(x.u):"")+".";
+  return {nivel:x.n,peligro:orden[0][0]>0?PELIGROS[orden[0][1]]:"no tengo ese dato",secundario:orden[1][0]>0?PELIGROS[orden[1][1]]:"",
+    historial:{texto,fuente:"INDECI - base de emergencias y daños 2003-2020",fecha:"datos hasta 2020"},
+    aviso:AV_GEN,escenario:{fuente:"INDECI 2003-2020 (nivel calculado por el prototipo)",fecha:"datos hasta 2020"},hist:x.y,tipos:x.t};
+}
+const RIESGO={},RIESGO_DEP={};
+Object.keys(IND_DIST).forEach(u=>{RIESGO[u]=riesgoDeIndeci(IND_DIST[u],"este distrito");});
+Object.keys(IND_DEP).forEach(c=>{RIESGO_DEP[c]=riesgoDeIndeci(IND_DEP[c],"este departamento");});
 
 /* Datos leídos a mano el 23-oct-2026. Reemplazar por conectores (ENFEN, SENAMHI). */
 const ENFEN_ESTADO={estado:"Alerta de El Niño costero",comunicado:"Comunicado Oficial ENFEN N° 18-2026",fecha:"16 oct 2026",
@@ -558,12 +532,12 @@ function renderDots(target){
   if(!S.dep){
     Object.keys(GEO_DEP).forEach(c=>{const n=nivelDep(c);if(ORD[n]>=3)items.push([c,GEO_DEP[c].d,n,depName(c),()=>pickDep(c)]);});
   }else{
-    const dd=Object.keys(RIESGO).filter(u=>GEO_DIST[u]&&u.slice(0,2)===S.dep&&(!S.prov||GEO_DIST[u].p===S.prov));
+    const dd=Object.keys(RIESGO).filter(u=>GEO_DIST[u]&&u.slice(0,2)===S.dep&&(!S.prov||GEO_DIST[u].p===S.prov)&&ORD[nivelDist(u)]>=(S.prov?2:3));
     if(dd.length)dd.forEach(u=>items.push([u,GEO_DIST[u].d,nivelDist(u),GEO_DIST[u].n,()=>irALugar({tipo:"dist",u})]));
     else if(RIESGO_DEP[S.dep])items.push([S.dep,GEO_DEP[S.dep].d,nivelDep(S.dep),depName(S.dep),()=>pickDep(S.dep)]);
   }
   const orden=items.slice().sort((a,b)=>ORD[b[2]]-ORD[a[2]]).map(x=>x[0]);
-  const conEtiqueta=S.dep?orden:orden.slice(0,3);
+  const conEtiqueta=orden.slice(0,S.prov?8:(S.dep?6:3));
   items.forEach(([id,d,n,name,fn])=>{if(!n)return;const [x,y]=centro(d);addDot(x,y,n,r,name,fn,conEtiqueta.includes(id),fs);});
 }
 /* ============ PRONÓSTICO EN VIVO (Open-Meteo, por horas) + SEMÁFORO ============ */
@@ -618,7 +592,7 @@ function syncModes(){
     b.setAttribute("aria-pressed",String(b.dataset.m===LIVE.modo));
     if(b.dataset.m==="vivo")b.disabled=!LIVE.ok;
   });
-  const lg=$("lg");if(lg)lg.textContent=modoVivo()?"Colores: lluvia prevista en las próximas 72 h (Open-Meteo). Criterio del prototipo, no reemplaza los avisos de SENAMHI.":"Colores: nivel de riesgo de la zona (datos de ejemplo).";
+  const lg=$("lg");if(lg)lg.textContent=modoVivo()?"Colores: lluvia prevista en las próximas 72 h (Open-Meteo). Criterio del prototipo, no reemplaza los avisos de SENAMHI.":"Colores: riesgo histórico de la zona (INDECI 2003-2020).";
 }
 function semItems(){
   const base=c=>RIESGO_DEP[c]?RIESGO_DEP[c].nivel:"bajo";
@@ -642,7 +616,8 @@ function renderSem(){
   badge.innerHTML=LIVE.ok?'<i class="live"></i>EN VIVO':'EJEMPLO';
   $("semNote").textContent=LIVE.ok?"Pronóstico por horas · Open-Meteo · actualizado "+hora()+". Criterio del prototipo; no reemplaza los avisos de SENAMHI.":"Sin conexión al pronóstico: se muestran niveles de ejemplo.";
   list.innerHTML="";
-  it.forEach((x,i)=>{
+  if(SEMTAB!=="zonas")pintarAmbiente(list);
+  else it.forEach((x,i)=>{
     const b=document.createElement("button");b.type="button";b.className="srow lv-"+x.nivel;b.style.animationDelay=(i*35)+"ms";
     const m=x.live;
     const sub=x.sub+(m?" · "+m.sum24.toFixed(1)+" mm en 24 h · prob. "+Math.round(m.prob24)+"%":"");
@@ -665,6 +640,98 @@ document.querySelectorAll("#modes button").forEach(b=>b.addEventListener("click"
   if(b.dataset.m==="vivo"&&!LIVE.ok){toast("Sin conexión al pronóstico en vivo.");return;}
   LIVE.modo=b.dataset.m;syncModes();render();
 }));
+/* ============ MAR Y RÍOS EN VIVO (Open-Meteo Marine, ERA5 y GloFAS) ============ */
+const MAR_PTS=[["Tumbes",-3.6,-80.9],["Piura (Paita)",-5.1,-81.3],["Lambayeque",-6.9,-80.9],["Lima",-12.1,-77.4]];
+const RIO_PTS=[["Río Tumbes",-3.57,-80.46],["Río Chira",-4.9,-80.68],["Río Piura",-5.19,-80.63],["Río La Leche",-6.45,-79.88],["Río Jequetepeque",-7.25,-79.47]];
+const MAR={ok:false,datos:[]},RIOS={ok:false,datos:[]};
+let SEMTAB="zonas";
+const pad2=n=>String(n).padStart(2,"0");
+const isoDia=d=>d.getUTCFullYear()+"-"+pad2(d.getUTCMonth()+1)+"-"+pad2(d.getUTCDate());
+const promedio=a=>{const v=a.filter(x=>x!=null);return v.length?v.reduce((x,y)=>x+y,0)/v.length:null;};
+async function getJSON(u){const r=await fetch(u);if(!r.ok)throw new Error("HTTP "+r.status);return r.json();}
+async function climatologiaMar(mmdd){
+  const key="clim_mar_"+mmdd;
+  try{const c=JSON.parse(localStorage.getItem(key)||"null");if(c&&c.length===MAR_PTS.length)return c;}catch(e){}
+  const la=MAR_PTS.map(p=>p[1]).join(","),lo=MAR_PTS.map(p=>p[2]).join(",");
+  const años=[2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013];
+  const resp=await Promise.all(años.map(y=>getJSON("https://archive-api.open-meteo.com/v1/archive?latitude="+la+"&longitude="+lo+"&start_date="+y+"-"+mmdd+"&end_date="+y+"-"+mmdd+"&hourly=sea_surface_temperature&timezone=America%2FLima").catch(()=>null)));
+  const clim=MAR_PTS.map((_,i)=>promedio(resp.map(r=>r?promedio((Array.isArray(r)?r[i]:r).hourly.sea_surface_temperature):null)));
+  try{localStorage.setItem(key,JSON.stringify(clim));}catch(e){}
+  return clim;
+}
+async function cargarMar(){
+  try{
+    const la=MAR_PTS.map(p=>p[1]).join(","),lo=MAR_PTS.map(p=>p[2]).join(",");
+    const f=await getJSON("https://marine-api.open-meteo.com/v1/marine?latitude="+la+"&longitude="+lo+"&hourly=sea_surface_temperature,wave_height,sea_level_height_msl&forecast_days=2&timezone=America%2FLima");
+    const ref=new Date(Date.now()-5*3600e3-6*864e5),diaRef=isoDia(ref);
+    let clim=MAR_PTS.map(()=>null),actual=MAR_PTS.map(()=>null);
+    try{
+      clim=await climatologiaMar(diaRef.slice(5));
+      const a=await getJSON("https://archive-api.open-meteo.com/v1/archive?latitude="+la+"&longitude="+lo+"&start_date="+diaRef+"&end_date="+diaRef+"&hourly=sea_surface_temperature&timezone=America%2FLima");
+      actual=MAR_PTS.map((_,i)=>promedio((Array.isArray(a)?a[i]:a).hourly.sea_surface_temperature));
+    }catch(e){console.warn("anomalía del mar",e);}
+    const arr=Array.isArray(f)?f:[f];
+    MAR.datos=arr.map((p,i)=>{
+      const h=p.hourly,ok=a=>a.filter(v=>v!=null);
+      const sst=ok(h.sea_surface_temperature)[0],olas=ok(h.wave_height),marea=ok(h.sea_level_height_msl);
+      const anom=actual[i]!=null&&clim[i]!=null?actual[i]-clim[i]:null;
+      return {nombre:MAR_PTS[i][0],sst:sst==null?null:sst,anom,diaRef,olaMax:olas.length?Math.max(...olas):null,mareaMin:marea.length?Math.min(...marea):null,mareaMax:marea.length?Math.max(...marea):null,
+        nivel:anom==null?"bajo":anom>=3?"muy-alto":anom>=2?"alto":anom>=1?"medio":"bajo"};
+    });
+    MAR.ok=true;
+  }catch(e){console.warn("mar",e);MAR.ok=false;}
+}
+async function cargarRios(){
+  try{
+    const la=RIO_PTS.map(p=>p[1]).join(","),lo=RIO_PTS.map(p=>p[2]).join(",");
+    const j=await getJSON("https://flood-api.open-meteo.com/v1/flood?latitude="+la+"&longitude="+lo+"&daily=river_discharge,river_discharge_max&past_days=30&forecast_days=7");
+    const arr=Array.isArray(j)?j:[j];
+    RIOS.datos=arr.map((p,i)=>{
+      const q=p.daily.river_discharge.map(v=>v||0),mx=p.daily.river_discharge_max.map(v=>v||0);
+      const prom30=promedio(q.slice(0,30))||0,max7=Math.max(0,...mx.slice(30)),hoy=q[30]||0;
+      const ratio=max7/Math.max(prom30,0.5);
+      return {nombre:RIO_PTS[i][0],hoy,max7,prom30,ratio,serie:q,
+        nivel:max7<1?"bajo":ratio>=3?"muy-alto":ratio>=2?"alto":ratio>=1.3?"medio":"bajo"};
+    });
+    RIOS.ok=true;
+  }catch(e){console.warn("ríos",e);RIOS.ok=false;}
+}
+async function cargarAmbiente(){await Promise.all([cargarMar(),cargarRios()]);renderSem();}
+const sgn=v=>(v>=0?"+":"−")+Math.abs(v).toFixed(1);
+function sparkN(a,esc2){
+  const mx=Math.max(...a,0.0001),w=120/a.length;
+  return '<svg viewBox="0 0 120 20" aria-hidden="true">'+a.map((v,i)=>{const hh=Math.max(1,v/mx*20);return '<rect x="'+(i*w).toFixed(1)+'" y="'+(20-hh).toFixed(1)+'" width="'+(w*0.8).toFixed(1)+'" height="'+hh.toFixed(1)+'" rx="1"'+(i>=30?' opacity="1"':' opacity=".55"')+'/>';}).join("")+'</svg>';
+}
+function pintarAmbiente(list){
+  const esMar=SEMTAB==="mar",src=esMar?MAR:RIOS;
+  if(!src.ok){list.innerHTML='<p class="note">Sin conexión a los datos de '+(esMar?"mar":"ríos")+'. Se mostrarán cuando haya conexión.</p>';$("semNote").textContent="";return;}
+  $("semNote").textContent=esMar
+    ?"Mar: temperatura y oleaje de Open-Meteo Marine. Anomalía: ERA5 de hace unos 5 días contra el promedio 2003-2013 del mismo día. Criterio del prototipo."
+    :"Ríos: caudal previsto a 7 días contra el promedio de los últimos 30 días (GloFAS vía Open-Meteo). Criterio del prototipo.";
+  src.datos.forEach((x,i)=>{
+    const b=document.createElement("div");b.className="srow lv-"+x.nivel;b.style.animationDelay=(i*35)+"ms";
+    let sub,extra;
+    if(esMar){
+      sub=(x.sst!=null?"Mar a "+x.sst.toFixed(1)+" °C":"Sin dato de temperatura")+(x.anom!=null?" · "+sgn(x.anom)+" °C sobre lo normal":"")+(x.olaMax!=null?" · olas hasta "+x.olaMax.toFixed(1)+" m":"")+(x.mareaMin!=null?" · marea "+x.mareaMin.toFixed(2)+" a "+x.mareaMax.toFixed(2)+" m":"");
+      extra=x.anom==null?"Sin anomalía disponible":x.anom>=2?"Mar mucho más cálido que lo normal":x.anom>=1?"Mar más cálido que lo normal":"Mar dentro de lo normal";
+    }else{
+      sub="Hoy "+x.hoy.toFixed(1)+" m³/s · máximo en 7 días "+x.max7.toFixed(1)+" m³/s · promedio 30 días "+x.prom30.toFixed(1)+" m³/s";
+      extra=x.max7<1?"Caudal bajo":x.ratio>=2?"Crecida prevista":x.ratio>=1.3?"Caudal subiendo":"Caudal estable";
+    }
+    b.innerHTML='<span class="sdot"></span><span class="sname"><b></b><small></small></span><span class="spill"></span><span class="sextra">'+(esMar?"":sparkN(x.serie))+'<span></span></span>';
+    b.querySelector("b").textContent=x.nombre;b.querySelector("small").textContent=sub;b.querySelector(".spill").textContent=PILL[x.nivel];b.querySelector(".sextra span").textContent=extra;
+    list.appendChild(b);
+  });
+}
+document.querySelectorAll("#stabs button").forEach(b=>b.addEventListener("click",()=>{
+  SEMTAB=b.dataset.t;document.querySelectorAll("#stabs button").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));renderSem();
+}));
+function histSvg(y){
+  const mx=Math.max(1,...y);
+  return '<svg viewBox="0 0 288 74" class="hist" role="img" aria-label="Emergencias por año, 2003 a 2020">'+
+    y.map((v,i)=>{const h=Math.round(v/mx*50),c=(2003+i===2017)?'var(--r-muy)':'var(--accent)';return '<rect x="'+(i*16+2)+'" y="'+(56-Math.max(h,v?2:0))+'" width="12" height="'+Math.max(h,v?2:0)+'" rx="2" fill="'+c+'"><title>'+(2003+i)+': '+v+'</title></rect>';}).join("")+
+    [0,7,14,17].map(i=>'<text x="'+(i*16+8)+'" y="70" text-anchor="middle" font-size="9" fill="currentColor">'+(2003+i)+'</text>').join("")+'</svg>';
+}
 function renderCrumbs(){
   const parts=[["Perú",()=>{S.dep=S.prov=S.dist=S.riesgo=null;selDep.value="";resetSel(selProv,"Elige departamento primero");resetSel(selDist,"Elige provincia primero");hideRisk();$("tip").textContent="Pasa el dedo o el mouse sobre el mapa";render();}]];
   if(S.dep)parts.push([depName(S.dep),()=>{const d=S.dep;S.prov=S.dist=S.riesgo=null;pickDep(d);}]);
@@ -681,7 +748,7 @@ function ofrecerGeneral(msg){
   $("riskArea").hidden=false;
   $("riskArea").innerHTML='<div class="fact"><b>Aviso</b>'+esc(msg)+'</div>'+
     '<div class="row" style="margin-top:12px"><button class="btn" id="goGen" type="button">Continuar con un plan general de '+esc(depName(S.dep))+'</button></div>'+
-    '<p class="note" style="margin-top:10px">O prueba con una zona que tiene datos de ejemplo:</p>'+
+    '<p class="note" style="margin-top:10px">O prueba con una zona que tiene detalle por distrito:</p>'+
     '<div class="opts" style="margin-top:6px"><button class="opt" type="button" data-d="24">Tumbes</button><button class="opt" type="button" data-d="20">Piura</button><button class="opt" type="button" data-d="14">Lambayeque</button></div>';
   $("goGen").onclick=()=>{S.riesgo=riesgoGeneral();renderRisk();$("to2").disabled=false;$("to2").scrollIntoView({behavior:"smooth",block:"center"});};
   $("riskArea").querySelectorAll("[data-d]").forEach(b=>b.onclick=()=>{pickDep(b.dataset.d);$("map").scrollIntoView({behavior:"smooth",block:"center"});});
@@ -775,7 +842,7 @@ svg.addEventListener("mouseleave",()=>$("tip").textContent=S.dep?"Seleccionado: 
 
 function renderRisk(){
   const r=S.riesgo;
-  if(!r){ofrecerGeneral("No tengo ese dato: "+distName()+" aún no tiene datos de ejemplo. Puedes seguir con un plan general o elegir otro lugar.");$("riskFull").innerHTML="";return;}
+  if(!r){ofrecerGeneral("No tengo ese dato: "+distName()+" aún no tiene datos. Puedes seguir con un plan general o elegir otro lugar.");$("riskFull").innerHTML="";return;}
   if(r.general){
     const g='<div class="risk sin-dato"><div class="lvl">Plan general de '+esc(distName())+'</div><div>No tengo datos de riesgo de esta zona. Te daremos recomendaciones generales y dónde confirmar con las autoridades.</div></div>';
     $("riskArea").innerHTML=g;$("riskFull").innerHTML=g;return;
@@ -795,7 +862,7 @@ function renderRisk(){
   </div>`;
   const facts=`
   <div class="facts" style="margin-top:12px">
-    <div class="fact"><b>Historial de emergencias</b>${esc(r.historial.texto)}<span class="src">${esc(r.historial.fuente)} · ${esc(r.historial.fecha)}</span></div>
+    <div class="fact"><b>Historial de emergencias</b>${esc(r.historial.texto)}${r.hist?'<div class="histbox">'+histSvg(r.hist)+'</div><span class="src">Barra roja: 2017, año del Niño costero.</span>':""}<span class="src">${esc(r.historial.fuente)} · ${esc(r.historial.fecha)}</span></div>
     <div class="fact"><b>Aviso del tiempo</b>${esc(r.aviso.texto)}<span class="src">${esc(r.aviso.fuente)} · ${esc(r.aviso.fecha)}</span></div>
     <div class="fact"><b>Estado de El Niño</b>${esc(r.enfen.valor)}<span class="src">${esc(r.enfen.fuente)} · ${esc(r.enfen.fecha)}</span></div>
   </div>`;
@@ -828,7 +895,7 @@ const SYSTEM=`Eres un asistente de gestión de riesgo de desastres para familias
 REGLAS ESTRICTAS:
 1. Usa SOLO los datos de riesgo y el perfil de familia que recibes. No inventes cifras, fechas, teléfonos ni lugares.
 2. Cada dato de riesgo que menciones debe citar su fuente y fecha tal como vienen en los datos. Si un dato falta, escribe "no tengo ese dato".
-3. Los datos son de ejemplo de un prototipo: dilo en "fuentes".
+3. Los datos vienen de un prototipo (INDECI 2003-2020, Open-Meteo y un resumen de ENFEN): cítalos con su fuente en "fuentes".
 4. Ante una alerta urgente o emergencia, remite a INDECI (llamar al 119) y a los canales oficiales (Defensa Civil local, COER/COEN). No inventes otros números.
 5. No des puntos de reunión ni rutas concretas con nombres de calles: indica cómo elegirlos y practicarlos con la familia.
 6. Responde SOLO con un JSON válido, sin texto extra ni markdown, con esta forma exacta:
@@ -929,7 +996,7 @@ function renderPlan(){
   </div>
   <div class="pc" style="margin-top:14px"><h3>De dónde salen los datos</h3>
     <ul>${(p.fuentes||[]).map(f=>`<li>${esc(f.dato)}: ${esc(f.fuente)} (${esc(f.fecha)})</li>`).join("")||"<li>No tengo ese dato.</li>"}</ul>
-    <p class="note">Datos de ejemplo del prototipo. Confirma siempre con INDECI (119) y tu municipalidad.</p></div>
+    <p class="note">Datos del prototipo (INDECI 2003-2020, Open-Meteo, ENFEN). Confirma siempre con INDECI (119) y tu municipalidad.</p></div>
   <div class="row" style="margin-top:14px">
     <button class="btn wa" id="bWa">Compartir por WhatsApp</button>
     <button class="btn alt" id="bLink">Copiar enlace</button>
@@ -949,7 +1016,7 @@ function enlace(){try{return location.href.split("#")[0];}catch(e){return "";}}
 function resumenTexto(){
   const p=S.plan,r=S.riesgo;
   const L=(t,a)=>`*${t}*\n`+(a||[]).slice(0,3).map(x=>"• "+x).join("\n");
-  return `*Plan familiar ante El Niño – ${distName()}* (${NIV[r.nivel][0]}, ${r.peligro})\n\n${L("Antes",p.antes)}\n\n${L("Durante",p.durante)}\n\n${L("Después",p.despues)}\n\n*Emergencias:* INDECI 119\n_Datos de ejemplo del prototipo._\nHaz tu plan: ${enlace()}`;
+  return `*Plan familiar ante El Niño – ${distName()}* (${NIV[r.nivel][0]}, ${r.peligro})\n\n${L("Antes",p.antes)}\n\n${L("Durante",p.durante)}\n\n${L("Después",p.despues)}\n\n*Emergencias:* INDECI 119\n_Datos del prototipo: INDECI 2003-2020 y Open-Meteo._\nHaz tu plan: ${enlace()}`;
 }
 async function copiar(t,msg){
   try{await navigator.clipboard.writeText(t);toast(msg);}
@@ -978,12 +1045,12 @@ document.querySelectorAll(".tabs button").forEach(b=>b.addEventListener("click",
 
 /* ============ AGENTE DE CHAT ============ */
 const CHAT_RULES=`Eres el asistente de una familia peruana ante El Niño. Español simple, cercano y tranquilizador, máximo 70 palabras por respuesta.
-REGLAS: 1) Responde SOLO con los DATOS que recibes; no inventes cifras, fechas, lugares ni teléfonos. 2) Cuando uses un dato, menciona entre paréntesis su fuente y fecha. 3) Si falta información, di "no tengo ese dato" y sugiere confirmarlo con su municipalidad o INDECI. 4) Si hay peligro inmediato o emergencia, indica llamar a INDECI (119) y seguir a las autoridades. 5) Los datos son de ejemplo de un prototipo: recuérdalo si preguntan por exactitud. 6) Si la pregunta no es sobre riesgo, prevención o el plan familiar, di amablemente que solo puedes ayudar con eso. Sin markdown, solo texto.`;
+REGLAS: 1) Responde SOLO con los DATOS que recibes; no inventes cifras, fechas, lugares ni teléfonos. 2) Cuando uses un dato, menciona entre paréntesis su fuente y fecha. 3) Si falta información, di "no tengo ese dato" y sugiere confirmarlo con su municipalidad o INDECI. 4) Si hay peligro inmediato o emergencia, indica llamar a INDECI (119) y seguir a las autoridades. 5) Los datos son de un prototipo (INDECI 2003-2020, Open-Meteo, resumen de ENFEN): recuérdalo si preguntan por exactitud. 6) Si la pregunta no es sobre riesgo, prevención o el plan familiar, di amablemente que solo puedes ayudar con eso. Sin markdown, solo texto.`;
 const CH={hist:[],busy:false};
 function chatDatos(){
   const r=S.riesgo;
   return {distrito:r?{nombre:distName(),provincia:provName(S.prov),departamento:depName(S.dep),nivel:r.nivel,peligro_principal:r.peligro,peligro_secundario:r.secundario||"no tengo ese dato",historial:r.historial,aviso:r.aviso,escenario:r.escenario}:"el usuario aún no eligió distrito",
-    familia:S.perfil,estado_el_nino:ENFEN_ESTADO,avisos_senamhi:AVISOS_SENAMHI,plan_generado:S.plan||"aún no generado",pronostico_en_vivo:(()=>{const m=liveDe(S.dist||S.dep||"");return m?{fuente:"Open-Meteo (modelos), actualizado "+hora(),lluvia_mm_24h:+m.sum24.toFixed(1),lluvia_mm_72h:+m.sum72.toFixed(1),prob_max_24h:m.prob24,intensidad_max_mm_h:+m.max.toFixed(1),cuando:cuando(m),nivel_prototipo:PILL[m.nivel]}:"no tengo ese dato";})()};
+    familia:S.perfil,estado_el_nino:ENFEN_ESTADO,avisos_senamhi:AVISOS_SENAMHI,plan_generado:S.plan||"aún no generado",mar:MAR.ok?MAR.datos.map(x=>({punto:x.nombre,temperatura_c:x.sst,anomalia_c:x.anom,olas_max_m:x.olaMax})):"no tengo ese dato",rios:RIOS.ok?RIOS.datos.map(x=>({rio:x.nombre,caudal_hoy_m3s:+x.hoy.toFixed(1),maximo_7_dias_m3s:+x.max7.toFixed(1),promedio_30_dias_m3s:+x.prom30.toFixed(1)})):"no tengo ese dato",pronostico_en_vivo:(()=>{const m=liveDe(S.dist||S.dep||"");return m?{fuente:"Open-Meteo (modelos), actualizado "+hora(),lluvia_mm_24h:+m.sum24.toFixed(1),lluvia_mm_72h:+m.sum72.toFixed(1),prob_max_24h:m.prob24,intensidad_max_mm_h:+m.max.toFixed(1),cuando:cuando(m),nivel_prototipo:PILL[m.nivel]}:"no tengo ese dato";})()};
 }
 function chatInput(){
   const first=CHAT_RULES+"\n\nDATOS (única fuente permitida):\n"+JSON.stringify(chatDatos());
@@ -1064,8 +1131,10 @@ function agentNotify(){
   if(!S.riesgo)return;
   const key=(S.dist||S.dep)+"|"+S.riesgo.nivel;
   if(CH.last===key)return;CH.last=key;
-  agentSay(resumenLugar());if(DESK.matches&&!S.plan)askNext();else chatChips();
-  $("shS").textContent="Datos de "+distName()+" · ejemplo del prototipo";
+  agentSay(resumenLugar());
+  if(S.riesgo.hist){const gm=agentSay("");gm.classList.add("wide");gm.innerHTML='<div class="pc"><b>Emergencias por año (INDECI 2003-2020)</b><div class="histbox">'+histSvg(S.riesgo.hist)+'</div><p class="note">Barra roja: 2017, año del Niño costero.</p></div>';}
+  if(DESK.matches&&!S.plan)askNext();else chatChips();
+  $("shS").textContent="Datos de "+distName()+" · INDECI y pronóstico en vivo";
 }
 const LUGARES=[["Tumbes","240101"],["Zarumilla","240301"],["Piura","200101"],["Catacaos","200105"],["Sullana","200601"],["Chiclayo","140101"],["Lambayeque","140301"]];
 function chatChips(){
@@ -1149,6 +1218,6 @@ $("fab").onclick=chatOpen;
 $("shX").onclick=()=>{$("sheet").hidden=true;$("fab").hidden=false;};
 $("cf").addEventListener("submit",e=>{e.preventDefault();chatSend($("cin").value);});
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("sheet").hidden)$("shX").click();});
-renderBanner();placeMap();chatInit();setStep(1);cargarVivo();setInterval(cargarVivo,900000);
+renderBanner();placeMap();chatInit();setStep(1);cargarVivo();setInterval(cargarVivo,900000);cargarAmbiente();setInterval(cargarAmbiente,1800000);
 try{if(navigator.permissions)navigator.permissions.query({name:"geolocation"}).then(p=>{if(p.state==="granted")ubicar();});}catch(e){}
 </script>
