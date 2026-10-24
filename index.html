@@ -1465,8 +1465,8 @@ async function overpass(q){
 }
 async function geocodificar(q){
   const c=new AbortController();const to=setTimeout(()=>c.abort(),9000);
-  const r=await fetch("https://nominatim.openstreetmap.org/search?q="+encodeURIComponent(q)+"&countrycodes=pe&format=json&limit=1&accept-language=es",{signal:c.signal});clearTimeout(to);
-  const j=await r.json();return j.length?{lat:+j[0].lat,lon:+j[0].lon,nombre:j[0].display_name.split(",").slice(0,2).join(",").trim()}:null;
+  const r=await fetch("https://nominatim.openstreetmap.org/search?q="+encodeURIComponent(q)+"&countrycodes=pe&format=json&limit=5&featureType=settlement&accept-language=es",{signal:c.signal});clearTimeout(to);
+  const j=await r.json();const p=j.find(x=>x.type!=="administrative")||j[0];return p?{lat:+p.lat,lon:+p.lon,nombre:p.display_name.split(",").slice(0,2).join(",").trim()}:null;
 }
 function consultaLugar(){
   if(S.dist&&GEO_DIST[S.dist])return distName()+", "+provName(S.prov)+", "+depName(S.dep)+", Perú";
