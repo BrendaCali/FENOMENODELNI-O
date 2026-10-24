@@ -71,6 +71,7 @@ select:disabled{opacity:.5}
 .risk.medio{background:var(--r-medio);color:var(--r-medio-ink)}
 .risk.alto{background:var(--r-alto);color:var(--r-alto-ink)}
 .risk.muy-alto{background:var(--r-muy);color:var(--r-muy-ink)}
+.risk.sin-dato{background:var(--tile);color:var(--ink);border:2px dashed var(--muted)}
 .risk .lvl{font:800 28px var(--f-display)}
 .meter{display:flex;gap:5px}
 .meter i{flex:1;height:10px;border-radius:5px;background:currentColor;opacity:.25}
@@ -238,6 +239,13 @@ const AVISOS_SENAMHI={zona:"Costa Norte",leido:"23 oct 2026",fuente:"SENAMHI - a
   filas:[["Lluvias",["rojo","rojo","rojo"],"Aviso 432"],["Viento",["rojo",null,null],"Aviso 427 (hasta el 23)"],["Calor del día",["rojo","rojo","rojo"],"Aviso 431"]]};
 async function getContextoHoy(){return {enfen:ENFEN_ESTADO,avisos:AVISOS_SENAMHI};}
 
+/* Plan general cuando una zona no tiene datos: no se inventa nivel ni peligro. */
+function riesgoGeneral(){
+  const nd={texto:"No tengo ese dato",fuente:"sin fuente cargada",fecha:"—"};
+  return {general:true,nivel:"sin-dato",peligro:"no tengo ese dato",secundario:"",historial:nd,aviso:nd,
+    escenario:{fuente:"sin fuente cargada",fecha:"—"},enfen:ENFEN};
+}
+
 /* Punto único para conectar las fuentes reales (ENFEN, CENEPRED, INDECI, SENAMHI). */
 async function getRiesgoPorUbigeo(ubigeo){
   const d = RIESGO[ubigeo];
@@ -249,7 +257,7 @@ async function getRiesgoPorUbigeo(ubigeo){
 const S = {dep:null,prov:null,dist:null,riesgo:null,perfil:{personas:null,ninos:null,mayores:null,disc:null,mascotas:null,rio:null},plan:null};
 const $ = id=>document.getElementById(id);
 const esc = s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const NIV = {"bajo":["Riesgo bajo",1],"medio":["Riesgo medio",2],"alto":["Riesgo alto",3],"muy-alto":["Riesgo muy alto",4]};
+const NIV = {"sin-dato":["Sin datos de la zona",0],"bajo":["Riesgo bajo",1],"medio":["Riesgo medio",2],"alto":["Riesgo alto",3],"muy-alto":["Riesgo muy alto",4]};
 
 function setStep(n){
   document.querySelectorAll("#steps li").forEach(li=>{const s=+li.dataset.s;li.className=s===n?"on":s<n?"done":"";});
@@ -262,7 +270,7 @@ function toast(t){const e=$("toast");e.textContent=t;e.hidden=false;clearTimeout
 const svg=$("map"),NS="http://www.w3.org/2000/svg";
 const depName=c=>GEO_DEP[c]?GEO_DEP[c].n:"";
 const provName=k=>GEO_PROV[k]?GEO_PROV[k].n:"";
-const distName=()=>S.dist&&GEO_DIST[S.dist]?GEO_DIST[S.dist].n:"";
+const distName=()=>S.dist&&GEO_DIST[S.dist]?GEO_DIST[S.dist].n:(S.dep?depName(S.dep):"");
 const provsOf=dep=>Object.keys(GEO_PROV).filter(k=>k.startsWith(dep));
 const distsOf=prov=>Object.keys(GEO_DIST).filter(k=>GEO_DIST[k].p===prov);
 const distHas=u=>!!RIESGO[u];
@@ -336,6 +344,15 @@ function renderCrumbs(){
     else{const s=document.createElement("b");s.textContent=t;c.appendChild(s);}
   });
 }
+function ofrecerGeneral(msg){
+  $("riskArea").hidden=false;
+  $("riskArea").innerHTML='<div class="fact"><b>Aviso</b>'+esc(msg)+'</div>'+
+    '<div class="row" style="margin-top:12px"><button class="btn" id="goGen" type="button">Continuar con un plan general de '+esc(depName(S.dep))+'</button></div>'+
+    '<p class="note" style="margin-top:10px">O prueba con una zona que tiene datos de ejemplo:</p>'+
+    '<div class="opts" style="margin-top:6px"><button class="opt" type="button" data-d="24">Tumbes</button><button class="opt" type="button" data-d="20">Piura</button><button class="opt" type="button" data-d="14">Lambayeque</button></div>';
+  $("goGen").onclick=()=>{S.riesgo=riesgoGeneral();renderRisk();$("to2").disabled=false;$("to2").scrollIntoView({behavior:"smooth",block:"center"});};
+  $("riskArea").querySelectorAll("[data-d]").forEach(b=>b.onclick=()=>{pickDep(b.dataset.d);$("map").scrollIntoView({behavior:"smooth",block:"center"});});
+}
 function hideRisk(){$("riskArea").hidden=true;$("to2").disabled=true;}
 function resetSel(sel,txt){sel.innerHTML=`<option value="">${esc(txt)}</option>`;sel.disabled=true;}
 
@@ -350,8 +367,7 @@ function pickDep(cod){
   resetSel(selDist,"Elige provincia primero");
   if(!depHas(cod)){
     resetSel(selProv,"Sin datos de ejemplo todavía");
-    $("riskArea").hidden=false;
-    $("riskArea").innerHTML=`<div class="fact"><b>Aviso</b>Aún no tengo datos de ${esc(depName(cod))} en este prototipo. Prueba con Tumbes, Piura o Lambayeque.</div>`;
+    ofrecerGeneral("Aún no tengo datos de riesgo de "+depName(cod)+" en este prototipo. Puedes seguir con un plan general o probar con una zona que sí tiene datos.");
   }else{
     selProv.innerHTML='<option value="">Elige provincia</option>'+provsOf(cod).map(k=>`<option value="${k}">${esc(provName(k))}${provHas(k)?"":" (sin datos aún)"}</option>`).join("");
     selProv.disabled=false;
@@ -383,11 +399,15 @@ svg.addEventListener("mouseleave",()=>$("tip").textContent=S.dep?"Seleccionado: 
 
 function renderRisk(){
   const r=S.riesgo;
-  if(!r){$("riskArea").innerHTML='<div class="fact"><b>Aviso</b>No tengo ese dato: este distrito aún no tiene datos de ejemplo. Prueba con uno de los distritos de color en el mapa.</div>';return;}
+  if(!r){ofrecerGeneral("No tengo ese dato: "+distName()+" aún no tiene datos de ejemplo. Puedes seguir con un plan general o elegir un distrito de color en el mapa.");return;}
+  if(r.general){
+    $("riskArea").innerHTML='<div class="risk sin-dato"><div class="lvl">Plan general de '+esc(distName())+'</div><div>No tengo datos de riesgo de esta zona. Te daremos recomendaciones generales y dónde confirmar con las autoridades.</div></div>';
+    return;
+  }
   const [lbl,n]=NIV[r.nivel];
   $("riskArea").innerHTML=`
   <div class="risk ${r.nivel}">
-    <div><small style="font-weight:700;letter-spacing:.06em;text-transform:uppercase">${esc(distName())} · ${esc(provName(S.prov))}</small></div>
+    <div><small style="font-weight:700;letter-spacing:.06em;text-transform:uppercase">${esc(distName())}${S.prov?" · "+esc(provName(S.prov)):""}</small></div>
     <div class="lvl">${lbl}</div>
     <div class="meter" aria-hidden="true">${[1,2,3,4].map(i=>`<i class="${i<=n?"on":""}"></i>`).join("")}</div>
     <div><b>Peligro principal:</b> ${esc(r.peligro)}${r.secundario?` · también: ${esc(r.secundario)}`:""}</div>
