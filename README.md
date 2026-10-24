@@ -55,3 +55,14 @@ Reglas del agente (ya escritas en el prompt, conviene mantenerlas): responder so
 - INDECI: base de emergencias y daños 2003-2020 (Excel).
 - SENAMHI: avisos meteorológicos (página HTML) y observatorio.
 - INEI: ubigeo.
+
+## Noticias automáticas (opcional)
+La sección Noticias muestra una lista de notas reales con enlace al medio. Para recibirlas automáticamente:
+1. Publica `worker/noticias.js` como Cloudflare Worker (convierte Google Noticias en JSON con CORS).
+2. Antes del script principal, define `window.NEWS_ENDPOINT = "https://TU-WORKER.workers.dev";`
+   o bien `window.INTEGRACIONES.noticias = async ({filtro, lugar}) => [{t, url, fecha, fuente}]`.
+
+## Datos reales que ya usa
+- Riesgo histórico: base de emergencias y daños de INDECI 2003-2020 (nivel calculado por el prototipo).
+- Lluvia por horas, mar y ríos: Open-Meteo (Forecast, Marine y Flood), sin clave.
+- Refugios y puntos de apoyo: OpenStreetMap (Nominatim y Overpass). Los albergues oficiales los define INDECI o la municipalidad.

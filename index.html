@@ -416,8 +416,8 @@ footer{font-size:13px;color:var(--muted);display:flex;flex-direction:column;gap:
 
   <div class="mpanel" id="p-noticias" hidden>
     <div class="mrow" id="nChips" role="group" aria-label="Filtrar noticias">
-      <button type="button" class="chipf" data-k="semana" aria-pressed="true">Esta semana</button>
-      <button type="button" class="chipf" data-k="mes" aria-pressed="false">Este mes</button>
+      <button type="button" class="chipf" data-k="semana" aria-pressed="true">Lo más reciente</button>
+      <button type="button" class="chipf" data-k="mes" aria-pressed="false">Gobierno y ayuda</button>
       <button type="button" class="chipf" data-k="hist" aria-pressed="false">El Niño de 2017</button>
       <button type="button" class="chipf" data-k="zona" aria-pressed="false">Mi zona</button>
     </div>
@@ -1326,51 +1326,71 @@ function irAMas(p){togglePanel(p,true);$("mas").scrollIntoView({behavior:"smooth
 document.querySelectorAll(".mtile").forEach(b=>b.addEventListener("click",()=>togglePanel(b.dataset.p)));
 $("sos").onclick=()=>irAMas("llamar");
 
-/* ---- Noticias reales (Google Noticias, leídas a través de r.jina.ai) ---- */
-const NEWS={cargado:false,cache:{}};
-const NEWS_Q={
-  semana:'("Niño costero" OR "fenómeno El Niño") Perú when:7d',
-  mes:'("Niño costero" OR "fenómeno El Niño") Perú when:30d',
-  hist:'"Niño costero" 2017 Perú lluvias'
-};
-function fechaCorta(s){const d=new Date(s);return isNaN(d)?"":d.toLocaleDateString("es-PE",{day:"numeric",month:"short",year:"numeric"});}
+/* ---- Noticias: lista con enlaces reales (octubre 2026) y conexión opcional a una API propia ---- */
+const NEWS={cargado:false};
+/* cat: r = lo más reciente, g = gobierno y ayuda, h = 2017. zonas: departamentos que menciona. fecha: solo si la confirmé. */
+const NOTICIAS=[
+ {t:"Comunicado Oficial ENFEN N° 18-2026: se mantiene la Alerta de El Niño costero",fuente:"ENFEN-IMARPE",fecha:"2026-10-16",url:"https://enfen.imarpe.gob.pe/download/comunicado-oficial-enfen-n-18-2026/",cat:"r",zonas:[]},
+ {t:"El Niño Costero se extendería hasta el otoño de 2027, según el último reporte del Enfen",fuente:"Infobae",fecha:"2026-10-17",url:"https://www.infobae.com/peru/2026/10/17/el-nino-costero-se-extenderia-hasta-el-otono-de-2027-segun-el-ultimo-reporte-del-enfen/",cat:"r",zonas:[]},
+ {t:"ENFEN: Niño costero duraría hasta otoño 2027",fuente:"América TV",fecha:"2026-10-18",url:"https://www.americatv.com.pe/noticias/amp/actualidad/enfen-nino-costero-duraria-hasta-otono-2027-n523588",cat:"r",zonas:[]},
+ {t:"La próxima semana se conocerá la ubicación de los albergues para damnificados de El Niño",fuente:"El Peruano",fecha:"2026-10-19",url:"https://elperuano.pe/noticia/307076-la-proxima-semana-se-conocera-la-ubicacion-de-los-albergues-para-damnificados-de-el-nino",cat:"g",zonas:["Tumbes","Piura","Lambayeque"]},
+ {t:"Ministro de Defensa liderará acciones de emergencia en Piura y Tumbes ante El Niño",fuente:"El Peruano",fecha:null,url:"https://elperuano.pe/noticia/306973-ministro-de-defensa-liderara-acciones-de-emergencia-en-piura-y-tumbes-ante-el-nino",cat:"g",zonas:["Piura","Tumbes"]},
+ {t:"ENFEN lanza nueva alerta por El Niño Costero y eleva riesgo para octubre",fuente:"Expreso",fecha:null,url:"https://www.expreso.com.pe/actualidad/enfen-lanza-nueva-alerta-por-el-nino-costero-y-eleva-riesgo-para-octubre-magnitud-extraordinaria-88-por-ciento-noticia/1318855/",cat:"r",zonas:[]},
+ {t:"ENFEN elevó al 88 % la probabilidad de que El Niño Costero alcance una magnitud extraordinaria en las próximas semanas",fuente:"RPP",fecha:null,url:"https://rpp.pe/peru/actualidad/enfen-eleva-al-88-la-probabilidad-de-que-el-nino-costero-alcance-una-magnitud-extraordinaria-en-las-proximas-semanas-noticia-1709838",cat:"r",zonas:[]},
+ {t:"Lluvias intensas serán más frecuentes desde octubre por el Niño extraordinario, afirma ENFEN",fuente:"Gestión",fecha:null,url:"https://gestion.pe/peru/lluvias-intensas-seran-mas-frecuentes-desde-octubre-por-el-nino-extraordinario-afirma-enfen-noticia/",cat:"r",zonas:[]},
+ {t:"ENFEN prevé lluvias superiores a lo normal en costa y sierra a fines de 2026",fuente:"Panamericana",fecha:null,url:"https://panamericana.pe/nacionales/475946-enfen-preve-lluvias-superiores-normal-costa-sierra-fines-2026",cat:"r",zonas:[]},
+ {t:"El Niño Costero: costa peruana tendría temperaturas hasta 5 °C por encima de lo normal y lluvias más intensas",fuente:"Caretas",fecha:null,url:"https://caretas.pe/?p=834067",cat:"r",zonas:[]},
+ {t:"ENFEN descarta un súper Niño pero anticipa que fenómeno se extendería hasta enero 2027",fuente:"El Peruano",fecha:null,url:"https://www.elperuano.pe/noticia/294495-enfen-descarta-un-super-nino-pero-anticipa-que-fenomeno-se-extenderia-hasta-enero-2027",cat:"r",zonas:[]},
+ {t:"ENFEN anunció la posible presencia del Niño costero de magnitud leve",fuente:"Forbes Perú",fecha:"2026-02-04",url:"https://forbes.pe/actualidad/2026-02-04/enfen-anuncio-la-posible-presencia-del-nino-costero-de-magnitud-leve/",cat:"r",zonas:[]},
+ {t:"Fenómeno El Niño Costero: ¿Cuántos distritos de Piura se encuentran en riesgo alto de inundación por fuertes lluvias?",fuente:"RPP",fecha:null,url:"https://rpp.pe/peru/piura/fenomeno-el-nino-costero-cuantos-distritos-de-piura-se-encuentran-en-riesgo-alto-de-inundacion-por-fuertes-lluvias-noticia-1694315",cat:"g",zonas:["Piura"]},
+ {t:"Potenciarán capacidad ante El Niño",fuente:"El Peruano",fecha:null,url:"https://elperuano.pe/noticia/304341-potenciaran-capacidad-ante-el-nino",cat:"g",zonas:[]},
+ {t:"Ministerio de Educación pone en marcha estrategia de respuesta ante el Niño 2026",fuente:"El Peruano",fecha:null,url:"https://elperuano.pe/noticia/300088-ministerio-de-educacion-pone-en-marcha-estrategia-de-respuesta-ante-el-nino-2026",cat:"g",zonas:["Tumbes","Piura","Lambayeque","La Libertad","Loreto"]},
+ {t:"Aumentan a 90 los muertos por lluvias e inundaciones en Perú",fuente:"24horas (2017)",fecha:null,url:"https://www.24horas.cl/internacional/aumentan-a-90-los-muertos-por-lluvias-e-inundaciones-en-peru-2338144",cat:"h",zonas:[]},
+ {t:"Niño costero y ríos del Perú (marzo de 2017)",fuente:"Mongabay",fecha:null,url:"https://es.mongabay.com/2017/03/peru-ninocostero-rios/",cat:"h",zonas:[]},
+ {t:"Informe preliminar de la comisión de reconstrucción tras el Fenómeno El Niño",fuente:"Congreso de la República",fecha:null,url:"https://www.congreso.gob.pe/Docs/comisiones2021/cems-reconstruccion-fenomeno-nino-c/files/informe_preliminar.pdf",cat:"h",zonas:[]}
+];
+function picoNacional(){
+  const y=Array(18).fill(0);Object.values(IND_DEP).forEach(v=>v.y.forEach((n,i)=>y[i]+=n));
+  const i=y.indexOf(Math.max(...y));return {anio:2003+i,n:y[i]};
+}
+function fechaCorta(s){const d=new Date(/^\d{4}-\d{2}-\d{2}$/.test(s)?s+"T12:00:00":s);return isNaN(d)?"":d.toLocaleDateString("es-PE",{day:"numeric",month:"short",year:"numeric"});}
 async function cargarNoticias(k){
   NEWS.cargado=true;
   document.querySelectorAll("#nChips .chipf").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.k===k)));
-  const list=$("nList"),note=$("nNote");
-  if(k==="zona"&&!S.dep){list.innerHTML="";note.textContent="Elige un lugar en el mapa o en el chat para ver noticias de tu zona.";return;}
-  const q=k==="zona"?'"El Niño" lluvias '+depName(S.dep)+' Perú when:30d':NEWS_Q[k];
-  const rss="https://news.google.com/rss/search?q="+encodeURIComponent(q)+"&hl=es-419&gl=PE&ceid=PE:es-419";
-  list.innerHTML='<div class="loading"><span class="spin"></span>Buscando noticias…</div>';note.textContent="";
+  const list=$("nList"),note=$("nNote");list.innerHTML="";note.textContent="";
+  let items=[],origen="curada";
+  /* Conexión opcional: un endpoint propio (ver carpeta worker) o una función del equipo. */
   try{
-    let items=NEWS.cache[rss];
-    if(!items){
-      const c=new AbortController();const to=setTimeout(()=>c.abort(),20000);
-      const r=await fetch("https://r.jina.ai/"+rss,{headers:{"X-Return-Format":"text"},signal:c.signal});clearTimeout(to);
-      if(!r.ok)throw new Error("HTTP "+r.status);
-      const doc=new DOMParser().parseFromString(await r.text(),"text/xml");
-      if(doc.querySelector("parsererror"))throw new Error("RSS ilegible");
-      items=[...doc.querySelectorAll("item")].slice(0,12).map(it=>{
-        const src=it.querySelector("source"),fuente=src?src.textContent:"";
-        let t=(it.querySelector("title")||{}).textContent||"";if(fuente&&t.endsWith(" - "+fuente))t=t.slice(0,-(fuente.length+3));
-        return {t,fuente,fecha:(it.querySelector("pubDate")||{}).textContent||"",url:(it.querySelector("link")||{}).textContent||""};
-      }).filter(x=>x.t&&x.url);
-      NEWS.cache[rss]=items;
+    if(window.INTEGRACIONES&&window.INTEGRACIONES.noticias){items=await window.INTEGRACIONES.noticias({filtro:k,lugar:S.dep?depName(S.dep):null});origen="api";}
+    else if(window.NEWS_ENDPOINT){
+      const q=k==="hist"?'"Niño costero" 2017 Perú':k==="zona"&&S.dep?'"El Niño" lluvias '+depName(S.dep)+' Perú when:30d':'("Niño costero" OR "fenómeno El Niño") Perú when:7d';
+      const r=await fetch(window.NEWS_ENDPOINT+"?q="+encodeURIComponent(q));if(!r.ok)throw new Error("HTTP "+r.status);
+      items=(await r.json()).map(x=>({t:x.t,fuente:x.fuente,fecha:x.fecha,url:x.url}));origen="api";
     }
-    list.innerHTML="";
-    if(!items.length){note.textContent="No encontré noticias para este filtro. Prueba con otro.";return;}
-    items.forEach((x,i)=>{
-      const d=document.createElement("article");d.className="ncard";d.style.animationDelay=(i*40)+"ms";
-      const tag=document.createElement("span");tag.className="tag";tag.textContent=x.fuente||"Noticia";
-      const a=document.createElement("a");a.className="nt";a.href=x.url;a.target="_blank";a.rel="noopener";a.textContent=x.t;
-      const s=document.createElement("small");s.textContent=fechaCorta(x.fecha);
-      d.append(tag,a,s);list.appendChild(d);
-    });
-    note.textContent="Titulares de Google Noticias, ordenados por relevancia. Cada enlace abre la nota en el medio original. Verifica los datos en las fuentes oficiales.";
-  }catch(e){
-    console.warn("noticias",e);list.innerHTML="";
-    note.textContent="No pude cargar las noticias ahora. Revisa la conexión o abre las fuentes oficiales de abajo.";
+  }catch(e){console.warn("noticias api",e);items=[];origen="curada";}
+  if(origen==="curada"){
+    const dep=S.dep?depName(S.dep):null;
+    items=NOTICIAS.filter(x=>k==="zona"?(dep&&x.zonas.includes(dep)):(k==="mes"?x.cat==="g":k==="hist"?x.cat==="h":x.cat==="r"));
+    items.sort((a,b)=>(b.fecha||"").localeCompare(a.fecha||""));
+    if(k==="zona"&&!dep){note.textContent="Elige un lugar en el mapa o en el chat para ver noticias de tu zona.";return;}
+    if(k==="zona"&&!items.length)note.textContent="No tengo noticias que mencionen "+dep+". Mira “Lo más reciente”.";
   }
+  if(k==="hist"){
+    const p=picoNacional();
+    const c=document.createElement("article");c.className="ncard";
+    c.innerHTML='<span class="tag">Datos INDECI</span><b></b><small></small>';
+    c.querySelector("b").textContent="El año con más emergencias por lluvias, huaicos, inundaciones y marejadas en el registro de INDECI 2003-2020 fue "+p.anio+" ("+p.n.toLocaleString("es-PE")+" emergencias).";
+    c.querySelector("small").textContent="Cálculo del prototipo con la base de INDECI.";
+    list.appendChild(c);
+  }
+  items.slice(0,15).forEach((x,i)=>{
+    const d=document.createElement("article");d.className="ncard";d.style.animationDelay=(i*40)+"ms";
+    const tag=document.createElement("span");tag.className="tag";tag.textContent=x.fuente||"Noticia";
+    const a=document.createElement("a");a.className="nt";a.href=x.url;a.target="_blank";a.rel="noopener";a.textContent=x.t;
+    const s=document.createElement("small");s.textContent=x.fecha?fechaCorta(x.fecha):"Fecha por confirmar en el enlace";
+    d.append(tag,a,s);list.appendChild(d);
+  });
+  if(!note.textContent)note.textContent=origen==="api"?"Noticias en vivo desde la API conectada.":"Lista de notas reales con enlace a cada medio (octubre de 2026). Para recibirlas automáticamente, conecta una API: mira el README.";
 }
 document.querySelectorAll("#nChips .chipf").forEach(b=>b.addEventListener("click",()=>cargarNoticias(b.dataset.k)));
 
