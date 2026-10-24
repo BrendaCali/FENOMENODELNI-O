@@ -1434,9 +1434,9 @@ $("cLoc").onclick=()=>{
 /* ---- Refugios y puntos de apoyo (OpenStreetMap: Nominatim + Overpass) ---- */
 const REF={init:false,centro:null,nombre:"",cat:"apoyo",cache:{},n:0};
 const REF_CATS={
-  apoyo:{r:12000,f:['["emergency"="assembly_point"]','["emergency"="shelter"]','["social_facility"="shelter"]','["amenity"="shelter"]["shelter_type"!~"gazebo|public_transport|picnic_shelter|weather_shelter|bus_stop"]["public_transport"!~"."]','["amenity"="community_centre"]','["leisure"="stadium"]','["leisure"="sports_hall"]','["amenity"="townhall"]']},
-  salud:{r:10000,f:['["amenity"="hospital"]','["amenity"="clinic"]']},
-  auxilio:{r:10000,f:['["amenity"="fire_station"]','["amenity"="police"]']}
+  apoyo:{r:9000,f:['["emergency"="assembly_point"]','["emergency"="shelter"]','["social_facility"="shelter"]','["amenity"="community_centre"]','["leisure"="stadium"]','["leisure"="sports_hall"]','["amenity"="townhall"]']},
+  salud:{r:8000,f:['["amenity"="hospital"]','["amenity"="clinic"]']},
+  auxilio:{r:8000,f:['["amenity"="fire_station"]','["amenity"="police"]']}
 };
 function tipoDe(t){
   if(t.emergency==="assembly_point")return "Punto de reunión";
@@ -1454,9 +1454,9 @@ function tipoDe(t){
 }
 function km(a,b,c,d){const R=6371,r=x=>x*Math.PI/180,dl=r(c-a),dn=r(d-b);const h=Math.sin(dl/2)**2+Math.cos(r(a))*Math.cos(r(c))*Math.sin(dn/2)**2;return 2*R*Math.asin(Math.sqrt(h));}
 async function overpass(q){
-  for(const u of ["https://overpass-api.de/api/interpreter","https://overpass.kumi.systems/api/interpreter"]){
+  for(const u of ["https://overpass-api.de/api/interpreter","https://overpass.kumi.systems/api/interpreter","https://overpass.private.coffee/api/interpreter"]){
     try{
-      const c=new AbortController();const to=setTimeout(()=>c.abort(),25000);
+      const c=new AbortController();const to=setTimeout(()=>c.abort(),18000);
       const r=await fetch(u,{method:"POST",body:"data="+encodeURIComponent(q),signal:c.signal});clearTimeout(to);
       if(!r.ok)continue;return (await r.json()).elements||[];
     }catch(e){}
@@ -1486,7 +1486,7 @@ async function buscarRefugios(){
   try{
     let els=REF.cache[key];
     if(!els){
-      const q="[out:json][timeout:25];("+cat.f.map(f=>"nwr"+f+"(around:"+cat.r+","+la.toFixed(5)+","+lo.toFixed(5)+");").join("")+");out center 80;";
+      const q="[out:json][timeout:20];("+cat.f.map(f=>"nwr"+f+"(around:"+cat.r+","+la.toFixed(4)+","+lo.toFixed(4)+");").join("")+");out center 50;";
       els=await overpass(q);REF.cache[key]=els;
     }
     if(my!==REF.n)return;
@@ -1520,7 +1520,7 @@ async function buscarRefugios(){
     });
   }catch(e){
     console.warn("refugios",e);if(my!==REF.n)return;
-    list.innerHTML='<p class="note">No pude consultar el mapa ahora. Intenta de nuevo en un momento.</p>';
+    list.innerHTML='<p class="note">No pude consultar el mapa ahora. El servicio de OpenStreetMap a veces está lento.</p>';const rb=document.createElement("button");rb.type="button";rb.className="btn alt";rb.textContent="Reintentar";rb.onclick=buscarRefugios;list.appendChild(rb);
   }
 }
 $("rForm").addEventListener("submit",async e=>{
