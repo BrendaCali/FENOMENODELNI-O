@@ -373,6 +373,28 @@ select:disabled{opacity:.5}
 .wa-s-btn .en-linea{top:2px;left:4px}
 @media (min-width:960px){.wafab,.wabub{display:none!important}}
 @media (prefers-reduced-motion:reduce){.wa-s-btn{animation:none!important}}
+.brand{display:flex;flex-direction:column;align-items:center;gap:8px}
+.wa-hero{position:relative;display:inline-flex;align-items:center;gap:10px;text-align:left;padding:8px 18px 8px 22px;border-radius:14px;border:1px solid #1a7f45;background:#16382a;color:#f1f4f0;max-width:100%}
+.wa-hero svg{flex:none;color:#7CFF9B}
+.wa-hero span{display:flex;flex-direction:column;gap:1px;min-width:0}
+.wa-hero b{font-size:15px}
+.wa-hero small{font-size:12.5px;color:#c4d6cb}
+.wa-hero:hover{background:#1c4733}
+.wa-hero .en-linea{top:4px;left:6px}
+.scene{display:block;width:100%;height:auto;border-radius:10px}
+.pc.full{grid-column:1/-1}
+.ic{display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:color-mix(in srgb,var(--c) 16%,transparent);color:var(--c);flex:none}
+.ic.big{width:46px;height:46px;border-radius:13px}
+.ic svg{width:60%;height:60%;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.mgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:8px}
+.mi{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;padding:10px 6px;border:1px solid var(--line);border-radius:12px;background:var(--bg);font-size:13px;font-weight:700;line-height:1.25}
+.mi.extra{border-style:dashed}
+.mi em{font-style:normal;font-size:11px;font-weight:700;color:var(--muted)}
+.kgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px}
+.kid{display:flex;gap:10px;align-items:flex-start;padding:10px;border:1px solid var(--line);border-radius:12px;background:var(--bg);font-size:14px;line-height:1.35}
+.kid div{display:flex;flex-direction:column;gap:2px;min-width:0}
+.kid b{font-size:15px}
+@media (max-width:640px){.wa-hero small{display:none}.wa-hero{padding:8px 14px 8px 20px}}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:12px;font-weight:700;z-index:20}
 footer{font-size:13px;color:var(--muted);display:flex;flex-direction:column;gap:6px}
 @media (min-width:640px){.facts{grid-template-columns:1fr 1fr}.plan.two{grid-template-columns:1fr 1fr}}
@@ -381,7 +403,8 @@ footer{font-size:13px;color:var(--muted);display:flex;flex-direction:column;gap:
 
 <div class="app">
 <header>
-  <h1>Tu plan familiar ante El Niño</h1>
+  <div class="brand"><h1>Tu plan familiar ante El Niño</h1>
+    <button type="button" class="wa-hero" id="waHero"><i class="en-linea" aria-hidden="true"></i><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/><path d="M9 9.5c0 3 2.5 5.5 5.5 5.5l1.2-1.3-1.8-1-.8.6a3.6 3.6 0 0 1-1.7-1.7l.6-.8-1-1.8z"/></svg><span><b>Prueba nuestro agente en WhatsApp</b><small>Es el mismo asistente, programado con IA. Escríbele desde tu celular.</small></span></button></div>
   <p class="lead">Elige dónde vives, cuéntanos de tu familia y recibe un plan simple: qué hacer antes, durante y después de las lluvias.</p>
   <div class="banner" id="banner" role="status"></div>
   <div class="tabs" role="tablist" aria-label="Secciones">
@@ -1135,19 +1158,130 @@ $("gen").onclick=async()=>{
 
 /* ============ RENDER DEL PLAN ============ */
 function ul(a){return a&&a.length?`<ul>${a.map(x=>`<li>${esc(typeof x==="string"?x:JSON.stringify(x))}</li>`).join("")}</ul>`:'<p class="note">No tengo ese dato.</p>';}
+/* ---- Plan ilustrado: dibujitos de qué llevar, qué hacer, niños, prevención y refugios cercanos ---- */
+const ICO={
+ agua:'<path d="M12 3c3 4 6 7 6 11a6 6 0 0 1-12 0c0-4 3-7 6-11z"/><path d="M9.5 14.5a2.6 2.6 0 0 0 2.5 2.5"/>',
+ comida:'<rect x="6" y="5" width="12" height="15" rx="2"/><path d="M6 9h12M6 16h12"/>',
+ linterna:'<path d="M9 3h6l1 5H8l1-5z"/><rect x="8" y="8" width="8" height="12" rx="2"/><path d="M12 12v3M5 4l2 2M19 4l-2 2"/>',
+ botiquin:'<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5h6v2M12 11v5M9.5 13.5h5"/>',
+ medicina:'<rect x="3" y="9" width="18" height="6" rx="3" transform="rotate(-45 12 12)"/><path d="M9.5 9.5l5 5"/>',
+ documentos:'<path d="M7 3h7l4 4v14H7z"/><path d="M14 3v4h4M9.5 12h5M9.5 16h5"/>',
+ ropa:'<path d="M8 4L3 7l2 4 3-1v10h8V10l3 1 2-4-5-3a4 4 0 0 1-8 0z"/>',
+ radio:'<rect x="3" y="9" width="18" height="11" rx="2"/><circle cx="9" cy="14.5" r="3"/><path d="M15 13h3M15 16h3M7 9l9-5"/>',
+ celular:'<rect x="7" y="2.5" width="10" height="19" rx="2"/><path d="M11 18.5h2"/>',
+ dinero:'<circle cx="12" cy="12" r="8"/><path d="M12 7v10M9.5 9.5c0-1 1-1.5 2.5-1.5s2.5.7 2.5 1.8c0 2.4-5 1.4-5 4 0 1 1 1.7 2.5 1.7s2.5-.6 2.5-1.6"/>',
+ silbato:'<circle cx="9" cy="14" r="5"/><path d="M14 11l7-4v5l-5 2M9 11v3h3"/>',
+ mascota:'<circle cx="7" cy="10" r="1.8"/><circle cx="12" cy="7" r="1.8"/><circle cx="17" cy="10" r="1.8"/><path d="M12 12c-3 0-5 3-5 5 0 2 2 2.5 5 1.5 3 1 5 .5 5-1.5 0-2-2-5-5-5z"/>',
+ bebe:'<path d="M10 3h4v3h-4zM9 6h6l1 3v10a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2V9z"/><path d="M9 12h6M9 15h6"/>',
+ mochila:'<path d="M8 6a4 4 0 0 1 8 0v1H8z"/><rect x="5" y="7" width="14" height="14" rx="3"/><path d="M9 13h6M9 17h6"/>',
+ lapiz:'<path d="M4 20l4-1 11-11-3-3L5 16l-1 4z"/><path d="M14 6l3 3"/>',
+ manos:'<circle cx="8" cy="7" r="2.5"/><circle cx="16" cy="7" r="2.5"/><path d="M4 20v-5a4 4 0 0 1 4-4M20 20v-5a4 4 0 0 0-4-4M8 18h8"/>',
+ aire:'<circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6L7 7M17 17l1.4 1.4M18.4 5.6L17 7M7 17l-1.4 1.4"/>',
+ casa:'<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/>',
+ techo:'<path d="M3 12l9-8 9 8"/><path d="M6 11v9h12v-9"/><path d="M9 15l2 2 4-4"/>',
+ enchufe:'<path d="M9 3v5M15 3v5M7 8h10v3a5 5 0 0 1-10 0V8zM12 16v5"/>',
+ radioaviso:'<path d="M4 12a8 8 0 0 1 16 0M7 12a5 5 0 0 1 10 0"/><circle cx="12" cy="12" r="1.5"/><path d="M12 14v7"/>',
+ prohibido:'<circle cx="12" cy="12" r="9"/><path d="M5.6 5.6l12.8 12.8"/>',
+ ruta:'<path d="M4 20c4 0 4-6 8-6s4-8 8-8"/><circle cx="4" cy="20" r="1.5"/><path d="M17 4h4v4"/>'
+};
+const ICO_COL={agua:"#2b7bd6",comida:"#c77d12",linterna:"#b58a00",botiquin:"#c8312b",medicina:"#c8312b",documentos:"#4a6c8f",ropa:"#7d4fc4",radio:"#0f8a86",celular:"#3d4a52",dinero:"#2e8b57",silbato:"#e0731a",mascota:"#8a5a2b",bebe:"#d4537e",mochila:"#5b7d1f",lapiz:"#d98c0b",manos:"#d4537e",aire:"#2b7bd6",casa:"#5b7d1f",techo:"#2e8b57",enchufe:"#e0731a",radioaviso:"#0f8a86",prohibido:"#c8312b",ruta:"#2b7bd6"};
+function icono(k,grande){
+  const c=ICO_COL[k]||"#5b7d1f";
+  return '<span class="ic'+(grande?" big":"")+'" style="--c:'+c+'"><svg viewBox="0 0 24 24" aria-hidden="true">'+(ICO[k]||ICO.mochila)+'</svg></span>';
+}
+function iconoPara(t){
+  const n=norm(t);
+  const reglas=[[/pañal|leche|biber|bebe|bebé|formula|fórmula/,"bebe"],[/juguete|peluche|libro/,"mochila"],[/agua|bebida|botella/,"agua"],[/comida|aliment|enlatad|galleta|conserva|snack/,"comida"],[/linterna|pila|luz/,"linterna"],[/botiquin|curita|primeros aux|venda|alcohol/,"botiquin"],[/medicin|pastilla|remedio|receta/,"medicina"],[/document|dni|papel|escritura|certificad|carne|carnet/,"documentos"],[/ropa|abrigo|manta|calzado|zapato|cambio|poncho/,"ropa"],[/radio/,"radio"],[/celular|cargador|bateria|batería|telefono|teléfono|power/,"celular"],[/dinero|efectivo|sol(es)?\b|monedas/,"dinero"],[/silbato|pito/,"silbato"],[/mascota|perro|gato|correa|animal/,"mascota"]];
+  for(const [re,k] of reglas)if(re.test(n))return k;
+  return "mochila";
+}
+/* Dibujitos de escena (SVG propio, sin imágenes externas) */
+const SC_NUBE='<g fill="#c9d3d8"><circle cx="40" cy="26" r="11"/><circle cx="54" cy="22" r="13"/><circle cx="68" cy="27" r="10"/><rect x="34" y="26" width="42" height="11" rx="5"/></g><g stroke="#4a9be0" stroke-width="2" stroke-linecap="round"><path d="M44 44l-3 8M56 44l-3 8M68 44l-3 8"/></g>';
+const SC_CASA='<rect x="85" y="62" width="70" height="42" fill="#f2d7a6"/><polygon points="79,64 120,30 161,64" fill="#c8312b"/><rect x="112" y="80" width="16" height="24" fill="#8a5a2b"/><rect x="92" y="72" width="14" height="12" fill="#bfe3f5"/><rect x="134" y="72" width="14" height="12" fill="#bfe3f5"/>';
+function escena(k){
+  const base='<svg class="scene" viewBox="0 0 240 130" role="img" aria-label="';
+  if(k==="antes")return base+'Dibujo: casa protegida con costales de arena y una lista de tareas"><rect width="240" height="130" rx="10" fill="#97bd3d" opacity=".16"/><rect y="104" width="240" height="26" fill="#7fa45a"/>'+SC_NUBE+SC_CASA+'<g fill="#b9955c" stroke="#7a6038" stroke-width="1"><ellipse cx="62" cy="106" rx="13" ry="6"/><ellipse cx="82" cy="106" rx="13" ry="6"/><ellipse cx="72" cy="99" rx="13" ry="6"/></g><rect x="172" y="38" width="48" height="62" rx="5" fill="#fff" stroke="#1f2326" stroke-width="1.5"/><g stroke="#2e8b57" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M178 52l4 4 7-8M178 68l4 4 7-8M178 84l4 4 7-8"/></g><g stroke="#1f2326" stroke-width="2" stroke-linecap="round"><path d="M194 52h20M194 68h20M194 84h20"/></g></svg>';
+  if(k==="durante")return base+'Dibujo: una familia sube a un lugar alto lejos del agua"><rect width="240" height="130" rx="10" fill="#e0731a" opacity=".13"/><path d="M0 104q15-10 30 0t30 0t30 0t30 0v26H0z" fill="#4a9be0" opacity=".85"/><path d="M95 130L240 38v92z" fill="#7fa45a"/><g stroke="#4a9be0" stroke-width="2" stroke-linecap="round"><path d="M20 20l-3 8M40 14l-3 8M60 22l-3 8M80 12l-3 8M200 14l-3 8"/></g><g fill="#1f2326" stroke="#1f2326" stroke-width="3" stroke-linecap="round"><circle cx="128" cy="94" r="5"/><path d="M128 99v14M128 104l-6 6M128 104l6 4M128 113l-5 9M128 113l5 9" fill="none"/><circle cx="150" cy="82" r="5"/><path d="M150 87v14M150 92l-6 6M150 92l6 4M150 101l-5 9M150 101l5 9" fill="none"/></g><g fill="#c8312b" stroke="#c8312b" stroke-width="2.5" stroke-linecap="round"><circle cx="169" cy="76" r="3.6"/><path d="M169 80v9M169 83l-4 4M169 83l4 3M169 89l-3 6M169 89l3 6" fill="none"/></g><path d="M108 112C140 100 170 78 196 56" stroke="#ee8a1e" stroke-width="4.5" fill="none" stroke-linecap="round" stroke-dasharray="1 9"/><polygon points="200,52 186,54 194,64" fill="#ee8a1e"/><g><rect x="212" y="20" width="2.5" height="26" fill="#1f2326"/><polygon points="214,20 232,26 214,32" fill="#2e8b57"/></g></svg>';
+  if(k==="despues")return base+'Dibujo: la familia vuelve a casa segura, con sol y la casa revisada"><rect width="240" height="130" rx="10" fill="#f2c230" opacity=".15"/><rect y="104" width="240" height="26" fill="#7fa45a"/><g fill="#f2c230"><circle cx="40" cy="30" r="14"/></g><g stroke="#f2c230" stroke-width="3" stroke-linecap="round"><path d="M40 8v6M40 46v6M18 30h6M56 30h6M24 14l4 4M52 42l4 4M24 46l4-4M52 18l4-4"/></g>'+SC_CASA+'<circle cx="168" cy="48" r="14" fill="#2e8b57"/><path d="M161 48l5 5 9-10" stroke="#fff" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><g stroke="#8a5a2b" stroke-width="3" stroke-linecap="round"><path d="M200 70l16 32"/></g><polygon points="212,96 226,104 208,110" fill="#c77d12"/></svg>';
+  if(k==="ninos")return base+'Dibujo: una niña con su mochila de emergencia y una tarjeta con datos de contacto"><rect width="240" height="130" rx="10" fill="#d4537e" opacity=".13"/><rect y="108" width="240" height="22" fill="#7fa45a"/><rect x="82" y="62" width="14" height="34" rx="5" fill="#ee8a1e"/><rect x="100" y="60" width="38" height="42" rx="12" fill="#2b7bd6"/><circle cx="119" cy="42" r="15" fill="#f1c27d"/><path d="M104 40q2-16 15-16t15 16q-8-8-15-6t-15 6z" fill="#4a2c17"/><circle cx="114" cy="44" r="1.8" fill="#1f2326"/><circle cx="124" cy="44" r="1.8" fill="#1f2326"/><path d="M114 50q5 4 10 0" stroke="#1f2326" stroke-width="1.8" fill="none" stroke-linecap="round"/><rect x="105" y="100" width="10" height="12" fill="#1f2326"/><rect x="123" y="100" width="10" height="12" fill="#1f2326"/><path d="M168 30c0-7 10-7 10 0 0 5-5 8-5 10 0-2-5-5-5-10z" fill="#c8312b"/><rect x="170" y="62" width="52" height="34" rx="5" fill="#fff" stroke="#1f2326" stroke-width="1.5"/><circle cx="180" cy="73" r="4" fill="#f1c27d"/><path d="M190 70h24M190 78h24M176 88h38" stroke="#1f2326" stroke-width="2" stroke-linecap="round"/></svg>';
+  return "";
+}
+function mochilaGrid(items){
+  const arr=(items&&items.length?items:[]).map(x=>typeof x==="string"?x:JSON.stringify(x));
+  const p=S.perfil,extra=[];
+  if(p.ninos==="si")extra.push(["Pañales, leche o comida de los niños y un juguete","bebe"]);
+  if(p.mayores==="si")extra.push(["Medicinas, lentes y documentos de los adultos mayores","medicina"]);
+  if(p.disc==="si")extra.push(["Medicinas y apoyos de quien necesita cuidados","botiquin"]);
+  if(p.mascotas==="si")extra.push(["Comida, agua y correa de las mascotas","mascota"]);
+  if(!arr.length&&!extra.length)return '<p class="note">No tengo ese dato.</p>';
+  return '<div class="mgrid">'+arr.map(t=>'<div class="mi">'+icono(iconoPara(t),true)+'<span>'+esc(t)+'</span></div>').join("")+extra.map(([t,k])=>'<div class="mi extra">'+icono(k,true)+'<span>'+esc(t)+'</span><em>Por tu familia</em></div>').join("")+'</div>';
+}
+function ninosHtml(){
+  const t=[["mochila","Su propia mochila","Deja que cada niño elija un juguete o libro pequeño y lo guarde en su mochila."],["documentos","Tarjeta con sus datos","Escribe su nombre, su edad y el teléfono de un adulto en una tarjeta o pulsera."],["lapiz","Dibujen el camino","Dibujen juntos la ruta hacia el lugar alto y el punto de reunión."],["manos","De la mano","Al evacuar, los niños pequeños van de la mano de un adulto. Practíquenlo como un juego."],["aire","Respirar para calmarse","Inhalen despacio como si inflaran un globo y suelten el aire. Ayuda a bajar el miedo."]];
+  return escena("ninos")+'<div class="kgrid">'+t.map(([k,a,b])=>'<div class="kid">'+icono(k,true)+'<div><b>'+esc(a)+'</b><span>'+esc(b)+'</span></div></div>').join("")+'</div><p class="note">Consejos generales de preparación con niños.</p>';
+}
+function prevencionHtml(){
+  const t=[["techo","Limpien canaletas, desagües y techos antes de las lluvias."],["documentos","Guarden documentos, medicinas y celular en bolsas plásticas bien cerradas."],["casa","Suban objetos de valor y alimentos a un lugar alto de la casa."],["ruta","Revisen y practiquen la ruta de evacuación con toda la familia."],["enchufe","Si entra agua a la casa, corten la luz antes de tocar nada."],["prohibido","No crucen ríos, quebradas ni calles inundadas."],["radioaviso","Escuchen los avisos oficiales de SENAMHI e INDECI."]];
+  if(S.perfil.rio==="si")t.unshift(["ruta","Viven cerca de un río o quebrada: salgan temprano y no esperen a que suba el agua."]);
+  return '<div class="kgrid">'+t.map(([k,a])=>'<div class="kid">'+icono(k,true)+'<div><span>'+esc(a)+'</span></div></div>').join("")+'</div><p class="note">Consejos generales de prevención.</p>';
+}
+/* Refugios y puntos de apoyo cerca, dentro del plan */
+function tarjetaLugar(x){
+  const c=document.createElement("article");c.className="rcard";
+  const tag=document.createElement("span");tag.className="tag";tag.textContent=x.tipo;
+  const n=document.createElement("b");n.textContent=x.nombre;
+  const s=document.createElement("small");s.textContent="A "+x.d.toFixed(1).replace(".",",")+" km"+(x.dir?" · "+x.dir:"");
+  const acts=document.createElement("div");acts.className="acts";
+  const go=document.createElement("a");go.className="go";go.target="_blank";go.rel="noopener";go.textContent="Cómo llegar";
+  go.href="https://www.google.com/maps/dir/?api=1&destination="+x.lat.toFixed(6)+","+x.lon.toFixed(6);
+  const link="https://maps.google.com/?q="+x.lat.toFixed(6)+","+x.lon.toFixed(6);
+  const wa=document.createElement("a");wa.target="_blank";wa.rel="noopener";wa.textContent="Enviar por WhatsApp";
+  wa.href="https://wa.me/?text="+encodeURIComponent(x.tipo+" "+x.nombre+": "+link);
+  acts.append(go,wa);c.append(tag,n,s,acts);return c;
+}
+async function pintarRefugiosPlan(){
+  const box=$("planRef");if(!box)return;
+  box.innerHTML='<div class="loading"><span class="spin"></span>Buscando refugios y puntos de apoyo cerca…</div>';
+  const q=consultaLugar();
+  try{
+    if(!q){box.innerHTML='<p class="note">Elige un lugar para ver refugios cercanos.</p>';return;}
+    let g=await geocodificar(q);if(!g&&S.dist)g=await geocodificar(distName()+", "+depName(S.dep)+", Perú");
+    if(!g){box.innerHTML='<p class="note">No pude ubicar tu zona. Usa la sección Refugios, más abajo.</p>';return;}
+    const d=0.14,vb=[g.lon-d,g.lat+d,g.lon+d,g.lat-d].map(x=>x.toFixed(4)).join(","),items=[],vistos=new Set();
+    for(const [term,tipo] of [["refugio","Refugio"],["estadio","Estadio"],["coliseo","Coliseo"],["centro comunal","Centro comunal"],["municipalidad","Municipalidad"],["hospital","Hospital"]]){
+      try{
+        const c=new AbortController();const to=setTimeout(()=>c.abort(),9000);
+        const r=await fetch("https://nominatim.openstreetmap.org/search?q="+encodeURIComponent(term)+"&viewbox="+vb+"&bounded=1&format=jsonv2&limit=6&countrycodes=pe&accept-language=es",{signal:c.signal});clearTimeout(to);
+        if(!r.ok)continue;
+        (await r.json()).forEach(x=>{const lat=+x.lat,lon=+x.lon,nombre=x.name||(x.display_name||"").split(",")[0],k=nombre+lat.toFixed(4)+lon.toFixed(4);
+          if(!nombre||vistos.has(k))return;vistos.add(k);const dist=km(g.lat,g.lon,lat,lon);if(dist>15)return;
+          items.push({nombre,tipo,lat,lon,d:dist,dir:(x.display_name||"").split(",").slice(1,3).join(",").trim()});});
+      }catch(e){}
+      await new Promise(res=>setTimeout(res,350));
+    }
+    items.sort((a,b)=>a.d-b.d);
+    box.innerHTML="";
+    if(!items.length){box.innerHTML='<p class="note">No encontré lugares cerca. Consulta a tu municipalidad por los albergues oficiales.</p>';return;}
+    const grid=document.createElement("div");grid.className="rgrid";items.slice(0,6).forEach(x=>grid.appendChild(tarjetaLugar(x)));box.appendChild(grid);
+    const nt=document.createElement("p");nt.className="note";nt.textContent="Lugares de OpenStreetMap cerca de "+(S.dist?distName():g.nombre)+". Los albergues oficiales los define tu municipalidad o INDECI: confírmalos.";box.appendChild(nt);
+  }catch(e){box.innerHTML='<p class="note">No pude buscar refugios ahora. Usa la sección Refugios, más abajo.</p>';}
+}
 function renderPlan(){
   const p=S.plan,r=S.riesgo,[lbl]=NIV[r.nivel];
   $("planOut").innerHTML=`
   <div class="risk ${r.nivel}"><div class="lvl">${esc(distName())} · ${lbl}</div><div>${esc(p.resumen||"")}</div></div>
   ${p.alerta_urgente?`<div class="alert" role="alert" style="margin-top:12px">${esc(p.alerta_urgente)} INDECI (Defensa Civil): 115.</div>`:""}
   <div class="plan two" style="margin-top:14px">
-    <article class="pc"><span class="tag">Antes</span><h3>Prepárense</h3>${ul(p.antes)}</article>
-    <article class="pc"><span class="tag">Durante</span><h3>Si llega la emergencia</h3>${ul(p.durante)}</article>
-    <article class="pc"><span class="tag">Después</span><h3>Al volver</h3>${ul(p.despues)}</article>
-    <article class="pc"><span class="tag">Mochila</span><h3>Mochila de emergencia</h3>${ul(p.mochila)}</article>
+    <article class="pc"><span class="tag">Antes</span><h3>Prepárense</h3>${escena("antes")}${ul(p.antes)}</article>
+    <article class="pc"><span class="tag">Durante</span><h3>Si llega la emergencia</h3>${escena("durante")}${ul(p.durante)}</article>
+    <article class="pc"><span class="tag">Después</span><h3>Al volver</h3>${escena("despues")}${ul(p.despues)}</article>
     <article class="pc"><span class="tag">Ruta</span><h3>Evacuación y punto de reunión</h3><p>${esc(p.ruta_y_reunion||"No tengo ese dato.")}</p></article>
+    <article class="pc full"><span class="tag">Mochila</span><h3>Qué llevar en la mochila</h3>${mochilaGrid(p.mochila)}</article>
+    ${S.perfil.ninos==="si"?'<article class="pc full"><span class="tag">Con los niños</span><h3>Qué hacer con los niños</h3>'+ninosHtml()+'</article>':""}
+    <article class="pc full"><span class="tag">Prevención</span><h3>Prevenciones en casa</h3>${prevencionHtml()}</article>
+    <article class="pc full"><span class="tag">Refugios</span><h3>Refugios y puntos de apoyo cerca</h3><div id="planRef"></div></article>
     <article class="pc"><span class="tag">Contactos</span><h3>A quién llamar</h3>${ul(p.contactos)}</article>
-    <article class="pc" style="grid-column:1/-1"><span class="tag">Tu familia</span><h3>Cuidados según tu familia</h3>${ul(p.cuidados_perfil)}</article>
+    <article class="pc"><span class="tag">Tu familia</span><h3>Cuidados según tu familia</h3>${ul(p.cuidados_perfil)}</article>
   </div>
   <div class="pc" style="margin-top:14px"><h3>De dónde salen los datos</h3>
     <ul>${(p.fuentes||[]).map(f=>`<li>${esc(f.dato)}: ${esc(f.fuente)} (${esc(f.fecha)})</li>`).join("")||"<li>No tengo ese dato.</li>"}</ul>
@@ -1166,6 +1300,7 @@ function renderPlan(){
   $("bLink").onclick=()=>copiar(enlace(),"Enlace copiado");
   $("bTxt").onclick=()=>copiar(resumenTexto(),"Plan copiado");
   $("bNew").onclick=()=>{if(DESK.matches)nuevoPlan();else setStep(1);};
+  pintarRefugiosPlan();
 }
 function enlace(){try{return location.href.split("#")[0];}catch(e){return "";}}
 function resumenTexto(){
@@ -1387,6 +1522,7 @@ function togglePanel(p,abrir){
 function irAMas(p){togglePanel(p,true);if(DESK.matches)$("mas").scrollIntoView({behavior:"smooth",block:"start"});}
 document.querySelectorAll(".mtile").forEach(b=>b.addEventListener("click",()=>togglePanel(b.dataset.p)));
 $("waStripBtn").onclick=()=>$("waFab").click();
+$("waHero").onclick=()=>$("waFab").click();
 $("waFab").onclick=()=>{const u=waEnlace(true);if(u)window.open(u,"_blank","noopener");else irAMas("whatsapp");};
 (function(){
   let visto=false;try{visto=sessionStorage.getItem("wa_bub")==="1";}catch(e){}
