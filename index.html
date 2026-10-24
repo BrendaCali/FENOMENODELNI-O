@@ -130,6 +130,10 @@ select:disabled{opacity:.5}
 .cf .btn{min-height:52px;padding:0 18px}
 .dots{display:inline-flex;gap:4px}.dots i{width:8px;height:8px;border-radius:50%;background:var(--muted);animation:bl 1s infinite}.dots i:nth-child(2){animation-delay:.2s}.dots i:nth-child(3){animation-delay:.4s}
 @keyframes bl{50%{opacity:.25}}
+.tabs{display:flex;gap:6px;background:var(--tile);padding:5px;border-radius:14px}
+.tabs button{flex:1;min-height:48px;border:0;border-radius:10px;background:transparent;font-weight:700;font-size:16px;color:var(--muted)}
+.tabs button[aria-selected="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.18)}
+.steps[hidden]{display:none}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:12px;font-weight:700;z-index:20}
 footer{font-size:13px;color:var(--muted);display:flex;flex-direction:column;gap:6px}
 @media (min-width:640px){.facts{grid-template-columns:1fr 1fr}.plan.two{grid-template-columns:1fr 1fr}}
@@ -141,6 +145,10 @@ footer{font-size:13px;color:var(--muted);display:flex;flex-direction:column;gap:
   <span class="proto">Datos de ejemplo del prototipo</span>
   <h1>Tu plan familiar ante El Niño</h1>
   <p class="lead">Elige dónde vives, cuéntanos de tu familia y recibe un plan simple: qué hacer antes, durante y después de las lluvias.</p>
+  <div class="tabs" role="tablist" aria-label="Secciones">
+    <button type="button" role="tab" id="tabPlan" data-t="plan" aria-selected="true">Mi plan familiar</button>
+    <button type="button" role="tab" id="tabHoy" data-t="hoy" aria-selected="false">El Niño hoy</button>
+  </div>
   <ol class="steps" id="steps" aria-label="Pasos">
     <li data-s="1">1. Zona</li><li data-s="2">2. Tu familia</li><li data-s="3">3. Tu plan</li>
   </ol>
@@ -290,9 +298,18 @@ const $ = id=>document.getElementById(id);
 const esc = s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const NIV = {"sin-dato":["Sin datos de la zona",0],"bajo":["Riesgo bajo",1],"medio":["Riesgo medio",2],"alto":["Riesgo alto",3],"muy-alto":["Riesgo muy alto",4]};
 
+let TAB="plan";
+function showTab(t){
+  TAB=t;
+  document.querySelectorAll(".tabs button").forEach(b=>b.setAttribute("aria-selected",String(b.dataset.t===t)));
+  $("steps").hidden=t!=="plan";
+  ["s1","s2","s3"].forEach((id,i)=>$(id).hidden=t!=="plan"||(i+1)!==(S.step||1));
+  $("now").hidden=t!=="hoy";
+  if(t==="hoy")window.scrollTo({top:0});
+}
 function setStep(n){
   document.querySelectorAll("#steps li").forEach(li=>{const s=+li.dataset.s;li.className=s===n?"on":s<n?"done":"";});
-  ["s1","s2","s3"].forEach((id,i)=>$(id).hidden=(i+1)!==n);$("now").hidden=n!==1;
+  S.step=n;showTab("plan");
   window.scrollTo({top:0,behavior:"smooth"});
 }
 function toast(t){const e=$("toast");e.textContent=t;e.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>e.hidden=true,2400);}
@@ -623,6 +640,7 @@ async function renderHoy(){
   }catch(err){$("nowOut").innerHTML='<p class="note">No pudimos cargar el estado de El Niño. Intenta de nuevo.</p>';}
 }
 renderHoy();
+document.querySelectorAll(".tabs button").forEach(b=>b.addEventListener("click",()=>showTab(b.dataset.t)));
 
 /* ============ AGENTE DE CHAT ============ */
 const CHAT_RULES=`Eres el asistente de una familia peruana ante El Niño. Español simple, cercano y tranquilizador, máximo 70 palabras por respuesta.
