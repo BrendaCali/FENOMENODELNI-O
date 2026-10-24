@@ -154,7 +154,7 @@ footer{font-size:13px;color:var(--muted);display:flex;flex-direction:column;gap:
     <div class="crumbs" id="crumbs" aria-label="Dónde estás"></div>
     <svg class="map" id="map" viewBox="0 0 500 732" role="group" aria-label="Mapa de los departamentos del Perú"></svg>
     <div class="tip" id="tip" aria-live="polite">Pasa el dedo o el mouse sobre el mapa</div>
-    <div class="legend">Toca una sección para acercarte. Las de color con borde tienen datos de ejemplo.</div>
+    <div class="legend">Toca una sección para acercarte. Las de color con borde tienen detalle por provincia y distrito; las demás muestran datos de ejemplo a nivel de departamento.</div>
   </div>
   <div class="field"><label for="selDep">Departamento</label><select id="selDep"></select></div>
   <div class="field"><label for="selProv">Provincia</label><select id="selProv" disabled></select></div>
@@ -226,7 +226,38 @@ const RIESGO = {
  "140112":R("medio","Lluvias intensas","Zona costera con daños en viviendas por lluvias y oleaje en episodios pasados.","Ejemplo: lluvias moderadas.","Inundación"),
  "140301":R("alto","Huaico","Antecedentes de huaicos y desborde de canales en lluvias extraordinarias.","Ejemplo: lluvias moderadas a fuertes.","Inundación")
 };
-const ENFEN = {texto:"Estado de alerta y pronóstico de El Niño costero",valor:"Dato no cargado en el prototipo",fuente:"ENFEN-IMARPE - comunicado oficial",fecha:F_EJ};
+const ENFEN = {texto:"Estado de alerta y pronóstico de El Niño costero",valor:"Alerta de El Niño costero (Comunicado Oficial ENFEN N° 18-2026). Se esperan lluvias sobre lo normal en costa norte y centro.",fuente:"ENFEN-IMARPE (resumen de prensa; verificar en el comunicado)",fecha:"16 oct 2026"};
+
+/* Datos de ejemplo a nivel de departamento (orientativos, por el pronóstico regional de ENFEN). No son el escenario oficial de CENEPRED. */
+const AV_GEN={texto:"Hay avisos de precipitaciones vigentes del 22 al 25 de octubre de 2026 en costa y sierra. Revisa el aviso de tu zona en SENAMHI.",fuente:"SENAMHI - avisos meteorológicos",fecha:"leído el 23 oct 2026"};
+const D=(nivel,peligro,secundario,hist)=>({...R(nivel,peligro,hist||"Zona con registro de emergencias por lluvias en temporadas anteriores.",AV_GEN.texto,secundario),aviso:AV_GEN});
+const RIESGO_DEP = {
+ "01":D("medio","Huaico","Lluvias intensas"),
+ "02":D("alto","Huaico","Inundación"),
+ "03":D("bajo","Lluvias intensas","Huaico"),
+ "04":D("medio","Huaico","Lluvias intensas"),
+ "05":D("bajo","Lluvias intensas","Huaico"),
+ "06":D("alto","Huaico","Inundación"),
+ "07":D("medio","Lluvias intensas","Inundación"),
+ "08":D("bajo","Huaico","Lluvias intensas"),
+ "09":D("bajo","Huaico","Lluvias intensas"),
+ "10":D("medio","Huaico","Inundación"),
+ "11":D("medio","Huaico","Lluvias intensas"),
+ "12":D("medio","Huaico","Inundación"),
+ "13":D("alto","Inundación","Huaico"),
+ "14":D("alto","Inundación","Huaico"),
+ "15":D("alto","Huaico","Lluvias intensas"),
+ "16":D("bajo","Inundación","Lluvias intensas"),
+ "17":D("bajo","Inundación","Lluvias intensas"),
+ "18":D("bajo","Huaico","Lluvias intensas"),
+ "19":D("medio","Huaico","Inundación"),
+ "20":D("alto","Inundación","Huaico"),
+ "21":D("bajo","Lluvias intensas","Inundación"),
+ "22":D("medio","Inundación","Huaico"),
+ "23":D("bajo","Huaico","Lluvias intensas"),
+ "24":D("alto","Inundación","Lluvias intensas"),
+ "25":D("bajo","Inundación","Lluvias intensas")
+};
 
 /* Datos leídos a mano el 23-oct-2026. Reemplazar por conectores (ENFEN, SENAMHI). */
 const ENFEN_ESTADO={estado:"Alerta de El Niño costero",comunicado:"Comunicado Oficial ENFEN N° 18-2026",fecha:"16 oct 2026",
@@ -248,9 +279,9 @@ function riesgoGeneral(){
 
 /* Punto único para conectar las fuentes reales (ENFEN, CENEPRED, INDECI, SENAMHI). */
 async function getRiesgoPorUbigeo(ubigeo){
-  const d = RIESGO[ubigeo];
+  const d = RIESGO[ubigeo] || RIESGO_DEP[String(ubigeo).slice(0,2)];
   if(!d) return null;           // "no tengo ese dato"
-  return {ubigeo, ...d, enfen:ENFEN};
+  return {ubigeo, ...d, enfen:ENFEN, aNivelDepto:!RIESGO[ubigeo]};
 }
 
 /* ============ ESTADO ============ */
@@ -295,8 +326,8 @@ function shape(id,name,d,cls,onClick){
   const g=document.createElementNS(NS,"g"),p=document.createElementNS(NS,"path");
   g.setAttribute("class","tile "+cls);p.setAttribute("d",d);g.appendChild(p);
   if(onClick){
-    g.setAttribute("tabindex","0");g.setAttribute("role","button");g.setAttribute("aria-label",name+(/\bhas\b/.test(cls)?" (con datos de ejemplo)":" (sin datos aún)"));
-    g.addEventListener("mouseenter",()=>$("tip").textContent=name+(/\bhas\b/.test(cls)?"":" · aún sin datos"));
+    g.setAttribute("tabindex","0");g.setAttribute("role","button");g.setAttribute("aria-label",name+(/\bhas\b/.test(cls)?" (con detalle por distrito)":""));
+    g.addEventListener("mouseenter",()=>$("tip").textContent=name+(/\bhas\b/.test(cls)?"":" · datos a nivel de departamento"));
     g.addEventListener("focus",()=>$("tip").textContent=name);
     g.addEventListener("click",onClick);
     g.addEventListener("keydown",ev=>{if(ev.key==="Enter"||ev.key===" "){ev.preventDefault();onClick();}});
@@ -358,7 +389,7 @@ function resetSel(sel,txt){sel.innerHTML=`<option value="">${esc(txt)}</option>`
 
 /* ============ SELECTORES SINCRONIZADOS ============ */
 const selDep=$("selDep"),selProv=$("selProv"),selDist=$("selDist");
-selDep.innerHTML='<option value="">Elige departamento</option>'+Object.keys(GEO_DEP).sort((a,b)=>depName(a).localeCompare(depName(b),"es")).map(c=>`<option value="${c}">${esc(depName(c))}${depHas(c)?"":" (sin datos aún)"}</option>`).join("");
+selDep.innerHTML='<option value="">Elige departamento</option>'+Object.keys(GEO_DEP).sort((a,b)=>depName(a).localeCompare(depName(b),"es")).map(c=>`<option value="${c}">${esc(depName(c))}</option>`).join("");
 resetSel(selProv,"Elige departamento primero");resetSel(selDist,"Elige provincia primero");
 
 function pickDep(cod){
@@ -366,10 +397,11 @@ function pickDep(cod){
   $("tip").textContent="Seleccionado: "+depName(cod);
   resetSel(selDist,"Elige provincia primero");
   if(!depHas(cod)){
-    resetSel(selProv,"Sin datos de ejemplo todavía");
-    ofrecerGeneral("Aún no tengo datos de riesgo de "+depName(cod)+" en este prototipo. Puedes seguir con un plan general o probar con una zona que sí tiene datos.");
+    resetSel(selProv,"Detalle por provincia próximamente");
+    $("riskArea").hidden=false;$("riskArea").innerHTML='<div class="loading"><span class="spin"></span>Buscando datos de tu zona…</div>';
+    getRiesgoPorUbigeo(cod).then(r=>{if(S.dep!==cod||S.prov)return;S.riesgo=r;renderRisk();$("to2").disabled=!r;}).catch(()=>{$("riskArea").innerHTML='<div class="fact"><b>Error</b>No pudimos cargar los datos de tu zona. Intenta de nuevo.</div>';});
   }else{
-    selProv.innerHTML='<option value="">Elige provincia</option>'+provsOf(cod).map(k=>`<option value="${k}">${esc(provName(k))}${provHas(k)?"":" (sin datos aún)"}</option>`).join("");
+    selProv.innerHTML='<option value="">Elige provincia</option>'+provsOf(cod).map(k=>`<option value="${k}">${esc(provName(k))}</option>`).join("");
     selProv.disabled=false;
   }
   render();
@@ -378,7 +410,7 @@ function pickProv(k){
   S.prov=k;S.dist=S.riesgo=null;hideRisk();
   if(S.dep!==k.slice(0,2)){S.dep=k.slice(0,2);selDep.value=S.dep;}
   selProv.value=k;
-  selDist.innerHTML='<option value="">Elige distrito</option>'+distsOf(k).map(u=>`<option value="${u}">${esc(GEO_DIST[u].n)}${distHas(u)?"":" (sin datos aún)"}</option>`).join("");
+  selDist.innerHTML='<option value="">Elige distrito</option>'+distsOf(k).map(u=>`<option value="${u}">${esc(GEO_DIST[u].n)}</option>`).join("");
   selDist.disabled=false;
   render();
 }
@@ -412,6 +444,7 @@ function renderRisk(){
     <div class="meter" aria-hidden="true">${[1,2,3,4].map(i=>`<i class="${i<=n?"on":""}"></i>`).join("")}</div>
     <div><b>Peligro principal:</b> ${esc(r.peligro)}${r.secundario?` · también: ${esc(r.secundario)}`:""}</div>
     <small>Fuente: ${esc(r.escenario.fuente)} · ${esc(r.escenario.fecha)}</small>
+    ${r.aNivelDepto?'<small>Dato orientativo a nivel de departamento; el detalle por distrito llegará con las fuentes oficiales.</small>':""}
   </div>
   <div class="facts" style="margin-top:12px">
     <div class="fact"><b>Historial de emergencias</b>${esc(r.historial.texto)}<span class="src">${esc(r.historial.fuente)} · ${esc(r.historial.fecha)}</span></div>
