@@ -4,22 +4,22 @@
 <style>
 /* Concepto: flujo de 3 pasos (Zona, Familia, Plan). Mapa esquemático en mosaico de los 25 departamentos, mobile first. */
 :root{
-  --bg:#f2f6f5; --surface:#ffffff; --ink:#10282e; --muted:#4a6168; --line:#d3e0de;
-  --accent:#0b5c6b; --accent-ink:#ffffff; --accent-soft:#dcefee; --wa:#1a7f45;
+  --bg:#f3f5f2; --surface:#ffffff; --ink:#1f2326; --muted:#555e57; --line:#d9dfd6;
+  --accent:#97bd3d; --accent-ink:#17210a; --accent-soft:#e6f0cf; --wa:#1a7f45;
   --r-bajo:#2e8b57; --r-medio:#f2c230; --r-alto:#ee8a1e; --r-muy:#c8312b;
   --r-bajo-ink:#fff; --r-medio-ink:#2b2200; --r-alto-ink:#2b1500; --r-muy-ink:#fff;
-  --tile:#e3ecea; --tile-off:#eaf0ef; --focus:#0b5c6b;
+  --tile:#e4e8e0; --tile-off:#eceee8; --focus:#4f6f12;
   --f-display:'Bricolage Grotesque','Segoe UI',system-ui,sans-serif;
   --f-body:'Figtree','Segoe UI',system-ui,sans-serif;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#0d1b1f; --surface:#14282d; --ink:#e8f1f0; --muted:#9db5b8; --line:#294249;
-  --accent:#58c1cf; --accent-ink:#06191d; --accent-soft:#1b3a41; --wa:#46c27a;
-  --tile:#1d3338; --tile-off:#172a2e; --focus:#58c1cf; color-scheme:dark}}
+  --bg:#1f2224; --surface:#2b2f31; --ink:#eef2ee; --muted:#a9b2ac; --line:#3d4245;
+  --accent:#a6cc4a; --accent-ink:#141c07; --accent-soft:#2c3a14; --wa:#46c27a;
+  --tile:#363b3e; --tile-off:#2a2e30; --focus:#a6cc4a; color-scheme:dark}}
 :root[data-theme="dark"]{
-  --bg:#0d1b1f; --surface:#14282d; --ink:#e8f1f0; --muted:#9db5b8; --line:#294249;
-  --accent:#58c1cf; --accent-ink:#06191d; --accent-soft:#1b3a41; --wa:#46c27a;
-  --tile:#1d3338; --tile-off:#172a2e; --focus:#58c1cf; color-scheme:dark}
+  --bg:#1f2224; --surface:#2b2f31; --ink:#eef2ee; --muted:#a9b2ac; --line:#3d4245;
+  --accent:#a6cc4a; --accent-ink:#141c07; --accent-soft:#2c3a14; --wa:#46c27a;
+  --tile:#363b3e; --tile-off:#2a2e30; --focus:#a6cc4a; color-scheme:dark}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 body{background:var(--bg);color:var(--ink);font:400 18px/1.5 var(--f-body);
@@ -59,7 +59,7 @@ svg.map{display:block;width:100%;height:auto;max-height:520px;padding:6px}
 .tile.ctx:hover{opacity:1}
 .lbl{font-family:var(--f-body);font-weight:700;fill:var(--ink);text-anchor:middle;dominant-baseline:middle;pointer-events:none;paint-order:stroke;stroke:var(--surface);stroke-width:3px;stroke-linejoin:round;vector-effect:non-scaling-stroke}
 .crumbs{padding:10px 12px 0;font-size:15px;font-weight:700}
-.crumbs button{border:0;background:none;color:var(--accent);font-weight:700;text-decoration:underline;padding:6px 2px;min-height:36px}
+.crumbs button{border:0;background:none;color:var(--ink);font-weight:700;text-decoration:underline;padding:6px 2px;min-height:36px}
 .tip{min-height:26px;font-weight:700;padding:6px 12px 0}
 .legend{font-size:14px;color:var(--muted);padding:0 12px 10px}
 .field{display:flex;flex-direction:column;gap:6px}
@@ -168,7 +168,7 @@ select:disabled{opacity:.5}
 #mapSlot{display:none}
 @media (min-width:960px){
   body{padding-block:10px 0}
-  .app{max-width:1500px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:auto minmax(0,1fr);gap:14px 20px;align-items:stretch;height:calc(100dvh - 20px);min-height:560px}
+  .app{max-width:1500px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:auto minmax(0,1fr);gap:14px 20px;align-items:stretch;height:calc(100vh - 20px);height:calc(100dvh - 20px);min-height:600px}
   .app>header{grid-column:1/-1;flex-direction:row;flex-wrap:wrap;align-items:center;gap:8px 16px;padding-top:0}
   .app>header h1{font-size:24px}
   .app>header .lead,.app>header .tabs,.app>header .steps{display:none}
@@ -182,6 +182,21 @@ select:disabled{opacity:.5}
   #mapSlot .mapbox{flex:1;min-height:0;display:flex;flex-direction:column}
   #mapSlot svg.map{flex:1 1 0;height:0;min-height:0;max-height:none;width:100%}
 }
+.sheet{background:#2f3234;color:#f1f4f0;border-color:#444a4d}
+.sheet .sh-h{border-bottom-color:#444a4d}
+.sheet .sh-h small,.sheet .m small{color:#b5bdb8}
+.sheet .x{color:#f1f4f0;border-color:#5a6064}
+.sheet .m.a{background:#3b3f42;border-color:#4a4f52;color:#f1f4f0}
+.sheet .m.u{background:var(--accent);color:var(--accent-ink)}
+.sheet .m.wide{background:transparent;border:0;padding:0;color:inherit}
+.sheet .chip{color:#f1f4f0;border-color:var(--accent)}
+.sheet .chip:hover{background:var(--accent);color:var(--accent-ink)}
+.sheet .cf input{background:#26292b;color:#f1f4f0;border-color:#4a4f52}
+.sheet .btn.alt{color:#f1f4f0;border-color:#5a6064}
+.sheet #planOut>.engine,.sheet #planOut>.note{color:#b5bdb8}
+.sheet .dots i{background:#b5bdb8}
+.app>header h1{background:var(--accent);color:var(--accent-ink);padding:8px 14px;border-radius:10px;font-size:22px;line-height:1.15}
+.proto{background:var(--accent-soft);border-color:var(--accent)}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:12px;font-weight:700;z-index:20}
 footer{font-size:13px;color:var(--muted);display:flex;flex-direction:column;gap:6px}
 @media (min-width:640px){.facts{grid-template-columns:1fr 1fr}.plan.two{grid-template-columns:1fr 1fr}}
@@ -460,7 +475,7 @@ function addDot(x,y,nivel,r,name,onClick){
 }
 /* Puntos: zonas con riesgo alto o muy alto (datos de ejemplo). Reemplazable por avisos SENAMHI/ENFEN en vivo. */
 function renderDots(target){
-  const r=target[2]/(S.dep?60:70);
+  const r=target[2]/(S.dep?34:36);
   if(!S.dep){
     Object.keys(RIESGO_DEP).forEach(c=>{const n=RIESGO_DEP[c].nivel;if(ORD[n]>=3)addDot(...centro(GEO_DEP[c].d),n,r,depName(c),()=>pickDep(c));});
     return;
