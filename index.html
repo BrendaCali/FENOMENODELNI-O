@@ -1463,18 +1463,34 @@ async function overpass(q){
   }
   throw new Error("overpass");
 }
-function centroLugar(){
+async function geocodificar(q){
+  const c=new AbortController();const to=setTimeout(()=>c.abort(),9000);
+  const r=await fetch("https://nominatim.openstreetmap.org/search?q="+encodeURIComponent(q)+"&countrycodes=pe&format=json&limit=1&accept-language=es",{signal:c.signal});clearTimeout(to);
+  const j=await r.json();return j.length?{lat:+j[0].lat,lon:+j[0].lon,nombre:j[0].display_name.split(",").slice(0,2).join(",").trim()}:null;
+}
+function consultaLugar(){
+  if(S.dist&&GEO_DIST[S.dist])return distName()+", "+provName(S.prov)+", "+depName(S.dep)+", Perú";
+  if(S.dep&&GEO_DEP[S.dep])return depName(S.dep)+", Perú";
+  return null;
+}
+async function iniciarRefugios(){
+  const q=consultaLugar();
+  if(!q){if(!REF.init){REF.init=true;$("rWhere").textContent="Escribe un lugar, toca “Cerca de mí” o elige un lugar en el mapa.";$("rList").innerHTML="";}return;}
+  if(REF.init&&REF.auto&&REF.q===q)return;
+  REF.init=true;REF.auto=true;REF.q=q;
+  $("rWhere").textContent="Ubicando "+(S.dist?distName():depName(S.dep))+"…";
+  try{
+    let g=await geocodificar(q);
+    if(!g&&S.dist)g=await geocodificar(distName()+", "+depName(S.dep)+", Perú");
+    if(!g){const c=centroLugar2();if(c)g=c;}
+    if(!g){$("rWhere").textContent="No pude ubicar ese lugar. Escríbelo en el buscador.";return;}
+    REF.centro=[g.lat,g.lon];REF.nombre=S.dist?distName():g.nombre;buscarRefugios();
+  }catch(e){$("rWhere").textContent="No pude ubicar ese lugar ahora. Escríbelo en el buscador.";}
+}
+function centroLugar2(){
   if(S.dist&&GEO_DIST[S.dist]){const [la,lo]=mapToLL(bboxCentro(GEO_DIST[S.dist].d));return {lat:la,lon:lo,nombre:distName()};}
   if(S.dep&&GEO_DEP[S.dep]){const [la,lo]=mapToLL(bboxCentro(GEO_DEP[S.dep].d));return {lat:la,lon:lo,nombre:depName(S.dep)};}
   return null;
-}
-function iniciarRefugios(){
-  const c=centroLugar();
-  if(!REF.init||(c&&REF.auto&&(!REF.centro||REF.nombre!==c.nombre))){
-    REF.init=true;
-    if(c){REF.centro=[c.lat,c.lon];REF.nombre=c.nombre;REF.auto=true;buscarRefugios();}
-    else{$("rWhere").textContent="Escribe un lugar, toca “Cerca de mí” o elige un lugar en el mapa.";$("rList").innerHTML="";}
-  }
 }
 async function buscarRefugios(){
   if(!REF.centro)return;
@@ -1537,10 +1553,9 @@ $("rForm").addEventListener("submit",async e=>{
   e.preventDefault();const q=$("rIn").value.trim();if(!q)return;
   $("rWhere").textContent="Buscando “"+q+"”…";
   try{
-    const r=await fetch("https://nominatim.openstreetmap.org/search?q="+encodeURIComponent(q)+"&countrycodes=pe&format=json&limit=1");
-    const j=await r.json();
-    if(!j.length){$("rWhere").textContent="No encontré ese lugar en el Perú. Prueba con otro nombre.";return;}
-    REF.centro=[+j[0].lat,+j[0].lon];REF.nombre=j[0].display_name.split(",").slice(0,2).join(",").trim();REF.auto=false;REF.init=true;buscarRefugios();
+    const g=await geocodificar(q);
+    if(!g){$("rWhere").textContent="No encontré ese lugar en el Perú. Prueba con otro nombre.";return;}
+    REF.centro=[g.lat,g.lon];REF.nombre=g.nombre;REF.auto=false;REF.init=true;buscarRefugios();
   }catch(err){$("rWhere").textContent="No pude buscar ese lugar ahora. Intenta de nuevo.";}
 });
 $("rNear").onclick=()=>{
