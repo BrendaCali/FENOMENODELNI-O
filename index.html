@@ -337,6 +337,20 @@ select:disabled{opacity:.5}
 @keyframes pulseg{0%{box-shadow:0 0 0 0 rgba(26,127,69,.6)}100%{box-shadow:0 0 0 16px rgba(26,127,69,0)}}
 @media (max-width:959px){.fab{right:auto;left:max(16px,env(safe-area-inset-left,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px))}}
 @media (prefers-reduced-motion:reduce){.wafab{animation:none!important}}
+@media (max-width:959px){
+  h1{font-size:24px}
+  .banner{font-size:13px;padding:8px 12px}
+  .banner small{font-size:11px}
+  .zoomctl{top:108px}
+  .modes{flex-wrap:wrap}
+  .fab,.wafab{min-height:48px;font-size:14px;padding:0 14px}
+  .fab svg,.wafab svg{width:20px;height:20px}
+  .mas{margin-bottom:84px}
+  .mtile{min-height:92px;padding:14px}
+  .mpanel{padding:12px;scroll-margin-top:12px}
+  #semList{max-height:300px}
+  .ccard .num{font-size:30px}
+}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:12px;font-weight:700;z-index:20}
 footer{font-size:13px;color:var(--muted);display:flex;flex-direction:column;gap:6px}
 @media (min-width:640px){.facts{grid-template-columns:1fr 1fr}.plan.two{grid-template-columns:1fr 1fr}}
@@ -1341,11 +1355,12 @@ function togglePanel(p,abrir){
   const on=abrir||(tile&&tile.getAttribute("aria-expanded")!=="true");
   document.querySelectorAll(".mtile").forEach(b=>b.setAttribute("aria-expanded",String(b===tile&&on)));
   document.querySelectorAll(".mpanel").forEach(x=>{x.hidden=!(x.id==="p-"+p&&on);});
+  if(on&&!DESK.matches)setTimeout(()=>{const el=$("p-"+p);if(el&&!el.hidden)el.scrollIntoView({behavior:"smooth",block:"start"});},60);
   if(on&&p==="noticias"&&!NEWS.cargado)cargarNoticias("semana");
   if(on&&p==="refugios")iniciarRefugios();
   if(on&&p==="whatsapp")pintarWhatsapp();
 }
-function irAMas(p){togglePanel(p,true);$("mas").scrollIntoView({behavior:"smooth",block:"start"});}
+function irAMas(p){togglePanel(p,true);if(DESK.matches)$("mas").scrollIntoView({behavior:"smooth",block:"start"});}
 document.querySelectorAll(".mtile").forEach(b=>b.addEventListener("click",()=>togglePanel(b.dataset.p)));
 $("waFab").onclick=()=>{const u=waEnlace(true);if(u)window.open(u,"_blank","noopener");else irAMas("whatsapp");};
 
