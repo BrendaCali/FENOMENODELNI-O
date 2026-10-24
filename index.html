@@ -395,6 +395,8 @@ select:disabled{opacity:.5}
 .kid div{display:flex;flex-direction:column;gap:2px;min-width:0}
 .kid b{font-size:15px}
 @media (max-width:640px){.wa-hero small{display:none}.wa-hero{padding:8px 14px 8px 20px}}
+.chips{flex-wrap:nowrap!important;overflow-x:auto!important;overflow-y:hidden;padding:0 14px 8px;scrollbar-width:thin;scroll-snap-type:x proximity}
+.chips .chip{white-space:nowrap;scroll-snap-align:start;min-height:34px;font-size:13px;padding:2px 12px}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:12px;font-weight:700;z-index:20}
 footer{font-size:13px;color:var(--muted);display:flex;flex-direction:column;gap:6px}
 @media (min-width:640px){.facts{grid-template-columns:1fr 1fr}.plan.two{grid-template-columns:1fr 1fr}}
