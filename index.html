@@ -142,17 +142,46 @@ select:disabled{opacity:.5}
 #to2{position:sticky;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:5;box-shadow:0 6px 18px rgba(0,0,0,.28)}
 #riskFull:empty{display:none}
 @media (max-width:640px){.fab{bottom:calc(88px + env(safe-area-inset-bottom,0px));padding:0 16px}}
+.app{max-width:1180px;margin:0 auto}
+.banner{background:var(--r-muy);color:var(--r-muy-ink);border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:4px;font-size:16px}
+.banner b{font-family:var(--f-display);font-size:18px;line-height:1.2}
+.banner small{font-size:13px;opacity:.95}
+.tile path{fill-opacity:.9}
+.tile.lv-bajo path,.tile.lv-bajo:hover path,.tile.lv-bajo.sel path{fill:var(--r-bajo)}
+.tile.lv-medio path,.tile.lv-medio:hover path,.tile.lv-medio.sel path{fill:var(--r-medio)}
+.tile.lv-alto path,.tile.lv-alto:hover path,.tile.lv-alto.sel path{fill:var(--r-alto)}
+.tile.lv-muy-alto path,.tile.lv-muy-alto:hover path,.tile.lv-muy-alto.sel path{fill:var(--r-muy)}
+.tile.has path{stroke:var(--ink);stroke-width:1.4px}
+.tile:hover path,.tile:focus-visible path{filter:brightness(1.12);stroke:var(--ink)}
+.tile.sel path{stroke:var(--ink);stroke-width:3px}
+.sw{display:flex;gap:10px;flex-wrap:wrap;padding:0 12px 8px;font-size:14px;font-weight:700}
+.sw span{display:inline-flex;align-items:center;gap:6px}
+.sw i{width:16px;height:16px;border-radius:5px;display:inline-block}
+@media (min-width:960px){
+  .app{display:grid;grid-template-columns:minmax(340px,400px) minmax(0,1fr);gap:24px;align-items:start}
+  .sheet,.sheet[hidden]{display:flex!important;position:sticky;top:12px;left:auto;right:auto;bottom:auto;margin:0;max-width:none;width:auto;height:calc(100dvh - 24px);border-radius:18px;border:1px solid var(--line);box-shadow:none;z-index:1}
+  .fab,.fab[hidden],.x{display:none!important}
+  .wrap{max-width:none}
+}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:12px;font-weight:700;z-index:20}
 footer{font-size:13px;color:var(--muted);display:flex;flex-direction:column;gap:6px}
 @media (min-width:640px){.facts{grid-template-columns:1fr 1fr}.plan.two{grid-template-columns:1fr 1fr}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation-duration:2s!important}}
 </style>
 
+<div class="app">
+<aside class="sheet" id="sheet" hidden aria-labelledby="shT">
+  <div class="sh-h"><div><h3 id="shT">Asistente familiar</h3><small id="shS">Responde solo con los datos de tu distrito</small></div><button class="x" id="shX" type="button" aria-label="Cerrar">×</button></div>
+  <div id="msgs" aria-live="polite"></div>
+  <div class="chips" id="chips"></div>
+  <form class="cf" id="cf"><input id="cin" type="text" autocomplete="off" placeholder="Escribe tu pregunta" aria-label="Tu pregunta"><button class="btn" type="submit">Enviar</button></form>
+</aside>
 <div class="wrap">
 <header>
   <span class="proto">Datos de ejemplo del prototipo</span>
   <h1>Tu plan familiar ante El Niño</h1>
   <p class="lead">Elige dónde vives, cuéntanos de tu familia y recibe un plan simple: qué hacer antes, durante y después de las lluvias.</p>
+  <div class="banner" id="banner" role="status"></div>
   <div class="tabs" role="tablist" aria-label="Secciones">
     <button type="button" role="tab" id="tabPlan" data-t="plan" aria-selected="true">Mi plan familiar</button>
     <button type="button" role="tab" id="tabHoy" data-t="hoy" aria-selected="false">El Niño hoy</button>
@@ -171,7 +200,8 @@ footer{font-size:13px;color:var(--muted);display:flex;flex-direction:column;gap:
     <svg class="map" id="map" viewBox="0 0 500 732" role="group" aria-label="Mapa de los departamentos del Perú"></svg>
     <div class="zoomctl"><button type="button" id="zIn" aria-label="Acercar">+</button><button type="button" id="zOut" aria-label="Alejar">−</button><button type="button" id="zAll" class="all" aria-label="Ver todo el Perú">Perú</button></div>
     <div class="tip" id="tip" aria-live="polite">Pasa el dedo o el mouse sobre el mapa</div>
-    <div class="legend">Pellizca con dos dedos para acercar, arrastra para mover y toca una sección para elegirla. Las de color con borde tienen detalle por provincia y distrito.</div>
+    <div class="sw" aria-label="Leyenda de niveles de riesgo"><span><i style="background:var(--r-bajo)"></i>Bajo</span><span><i style="background:var(--r-medio)"></i>Medio</span><span><i style="background:var(--r-alto)"></i>Alto</span><span><i style="background:var(--r-muy)"></i>Muy alto</span></div>
+    <div class="legend">Los colores son niveles de riesgo de ejemplo, no probabilidades. Pellizca para acercar, arrastra para mover y toca para elegir.</div>
   </div>
   <div class="field"><label for="selDep">Departamento</label><select id="selDep"></select></div>
   <div class="field"><label for="selProv">Provincia</label><select id="selProv" disabled></select></div>
@@ -205,15 +235,10 @@ footer{font-size:13px;color:var(--muted);display:flex;flex-direction:column;gap:
   <span>Fuentes que se conectarán: ENFEN-IMARPE, CENEPRED (SIGRID), INDECI, SENAMHI y ubigeo INEI.</span>
 </footer>
 </div>
+</div>
 <button class="fab" id="fab" type="button" aria-haspopup="dialog">
   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg>Pregunta
 </button>
-<div class="sheet" id="sheet" hidden role="dialog" aria-labelledby="shT">
-  <div class="sh-h"><div><h3 id="shT">Asistente familiar</h3><small id="shS">Responde solo con los datos de tu distrito</small></div><button class="x" id="shX" type="button" aria-label="Cerrar">×</button></div>
-  <div id="msgs" aria-live="polite"></div>
-  <div class="chips" id="chips"></div>
-  <form class="cf" id="cf"><input id="cin" type="text" autocomplete="off" placeholder="Escribe tu pregunta" aria-label="Tu pregunta"><button class="btn" type="submit">Enviar</button></form>
-</div>
 <div class="toast" id="toast" hidden></div>
 
 <script>
@@ -349,13 +374,18 @@ function fitBox(d,pad){
   if(w/h<ratio)w=h*ratio;else h=w/ratio;
   return {box:[b.x+b.width/2-w/2,b.y+b.height/2-h/2,w,h],bb:b};
 }
-function shape(id,name,d,cls,onClick){
+const ORD={"bajo":1,"medio":2,"alto":3,"muy-alto":4};
+const nivelDep=c=>RIESGO_DEP[c]?RIESGO_DEP[c].nivel:null;
+const nivelProv=k=>{let best=nivelDep(k.slice(0,2)),m=ORD[best]||0;distsOf(k).forEach(u=>{if(RIESGO[u]&&ORD[RIESGO[u].nivel]>m){m=ORD[RIESGO[u].nivel];best=RIESGO[u].nivel;}});return best;};
+const nivelDist=u=>(RIESGO[u]||RIESGO_DEP[u.slice(0,2)]||{}).nivel||null;
+function shape(id,name,d,cls,onClick,nivel){
   const g=document.createElementNS(NS,"g"),p=document.createElementNS(NS,"path");
-  g.setAttribute("class","tile "+cls);p.setAttribute("d",d);g.appendChild(p);
+  g.setAttribute("class","tile "+cls+(nivel?" lv-"+nivel:""));p.setAttribute("d",d);g.appendChild(p);
+  const lv=nivel?" · "+NIV[nivel][0].toLowerCase():"";
   if(onClick){
-    g.setAttribute("tabindex","0");g.setAttribute("role","button");g.setAttribute("aria-label",name+(/\bhas\b/.test(cls)?" (con detalle por distrito)":""));
-    g.addEventListener("mouseenter",()=>$("tip").textContent=name+(/\bhas\b/.test(cls)?"":" · datos a nivel de departamento"));
-    g.addEventListener("focus",()=>$("tip").textContent=name);
+    g.setAttribute("tabindex","0");g.setAttribute("role","button");g.setAttribute("aria-label",name+lv);
+    g.addEventListener("mouseenter",()=>$("tip").textContent=name+lv);
+    g.addEventListener("focus",()=>$("tip").textContent=name+lv);
     g.addEventListener("click",onClick);
     g.addEventListener("keydown",ev=>{if(ev.key==="Enter"||ev.key===" "){ev.preventDefault();onClick();}});
   }
@@ -370,20 +400,20 @@ function label(name,d,fs,boxW){
 }
 function render(){
   svg.innerHTML="";
-  let target=null,ctx=false;
+  let target=null;
   if(!S.dep){
-    Object.keys(GEO_DEP).forEach(c=>shape(c,depName(c),GEO_DEP[c].d,depHas(c)?"has":"",()=>pickDep(c)));
+    Object.keys(GEO_DEP).forEach(c=>shape(c,depName(c),GEO_DEP[c].d,depHas(c)?"has":"",()=>pickDep(c),nivelDep(c)));
     target=[0,0,MAP_W,MAP_H];
   }else if(!S.prov){
-    Object.keys(GEO_DEP).forEach(c=>{if(c!==S.dep)shape(c,depName(c),GEO_DEP[c].d,"ctx"+(depHas(c)?" has":""),()=>pickDep(c));});
+    Object.keys(GEO_DEP).forEach(c=>{if(c!==S.dep)shape(c,depName(c),GEO_DEP[c].d,"ctx"+(depHas(c)?" has":""),()=>pickDep(c),nivelDep(c));});
     const ps=provsOf(S.dep);
-    if(ps.length)ps.forEach(k=>shape(k,provName(k),GEO_PROV[k].d,provHas(k)?"has":"",()=>pickProv(k)));
-    else shape(S.dep,depName(S.dep),GEO_DEP[S.dep].d,"sel",null);
+    if(ps.length)ps.forEach(k=>shape(k,provName(k),GEO_PROV[k].d,provHas(k)?"has":"",()=>pickProv(k),nivelProv(k)));
+    else shape(S.dep,depName(S.dep),GEO_DEP[S.dep].d,"sel",null,nivelDep(S.dep));
     const f=fitBox(GEO_DEP[S.dep].d,24);target=f.box;
     ps.forEach(k=>label(provName(k),GEO_PROV[k].d,target[2]/34,target[2]));
   }else{
-    provsOf(S.dep).forEach(k=>{if(k!==S.prov)shape(k,provName(k),GEO_PROV[k].d,"ctx"+(provHas(k)?" has":""),()=>pickProv(k));});
-    distsOf(S.prov).forEach(u=>shape(u,GEO_DIST[u].n,GEO_DIST[u].d,(distHas(u)?"has ":"")+(u===S.dist?"sel":""),()=>{selDist.value=u;pickDist(u);}));
+    provsOf(S.dep).forEach(k=>{if(k!==S.prov)shape(k,provName(k),GEO_PROV[k].d,"ctx"+(provHas(k)?" has":""),()=>pickProv(k),nivelProv(k));});
+    distsOf(S.prov).forEach(u=>shape(u,GEO_DIST[u].n,GEO_DIST[u].d,(distHas(u)?"has ":"")+(u===S.dist?"sel":""),()=>{selDist.value=u;pickDist(u);},nivelDist(u)));
     const f=fitBox(GEO_PROV[S.prov].d,16);target=f.box;
     distsOf(S.prov).forEach(u=>label(GEO_DIST[u].n,GEO_DIST[u].d,target[2]/38,target[2]));
   }
@@ -426,7 +456,7 @@ function pickDep(cod){
   if(!depHas(cod)){
     resetSel(selProv,"Detalle por provincia próximamente");
     $("riskArea").hidden=false;$("riskArea").innerHTML='<div class="loading"><span class="spin"></span>Buscando datos de tu zona…</div>';
-    getRiesgoPorUbigeo(cod).then(r=>{if(S.dep!==cod||S.prov)return;S.riesgo=r;renderRisk();$("to2").disabled=!r;}).catch(()=>{$("riskArea").innerHTML='<div class="fact"><b>Error</b>No pudimos cargar los datos de tu zona. Intenta de nuevo.</div>';});
+    getRiesgoPorUbigeo(cod).then(r=>{if(S.dep!==cod||S.prov)return;S.riesgo=r;renderRisk();$("to2").disabled=!r;agentNotify();}).catch(()=>{$("riskArea").innerHTML='<div class="fact"><b>Error</b>No pudimos cargar los datos de tu zona. Intenta de nuevo.</div>';});
   }else{
     selProv.innerHTML='<option value="">Elige provincia</option>'+provsOf(cod).map(k=>`<option value="${k}">${esc(provName(k))}</option>`).join("");
     selProv.disabled=false;
@@ -448,7 +478,7 @@ async function pickDist(u){
   $("riskArea").hidden=false;$("riskArea").innerHTML='<div class="loading"><span class="spin"></span>Buscando datos de tu zona…</div>';
   try{
     S.riesgo=await getRiesgoPorUbigeo(u);
-    renderRisk();$("to2").disabled=!S.riesgo;
+    renderRisk();$("to2").disabled=!S.riesgo;agentNotify();
   }catch(e){$("riskArea").innerHTML='<div class="fact"><b>Error</b>No pudimos cargar los datos de tu zona. Intenta de nuevo.</div>';}
 }
 selDep.onchange=()=>{if(selDep.value)pickDep(selDep.value);};
@@ -632,7 +662,7 @@ $("gen").onclick=async()=>{
   let plan,motor;
   try{({plan,motor}=await llamarIA(buildPrompt()));}
   catch(e){plan=planLocal();motor="Plan de respaldo (sin conexión a la IA)";}
-  S.plan=plan;S.motor=motor;renderPlan();
+  S.plan=plan;S.motor=motor;renderPlan();agentSay("Tu plan está listo. Pregúntame sobre la mochila, la ruta o qué hacer si hay alerta.");
 };
 
 /* ============ RENDER DEL PLAN ============ */
@@ -732,7 +762,7 @@ async function chatIA(){
 }
 function chatLocal(q){
   const r=S.riesgo,t=q.toLowerCase();
-  if(!r)return "Primero elige tu departamento, provincia y distrito en el mapa. Con eso te respondo con datos de tu zona.";
+  if(!r)return "No encontré ese lugar. Escribe el nombre de tu distrito (por ejemplo Catacaos), elige uno de los botones o toca el mapa.";
   const has=(...w)=>w.some(x=>t.includes(x));
   if(has("urgente","emergencia","ayuda","peligro ahora","socorro"))return "Si hay peligro ahora, llama a INDECI al 119 y sigue las indicaciones de las autoridades. Evacúa si te lo piden.";
   if(has("mochila","llevar","kit"))return "Mochila: agua, comida que no se malogre, linterna y pilas, botiquín y medicinas, documentos en bolsa plástica, ropa de cambio y cargador portátil."+(S.perfil.ninos==="si"?" Agrega pañales, leche y ropa para los niños.":"");
@@ -750,7 +780,10 @@ function addMsg(r,t,note){
 }
 async function chatSend(q){
   q=q.trim();if(!q||CH.busy)return;
-  CH.busy=true;addMsg("u",q);CH.hist.push({r:"u",t:q});$("cin").value="";
+  CH.busy=true;addMsg("u",q);$("cin").value="";
+  const lug=buscarLugar(q);
+  if(lug){await irALugar(lug);CH.busy=false;return;}
+  CH.hist.push({r:"u",t:q});
   const w=addMsg("a","");w.innerHTML='<span class="dots"><i></i><i></i><i></i></span>';
   let ans=null,note="";
   if(!S.riesgo)ans=chatLocal(q);
@@ -758,21 +791,60 @@ async function chatSend(q){
   w.textContent=ans;if(note){const s=document.createElement("small");s.textContent=note;w.appendChild(s);}
   CH.hist.push({r:"a",t:ans});CH.busy=false;$("msgs").scrollTop=$("msgs").scrollHeight;
 }
+/* ---- El agente guía el flujo y se sincroniza con el mapa ---- */
+const norm=s=>String(s).normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().trim();
+function buscarLugar(q){
+  const n=norm(q).replace(/^(vivo en|estoy en|mi distrito es|en)\s+/,"").replace(/[.!?¿¡]+$/,"");
+  if(!n)return null;
+  for(const u in GEO_DIST)if(norm(GEO_DIST[u].n)===n)return {tipo:"dist",u};
+  for(const c in GEO_DEP)if(norm(GEO_DEP[c].n)===n)return {tipo:"dep",c};
+  return null;
+}
+async function irALugar(l){
+  CH.last=null;
+  if(l.tipo==="dist"){const p=GEO_DIST[l.u].p;pickDep(p.slice(0,2));pickProv(p);selDist.value=l.u;await pickDist(l.u);}
+  else pickDep(l.c);
+}
+function agentSay(t,note){return addMsg("a",t,note);}
+function resumenLugar(){
+  const r=S.riesgo;if(!r)return "";
+  const lugar=distName()+(S.prov?" ("+provName(S.prov)+")":"");
+  if(r.general)return lugar+": no tengo datos de riesgo de esta zona, pero te preparo un plan general. Toca Armar mi plan.";
+  return lugar+": "+NIV[r.nivel][0].toLowerCase()+", peligro principal "+r.peligro.toLowerCase()+". "+r.aviso.texto+" ("+r.aviso.fuente+", "+r.aviso.fecha+"). Cuando quieras, toca Armar mi plan.";
+}
+function agentNotify(){
+  if(!S.riesgo)return;
+  const key=(S.dist||S.dep)+"|"+S.riesgo.nivel;
+  if(CH.last===key)return;CH.last=key;
+  agentSay(resumenLugar());chatChips();
+  $("shS").textContent="Datos de "+distName()+" · ejemplo del prototipo";
+}
+const LUGARES=[["Tumbes","240101"],["Zarumilla","240301"],["Piura","200101"],["Catacaos","200105"],["Sullana","200601"],["Chiclayo","140101"],["Lambayeque","140301"]];
 function chatChips(){
   const c=$("chips");c.innerHTML="";
-  ["¿Qué riesgo tiene mi distrito?","¿Qué pongo en la mochila?","¿Qué dice el aviso de hoy?","¿Qué pasó antes aquí?","Es una emergencia"].forEach(q=>{
-    const b=document.createElement("button");b.type="button";b.className="chip";b.textContent=q;b.onclick=()=>chatSend(q);c.appendChild(b);});
+  const add=(t,fn)=>{const b=document.createElement("button");b.type="button";b.className="chip";b.textContent=t;b.onclick=fn;c.appendChild(b);};
+  if(!S.riesgo){LUGARES.forEach(([n,u])=>add(n,()=>{addMsg("u",n);irALugar({tipo:"dist",u});}));return;}
+  add("Armar mi plan",()=>{addMsg("u","Armar mi plan");agentSay("Vamos. Cuéntame de tu familia con los botones de la pantalla.");setStep(2);});
+  ["¿Qué riesgo tiene mi distrito?","¿Qué pongo en la mochila?","¿Qué dice el aviso de hoy?","¿Qué pasó antes aquí?","Es una emergencia"].forEach(q=>add(q,()=>chatSend(q)));
+}
+function chatInit(){
+  agentSay("Hola, soy tu asistente. Te ayudo a preparar a tu familia ante El Niño con datos oficiales del Perú.");
+  agentSay("Hoy el ENFEN mantiene la "+ENFEN_ESTADO.estado+". Se esperan lluvias sobre lo normal en la costa norte.","ENFEN · "+ENFEN_ESTADO.comunicado+" · "+ENFEN_ESTADO.fecha);
+  agentSay("¿En qué distrito vives? Escríbelo, elige uno de abajo o toca el mapa.");
+  chatChips();
+}
+function renderBanner(){
+  const e=ENFEN_ESTADO,p=e.probExtraordinaria.map(([m,v])=>m+" "+v+"%").join(" · ");
+  $("banner").innerHTML="<b>ALERTA · "+esc(e.estado)+"</b><span>"+esc(e.resumen)+"</span><small>Probabilidad de magnitud extraordinaria: "+esc(p)+" · "+esc(e.comunicado)+", "+esc(e.fecha)+" · "+esc(e.probFuente)+"</small>";
 }
 function chatOpen(){
-  $("sheet").hidden=false;$("fab").hidden=true;
-  $("shS").textContent=S.riesgo?"Datos de "+distName()+" · ejemplo del prototipo":"Elige tu distrito para respuestas de tu zona";
-  if(!$("msgs").children.length)addMsg("a",S.riesgo?"Hola, soy tu asistente. Puedo contarte sobre el riesgo en "+distName()+", la mochila, los avisos del tiempo o tu plan. ¿Qué quieres saber?":"Hola. Elige tu departamento, provincia y distrito en el mapa y te respondo con los datos de tu zona. También puedo explicarte cómo funciona la app.");
-  $("cin").focus();
+  $("sheet").hidden=false;$("fab").hidden=true;$("cin").focus();
 }
 $("fab").onclick=chatOpen;
 $("shX").onclick=()=>{$("sheet").hidden=true;$("fab").hidden=false;};
 $("cf").addEventListener("submit",e=>{e.preventDefault();chatSend($("cin").value);});
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("sheet").hidden)$("shX").click();});
-chatChips();
+chatInit();
+renderBanner();
 setStep(1);
 </script>
