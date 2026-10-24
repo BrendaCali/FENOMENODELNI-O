@@ -274,6 +274,50 @@ select:disabled{opacity:.5}
 .stabs{padding:0!important}
 .hist{display:block;width:100%;max-width:380px;height:auto;color:var(--muted)}
 .histbox{margin-top:8px}
+.mas{max-width:720px;margin:22px auto 90px;display:flex;flex-direction:column;gap:14px}
+.mas h2{font-size:22px}
+.mtiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.mtile{display:flex;flex-direction:column;align-items:flex-start;gap:6px;text-align:left;padding:16px;border-radius:16px;border:2px solid var(--line);background:var(--surface);color:var(--ink);min-height:120px;transition:transform .2s,border-color .2s,background .2s}
+.mtile b{font:800 18px var(--f-display)}
+.mtile small{font-size:14px;color:var(--muted)}
+.mtile:hover{transform:translateY(-3px);border-color:var(--ink)}
+.mtile[aria-expanded="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.mtile[aria-expanded="true"] small{color:inherit;opacity:.85}
+.mtile.call{border-color:var(--r-muy)}
+.mtile.call svg{color:var(--r-muy)}
+.mtile.call[aria-expanded="true"]{background:var(--r-muy);border-color:var(--r-muy);color:#fff}
+.mtile.call[aria-expanded="true"] svg{color:#fff}
+.mpanel{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:12px;animation:rowin .35s ease-out both}
+.mrow{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.mrow input{flex:1 1 220px;min-width:0;min-height:48px;border:2px solid var(--line);border-radius:12px;padding:0 14px;font:inherit;background:var(--bg);color:var(--ink)}
+.chipf{min-height:40px;padding:0 14px;border-radius:999px;border:2px solid var(--line);background:var(--surface);color:var(--ink);font-weight:700;font-size:14px}
+.chipf[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.ngrid,.rgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+.ncard,.rcard{display:flex;flex-direction:column;gap:6px;border:1px solid var(--line);border-radius:14px;padding:12px;background:var(--bg);animation:rowin .4s ease-out both}
+.ncard small,.rcard small{color:var(--muted);font-size:13px}
+.ncard a.nt{color:var(--ink);font-weight:700;font-size:16px;line-height:1.3;text-decoration:none}
+.ncard a.nt:hover{text-decoration:underline}
+.tag{align-self:flex-start;font-size:12px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;padding:2px 10px;border-radius:999px;background:var(--accent-soft);color:var(--ink)}
+.rcard .acts{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+.rcard .acts a,.rcard .acts button{min-height:40px;padding:0 12px;border-radius:10px;border:2px solid var(--line);background:var(--surface);color:var(--ink);font-weight:700;font-size:14px;text-decoration:none;display:inline-flex;align-items:center}
+.rcard .acts a.go{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.oficiales a{font-weight:700;color:var(--ink)}
+.cgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.ccard{display:flex;align-items:center;justify-content:space-between;gap:10px;border:2px solid var(--line);border-radius:14px;padding:12px 14px;background:var(--bg)}
+.ccard.main{border-color:var(--r-muy);box-shadow:0 0 14px color-mix(in srgb,var(--r-muy) 45%,transparent)}
+.ccard .num{font:800 34px var(--f-display);line-height:1}
+.ccard small{display:block;color:var(--muted);font-size:13px}
+.ccard .cb{display:flex;flex-direction:column;gap:6px}
+.ccard a.tel{min-height:46px;padding:0 16px;border-radius:12px;background:var(--r-muy);color:#fff;font-weight:800;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
+.ccard button.cp{min-height:36px;border-radius:10px;border:2px solid var(--line);background:var(--surface);color:var(--ink);font-weight:700;font-size:13px}
+.cinfo{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.cbox{border:1px solid var(--line);border-radius:14px;padding:12px;background:var(--bg);display:flex;flex-direction:column;gap:8px}
+.cbox h3{font-size:16px}
+.cbox ol{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:4px;font-size:15px}
+.sos{position:fixed;left:max(16px,env(safe-area-inset-left,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:15;min-height:56px;padding:0 18px;border-radius:999px;border:0;background:var(--r-muy);color:#fff;font-weight:800;font-size:16px;display:flex;align-items:center;gap:8px;box-shadow:0 6px 20px rgba(0,0,0,.35);animation:pulse2 2.4s infinite}
+@keyframes pulse2{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--r-muy) 60%,transparent)}100%{box-shadow:0 0 0 16px transparent}}
+@media (min-width:960px){.mas{max-width:1500px}.fab{bottom:calc(16px + env(safe-area-inset-bottom,0px))}}
+@media (prefers-reduced-motion:reduce){.sos,.mpanel,.ncard,.rcard{animation:none!important}}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:12px;font-weight:700;z-index:20}
 footer{font-size:13px;color:var(--muted);display:flex;flex-direction:column;gap:6px}
 @media (min-width:640px){.facts{grid-template-columns:1fr 1fr}.plan.two{grid-template-columns:1fr 1fr}}
@@ -353,6 +397,73 @@ footer{font-size:13px;color:var(--muted);display:flex;flex-direction:column;gap:
 </footer>
 </div>
 </div>
+<section id="mas" class="mas" aria-labelledby="masT">
+  <h2 id="masT">Más información</h2>
+  <div class="mtiles" role="group" aria-label="Secciones de ayuda">
+    <button type="button" class="mtile" data-p="noticias" aria-expanded="false" aria-controls="p-noticias">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h13v14H6a2 2 0 0 1-2-2V5z"/><path d="M17 9h3v8a2 2 0 0 1-2 2h-1"/><path d="M8 9h5M8 13h5"/></svg>
+      <b>Noticias</b><small>Qué está pasando con El Niño y qué pasó antes</small>
+    </button>
+    <button type="button" class="mtile call" data-p="llamar" aria-expanded="false" aria-controls="p-llamar">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg>
+      <b>A quién llamar</b><small>INDECI 115 · Bomberos 116 · SAMU 106 · Policía 105</small>
+    </button>
+    <button type="button" class="mtile" data-p="refugios" aria-expanded="false" aria-controls="p-refugios">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/></svg>
+      <b>Refugios</b><small>Busca puntos de apoyo y cómo llegar</small>
+    </button>
+  </div>
+
+  <div class="mpanel" id="p-noticias" hidden>
+    <div class="mrow" id="nChips" role="group" aria-label="Filtrar noticias">
+      <button type="button" class="chipf" data-k="semana" aria-pressed="true">Esta semana</button>
+      <button type="button" class="chipf" data-k="mes" aria-pressed="false">Este mes</button>
+      <button type="button" class="chipf" data-k="hist" aria-pressed="false">El Niño de 2017</button>
+      <button type="button" class="chipf" data-k="zona" aria-pressed="false">Mi zona</button>
+    </div>
+    <div id="nList" class="ngrid" aria-live="polite"></div>
+    <p class="note" id="nNote"></p>
+    <div class="mrow oficiales"><span class="note">Fuentes oficiales:</span>
+      <a href="https://enfen.imarpe.gob.pe/" target="_blank" rel="noopener">ENFEN</a>
+      <a href="https://www.senamhi.gob.pe/?p=avisos-meteorologicos" target="_blank" rel="noopener">SENAMHI avisos</a>
+      <a href="https://portal.indeci.gob.pe/" target="_blank" rel="noopener">INDECI</a>
+      <a href="https://sigrid.cenepred.gob.pe/sigridv3" target="_blank" rel="noopener">CENEPRED</a>
+    </div>
+  </div>
+
+  <div class="mpanel" id="p-llamar" hidden>
+    <div class="cgrid" id="cGrid"></div>
+    <div class="cinfo">
+      <div class="cbox"><h3>Qué decir al llamar</h3>
+        <ol><li>Tu nombre y el lugar exacto: distrito, calle y una referencia.</li><li>Qué pasa: inundación, huaico, personas atrapadas o heridas.</li><li>Cuántas personas hay y si alguien necesita ayuda médica.</li><li>Un número donde te puedan devolver la llamada.</li></ol></div>
+      <div class="cbox"><h3>Tu contacto de emergencia</h3>
+        <p class="note">Se guarda solo en este teléfono.</p>
+        <div class="mrow"><input id="cNum" type="tel" inputmode="tel" placeholder="Número de un familiar" aria-label="Número de tu contacto de emergencia"><button type="button" class="btn" id="cSave">Guardar</button></div>
+        <div class="mrow" id="cSaved"></div></div>
+      <div class="cbox"><h3>Avisar dónde estás</h3>
+        <p class="note">Abre WhatsApp con un mensaje y tu ubicación. Tú eliges a quién enviarlo.</p>
+        <button type="button" class="btn alt" id="cLoc">Enviar mi ubicación por WhatsApp</button></div>
+    </div>
+    <p class="note">Números públicos de Perú. Confirma el de INDECI en portal.indeci.gob.pe. Si estás en peligro, llama primero y sigue las indicaciones de las autoridades.</p>
+  </div>
+
+  <div class="mpanel" id="p-refugios" hidden>
+    <form class="mrow rform" id="rForm">
+      <input id="rIn" type="search" placeholder="Busca un lugar: distrito, pueblo o ciudad" aria-label="Lugar donde buscar refugios">
+      <button type="submit" class="btn">Buscar</button>
+      <button type="button" class="btn alt" id="rNear">Cerca de mí</button>
+    </form>
+    <div class="mrow" id="rChips" role="group" aria-label="Tipo de lugar">
+      <button type="button" class="chipf" data-c="apoyo" aria-pressed="true">Refugios y puntos de reunión</button>
+      <button type="button" class="chipf" data-c="salud" aria-pressed="false">Salud</button>
+      <button type="button" class="chipf" data-c="auxilio" aria-pressed="false">Bomberos y policía</button>
+    </div>
+    <p class="note" id="rWhere"></p>
+    <div id="rList" class="rgrid" aria-live="polite"></div>
+    <p class="note">Lugares tomados de OpenStreetMap. Los albergues oficiales los define tu municipalidad o INDECI: confírmalos antes de ir.</p>
+  </div>
+</section>
+<button class="sos" id="sos" type="button" aria-label="Emergencia: a quién llamar"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg>Emergencia</button>
 <button class="fab" id="fab" type="button" aria-haspopup="dialog">
   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg>Pregunta
 </button>
@@ -1125,10 +1236,13 @@ const LUGARES=[["Tumbes","240101"],["Zarumilla","240301"],["Piura","200101"],["C
 function chatChips(){
   const c=$("chips");c.innerHTML="";
   const add=(t,fn)=>{const b=document.createElement("button");b.type="button";b.className="chip";b.textContent=t;b.onclick=fn;c.appendChild(b);};
-  if(!S.riesgo){add("Usar mi ubicación",ubicar);add("¿Cómo está El Niño hoy?",()=>{addMsg("u","¿Cómo está El Niño hoy?");agentSay(resumenHoy());});LUGARES.forEach(([n,u])=>add(n,()=>{addMsg("u",n);irALugar({tipo:"dist",u});}));return;}
+  if(!S.riesgo){add("Usar mi ubicación",ubicar);add("¿Cómo está El Niño hoy?",()=>{addMsg("u","¿Cómo está El Niño hoy?");agentSay(resumenHoy());});LUGARES.forEach(([n,u])=>add(n,()=>{addMsg("u",n);irALugar({tipo:"dist",u});}));add("A quién llamar",()=>{addMsg("u","A quién llamar");agentSay("Te abrí los números de emergencia, más abajo en la página.");irAMas("llamar");});return;}
   if(!S.plan)add("Armar mi plan",()=>{addMsg("u","Armar mi plan");if(DESK.matches)askNext();else{agentSay("Vamos. Cuéntame de tu familia con los botones de la pantalla.");setStep(2);}});
   ["¿Qué riesgo tiene mi distrito?","¿Qué pongo en la mochila?","¿Qué dice el aviso de hoy?","¿Qué pasó antes aquí?","Es una emergencia"].forEach(q=>add(q,()=>chatSend(q)));
   add("¿Cómo está El Niño hoy?",()=>{addMsg("u","¿Cómo está El Niño hoy?");agentSay(resumenHoy());});
+  add("Refugios cerca",()=>{addMsg("u","Refugios cerca");agentSay("Abrí la búsqueda de refugios, más abajo. Son lugares de OpenStreetMap; confirma los albergues oficiales con tu municipalidad.");irAMas("refugios");});
+  add("A quién llamar",()=>{addMsg("u","A quién llamar");agentSay("Te abrí los números de emergencia, más abajo en la página.");irAMas("llamar");});
+  add("Noticias",()=>{addMsg("u","Noticias");agentSay("Te abrí las noticias sobre El Niño, más abajo.");irAMas("noticias");});
 }
 function chatInit(){
   agentSay("Hola, soy tu asistente. Te ayudo a preparar a tu familia ante El Niño con datos oficiales del Perú.");
@@ -1199,6 +1313,211 @@ function nuevoPlan(){
   resetSel(selProv,"Elige departamento primero");resetSel(selDist,"Elige provincia primero");hideRisk();render();
   agentSay("Listo, empecemos de nuevo. ¿En qué distrito vives?");chatChips();
 }
+/* ============ MÁS INFORMACIÓN: noticias, a quién llamar y refugios ============ */
+function togglePanel(p,abrir){
+  const tile=document.querySelector('.mtile[data-p="'+p+'"]');
+  const on=abrir||tile.getAttribute("aria-expanded")!=="true";
+  document.querySelectorAll(".mtile").forEach(b=>b.setAttribute("aria-expanded",String(b===tile&&on)));
+  document.querySelectorAll(".mpanel").forEach(x=>{x.hidden=!(x.id==="p-"+p&&on);});
+  if(on&&p==="noticias"&&!NEWS.cargado)cargarNoticias("semana");
+  if(on&&p==="refugios")iniciarRefugios();
+}
+function irAMas(p){togglePanel(p,true);$("mas").scrollIntoView({behavior:"smooth",block:"start"});}
+document.querySelectorAll(".mtile").forEach(b=>b.addEventListener("click",()=>togglePanel(b.dataset.p)));
+$("sos").onclick=()=>irAMas("llamar");
+
+/* ---- Noticias reales (Google Noticias, leídas a través de r.jina.ai) ---- */
+const NEWS={cargado:false,cache:{}};
+const NEWS_Q={
+  semana:'("Niño costero" OR "fenómeno El Niño") Perú when:7d',
+  mes:'("Niño costero" OR "fenómeno El Niño") Perú when:30d',
+  hist:'"Niño costero" 2017 Perú lluvias'
+};
+function fechaCorta(s){const d=new Date(s);return isNaN(d)?"":d.toLocaleDateString("es-PE",{day:"numeric",month:"short",year:"numeric"});}
+async function cargarNoticias(k){
+  NEWS.cargado=true;
+  document.querySelectorAll("#nChips .chipf").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.k===k)));
+  const list=$("nList"),note=$("nNote");
+  if(k==="zona"&&!S.dep){list.innerHTML="";note.textContent="Elige un lugar en el mapa o en el chat para ver noticias de tu zona.";return;}
+  const q=k==="zona"?'"El Niño" lluvias '+depName(S.dep)+' Perú when:30d':NEWS_Q[k];
+  const rss="https://news.google.com/rss/search?q="+encodeURIComponent(q)+"&hl=es-419&gl=PE&ceid=PE:es-419";
+  list.innerHTML='<div class="loading"><span class="spin"></span>Buscando noticias…</div>';note.textContent="";
+  try{
+    let items=NEWS.cache[rss];
+    if(!items){
+      const c=new AbortController();const to=setTimeout(()=>c.abort(),20000);
+      const r=await fetch("https://r.jina.ai/"+rss,{headers:{"X-Return-Format":"text"},signal:c.signal});clearTimeout(to);
+      if(!r.ok)throw new Error("HTTP "+r.status);
+      const doc=new DOMParser().parseFromString(await r.text(),"text/xml");
+      if(doc.querySelector("parsererror"))throw new Error("RSS ilegible");
+      items=[...doc.querySelectorAll("item")].slice(0,12).map(it=>{
+        const src=it.querySelector("source"),fuente=src?src.textContent:"";
+        let t=(it.querySelector("title")||{}).textContent||"";if(fuente&&t.endsWith(" - "+fuente))t=t.slice(0,-(fuente.length+3));
+        return {t,fuente,fecha:(it.querySelector("pubDate")||{}).textContent||"",url:(it.querySelector("link")||{}).textContent||""};
+      }).filter(x=>x.t&&x.url);
+      NEWS.cache[rss]=items;
+    }
+    list.innerHTML="";
+    if(!items.length){note.textContent="No encontré noticias para este filtro. Prueba con otro.";return;}
+    items.forEach((x,i)=>{
+      const d=document.createElement("article");d.className="ncard";d.style.animationDelay=(i*40)+"ms";
+      const tag=document.createElement("span");tag.className="tag";tag.textContent=x.fuente||"Noticia";
+      const a=document.createElement("a");a.className="nt";a.href=x.url;a.target="_blank";a.rel="noopener";a.textContent=x.t;
+      const s=document.createElement("small");s.textContent=fechaCorta(x.fecha);
+      d.append(tag,a,s);list.appendChild(d);
+    });
+    note.textContent="Titulares de Google Noticias, ordenados por relevancia. Cada enlace abre la nota en el medio original. Verifica los datos en las fuentes oficiales.";
+  }catch(e){
+    console.warn("noticias",e);list.innerHTML="";
+    note.textContent="No pude cargar las noticias ahora. Revisa la conexión o abre las fuentes oficiales de abajo.";
+  }
+}
+document.querySelectorAll("#nChips .chipf").forEach(b=>b.addEventListener("click",()=>cargarNoticias(b.dataset.k)));
+
+/* ---- A quién llamar ---- */
+const NUMEROS=[["INDECI · Defensa Civil","115","Inundaciones, huaicos y desastres",true],["Bomberos","116","Incendios y rescates",false],["SAMU · emergencias médicas","106","Ambulancia y atención urgente",false],["Policía Nacional","105","Seguridad y auxilio",false]];
+(function(){
+  const g=$("cGrid");
+  NUMEROS.forEach(([n,num,desc,main])=>{
+    const c=document.createElement("div");c.className="ccard"+(main?" main":"");
+    c.innerHTML='<div><b></b><small></small><span class="num"></span></div><div class="cb"><a class="tel"></a><button type="button" class="cp">Copiar</button></div>';
+    c.querySelector("b").textContent=n;c.querySelector("small").textContent=desc;c.querySelector(".num").textContent=num;
+    const a=c.querySelector("a.tel");a.href="tel:"+num;a.textContent="Llamar al "+num;a.setAttribute("aria-label","Llamar a "+n+" al "+num);
+    c.querySelector(".cp").onclick=()=>copiar(num,"Número "+num+" copiado");
+    g.appendChild(c);
+  });
+})();
+function pintarContacto(){
+  const box=$("cSaved");box.innerHTML="";let n="";
+  try{n=localStorage.getItem("contacto_emergencia")||"";}catch(e){}
+  if(!n)return;
+  const a=document.createElement("a");a.className="btn";a.href="tel:"+n.replace(/[^\d+]/g,"");a.textContent="Llamar a "+n;
+  const b=document.createElement("button");b.type="button";b.className="btn alt";b.textContent="Borrar";
+  b.onclick=()=>{try{localStorage.removeItem("contacto_emergencia");}catch(e){}pintarContacto();};
+  box.append(a,b);
+}
+$("cSave").onclick=()=>{
+  const v=$("cNum").value.trim();
+  if(v.replace(/\D/g,"").length<6){toast("Escribe un número válido.");return;}
+  try{localStorage.setItem("contacto_emergencia",v);}catch(e){toast("No se pudo guardar en este teléfono.");return;}
+  $("cNum").value="";pintarContacto();toast("Contacto guardado");
+};
+pintarContacto();
+$("cLoc").onclick=()=>{
+  if(!navigator.geolocation){toast("Tu navegador no permite usar la ubicación.");return;}
+  navigator.geolocation.getCurrentPosition(p=>{
+    const url="https://maps.google.com/?q="+p.coords.latitude.toFixed(5)+","+p.coords.longitude.toFixed(5);
+    window.open("https://wa.me/?text="+encodeURIComponent("Estoy aquí y necesito ayuda: "+url),"_blank","noopener");
+  },()=>toast("No pude obtener tu ubicación. Revisa el permiso del navegador."),{timeout:10000,enableHighAccuracy:true});
+};
+
+/* ---- Refugios y puntos de apoyo (OpenStreetMap: Nominatim + Overpass) ---- */
+const REF={init:false,centro:null,nombre:"",cat:"apoyo",cache:{},n:0};
+const REF_CATS={
+  apoyo:{r:12000,f:['["emergency"="assembly_point"]','["emergency"="shelter"]','["social_facility"="shelter"]','["amenity"="shelter"]["shelter_type"!~"gazebo|public_transport|picnic_shelter|weather_shelter|bus_stop"]["public_transport"!~"."]','["amenity"="community_centre"]','["leisure"="stadium"]','["leisure"="sports_hall"]','["amenity"="townhall"]']},
+  salud:{r:10000,f:['["amenity"="hospital"]','["amenity"="clinic"]']},
+  auxilio:{r:10000,f:['["amenity"="fire_station"]','["amenity"="police"]']}
+};
+function tipoDe(t){
+  if(t.emergency==="assembly_point")return "Punto de reunión";
+  if(t.emergency==="shelter"||t.social_facility==="shelter")return "Refugio";
+  if(t.amenity==="shelter")return "Refugio";
+  if(t.amenity==="community_centre")return "Centro comunal";
+  if(t.leisure==="stadium")return "Estadio";
+  if(t.leisure==="sports_hall")return "Coliseo";
+  if(t.amenity==="townhall")return "Municipalidad";
+  if(t.amenity==="hospital")return "Hospital";
+  if(t.amenity==="clinic")return "Clínica o posta";
+  if(t.amenity==="fire_station")return "Bomberos";
+  if(t.amenity==="police")return "Policía";
+  return "Lugar";
+}
+function km(a,b,c,d){const R=6371,r=x=>x*Math.PI/180,dl=r(c-a),dn=r(d-b);const h=Math.sin(dl/2)**2+Math.cos(r(a))*Math.cos(r(c))*Math.sin(dn/2)**2;return 2*R*Math.asin(Math.sqrt(h));}
+async function overpass(q){
+  for(const u of ["https://overpass-api.de/api/interpreter","https://overpass.kumi.systems/api/interpreter"]){
+    try{
+      const c=new AbortController();const to=setTimeout(()=>c.abort(),25000);
+      const r=await fetch(u,{method:"POST",body:"data="+encodeURIComponent(q),signal:c.signal});clearTimeout(to);
+      if(!r.ok)continue;return (await r.json()).elements||[];
+    }catch(e){}
+  }
+  throw new Error("overpass");
+}
+function centroLugar(){
+  if(S.dist&&GEO_DIST[S.dist]){const [la,lo]=mapToLL(bboxCentro(GEO_DIST[S.dist].d));return {lat:la,lon:lo,nombre:distName()};}
+  if(S.dep&&GEO_DEP[S.dep]){const [la,lo]=mapToLL(bboxCentro(GEO_DEP[S.dep].d));return {lat:la,lon:lo,nombre:depName(S.dep)};}
+  return null;
+}
+function iniciarRefugios(){
+  const c=centroLugar();
+  if(!REF.init||(c&&REF.auto&&(!REF.centro||REF.nombre!==c.nombre))){
+    REF.init=true;
+    if(c){REF.centro=[c.lat,c.lon];REF.nombre=c.nombre;REF.auto=true;buscarRefugios();}
+    else{$("rWhere").textContent="Escribe un lugar, toca “Cerca de mí” o elige un lugar en el mapa.";$("rList").innerHTML="";}
+  }
+}
+async function buscarRefugios(){
+  if(!REF.centro)return;
+  const my=++REF.n,list=$("rList"),cat=REF_CATS[REF.cat];
+  document.querySelectorAll("#rChips .chipf").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.c===REF.cat)));
+  $("rWhere").textContent="Mostrando lugares cerca de "+REF.nombre+" (hasta "+Math.round(cat.r/1000)+" km).";
+  list.innerHTML='<div class="loading"><span class="spin"></span>Buscando lugares cercanos… puede tardar unos segundos.</div>';
+  const [la,lo]=REF.centro,key=REF.cat+"|"+la.toFixed(3)+","+lo.toFixed(3);
+  try{
+    let els=REF.cache[key];
+    if(!els){
+      const q="[out:json][timeout:25];("+cat.f.map(f=>"nwr"+f+"(around:"+cat.r+","+la.toFixed(5)+","+lo.toFixed(5)+");").join("")+");out center 80;";
+      els=await overpass(q);REF.cache[key]=els;
+    }
+    if(my!==REF.n)return;
+    const vistos=new Set();
+    const items=els.map(e=>{
+      const t=e.tags||{},lat=e.lat??(e.center&&e.center.lat),lon=e.lon??(e.center&&e.center.lon);
+      const tipo=tipoDe(t),nombre=t.name||(t.emergency==="assembly_point"?"Punto de reunión":"");
+      return {t,lat,lon,tipo,nombre,d:lat==null?1e9:km(la,lo,lat,lon)};
+    }).filter(x=>x.nombre&&x.lat!=null).filter(x=>{const k=x.nombre+x.lat.toFixed(4)+x.lon.toFixed(4);if(vistos.has(k))return false;vistos.add(k);return true;})
+      .sort((a,b)=>a.d-b.d).slice(0,15);
+    list.innerHTML="";
+    if(!items.length){list.innerHTML='<p class="note">No encontré lugares de este tipo cerca. Prueba con otra categoría, amplía la búsqueda con otro lugar o consulta a tu municipalidad.</p>';return;}
+    items.forEach((x,i)=>{
+      const c=document.createElement("article");c.className="rcard";c.style.animationDelay=(i*35)+"ms";
+      const tag=document.createElement("span");tag.className="tag";tag.textContent=x.tipo;
+      const n=document.createElement("b");n.textContent=x.nombre;
+      const s=document.createElement("small");
+      const dir=x.t["addr:full"]||[x.t["addr:street"],x.t["addr:housenumber"]].filter(Boolean).join(" ");
+      s.textContent="A "+x.d.toFixed(1).replace(".",",")+" km"+(dir?" · "+dir:"")+(x.t.phone?" · Tel. "+x.t.phone:"");
+      const acts=document.createElement("div");acts.className="acts";
+      const go=document.createElement("a");go.className="go";go.target="_blank";go.rel="noopener";go.textContent="Cómo llegar";
+      go.href="https://www.google.com/maps/dir/?api=1&destination="+x.lat.toFixed(6)+","+x.lon.toFixed(6);
+      const ver=document.createElement("a");ver.target="_blank";ver.rel="noopener";ver.textContent="Ver mapa";
+      ver.href="https://www.openstreetmap.org/?mlat="+x.lat.toFixed(6)+"&mlon="+x.lon.toFixed(6)+"#map=17/"+x.lat.toFixed(6)+"/"+x.lon.toFixed(6);
+      const cp=document.createElement("button");cp.type="button";cp.textContent="Copiar ubicación";
+      const link="https://maps.google.com/?q="+x.lat.toFixed(6)+","+x.lon.toFixed(6);
+      cp.onclick=()=>copiar(x.nombre+": "+link,"Ubicación copiada");
+      const wa=document.createElement("a");wa.target="_blank";wa.rel="noopener";wa.textContent="Enviar por WhatsApp";
+      wa.href="https://wa.me/?text="+encodeURIComponent(x.tipo+" "+x.nombre+": "+link);
+      acts.append(go,ver,cp,wa);c.append(tag,n,s,acts);list.appendChild(c);
+    });
+  }catch(e){
+    console.warn("refugios",e);if(my!==REF.n)return;
+    list.innerHTML='<p class="note">No pude consultar el mapa ahora. Intenta de nuevo en un momento.</p>';
+  }
+}
+$("rForm").addEventListener("submit",async e=>{
+  e.preventDefault();const q=$("rIn").value.trim();if(!q)return;
+  $("rWhere").textContent="Buscando “"+q+"”…";
+  try{
+    const r=await fetch("https://nominatim.openstreetmap.org/search?q="+encodeURIComponent(q)+"&countrycodes=pe&format=json&limit=1");
+    const j=await r.json();
+    if(!j.length){$("rWhere").textContent="No encontré ese lugar en el Perú. Prueba con otro nombre.";return;}
+    REF.centro=[+j[0].lat,+j[0].lon];REF.nombre=j[0].display_name.split(",").slice(0,2).join(",").trim();REF.auto=false;REF.init=true;buscarRefugios();
+  }catch(err){$("rWhere").textContent="No pude buscar ese lugar ahora. Intenta de nuevo.";}
+});
+$("rNear").onclick=()=>{
+  if(!navigator.geolocation){toast("Tu navegador no permite usar la ubicación.");return;}
+  navigator.geolocation.getCurrentPosition(p=>{REF.centro=[p.coords.latitude,p.coords.longitude];REF.nombre="tu ubicación";REF.auto=false;REF.init=true;buscarRefugios();},()=>toast("No pude obtener tu ubicación. Revisa el permiso del navegador."),{timeout:10000});
+};
+document.querySelectorAll("#rChips .chipf").forEach(b=>b.addEventListener("click",()=>{REF.cat=b.dataset.c;buscarRefugios();}));
 $("fab").onclick=chatOpen;
 $("shX").onclick=()=>{$("sheet").hidden=true;$("fab").hidden=false;};
 $("cf").addEventListener("submit",e=>{e.preventDefault();chatSend($("cin").value);});
