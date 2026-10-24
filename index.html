@@ -649,34 +649,19 @@ const pad2=n=>String(n).padStart(2,"0");
 const isoDia=d=>d.getUTCFullYear()+"-"+pad2(d.getUTCMonth()+1)+"-"+pad2(d.getUTCDate());
 const promedio=a=>{const v=a.filter(x=>x!=null);return v.length?v.reduce((x,y)=>x+y,0)/v.length:null;};
 async function getJSON(u){const r=await fetch(u);if(!r.ok)throw new Error("HTTP "+r.status);return r.json();}
-async function climatologiaMar(mmdd){
-  const key="clim_mar_"+mmdd;
-  try{const c=JSON.parse(localStorage.getItem(key)||"null");if(c&&c.length===MAR_PTS.length)return c;}catch(e){}
-  const la=MAR_PTS.map(p=>p[1]).join(","),lo=MAR_PTS.map(p=>p[2]).join(",");
-  const años=[2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013];
-  const resp=await Promise.all(años.map(y=>getJSON("https://archive-api.open-meteo.com/v1/archive?latitude="+la+"&longitude="+lo+"&start_date="+y+"-"+mmdd+"&end_date="+y+"-"+mmdd+"&hourly=sea_surface_temperature&timezone=America%2FLima").catch(()=>null)));
-  const clim=MAR_PTS.map((_,i)=>promedio(resp.map(r=>r?promedio((Array.isArray(r)?r[i]:r).hourly.sea_surface_temperature):null)));
-  try{localStorage.setItem(key,JSON.stringify(clim));}catch(e){}
-  return clim;
-}
 async function cargarMar(){
   try{
     const la=MAR_PTS.map(p=>p[1]).join(","),lo=MAR_PTS.map(p=>p[2]).join(",");
-    const f=await getJSON("https://marine-api.open-meteo.com/v1/marine?latitude="+la+"&longitude="+lo+"&hourly=sea_surface_temperature,wave_height,sea_level_height_msl&forecast_days=2&timezone=America%2FLima");
-    const ref=new Date(Date.now()-5*3600e3-6*864e5),diaRef=isoDia(ref);
-    let clim=MAR_PTS.map(()=>null),actual=MAR_PTS.map(()=>null);
-    try{
-      clim=await climatologiaMar(diaRef.slice(5));
-      const a=await getJSON("https://archive-api.open-meteo.com/v1/archive?latitude="+la+"&longitude="+lo+"&start_date="+diaRef+"&end_date="+diaRef+"&hourly=sea_surface_temperature&timezone=America%2FLima");
-      actual=MAR_PTS.map((_,i)=>promedio((Array.isArray(a)?a[i]:a).hourly.sea_surface_temperature));
-    }catch(e){console.warn("anomalía del mar",e);}
+    const f=await getJSON("https://marine-api.open-meteo.com/v1/marine?latitude="+la+"&longitude="+lo+"&hourly=sea_surface_temperature,wave_height,sea_level_height_msl&past_days=30&forecast_days=2&timezone=America%2FLima");
     const arr=Array.isArray(f)?f:[f];
     MAR.datos=arr.map((p,i)=>{
       const h=p.hourly,ok=a=>a.filter(v=>v!=null);
-      const sst=ok(h.sea_surface_temperature)[0],olas=ok(h.wave_height),marea=ok(h.sea_level_height_msl);
-      const anom=actual[i]!=null&&clim[i]!=null?actual[i]-clim[i]:null;
-      return {nombre:MAR_PTS[i][0],sst:sst==null?null:sst,anom,diaRef,olaMax:olas.length?Math.max(...olas):null,mareaMin:marea.length?Math.min(...marea):null,mareaMax:marea.length?Math.max(...marea):null,
-        nivel:anom==null?"bajo":anom>=3?"muy-alto":anom>=2?"alto":anom>=1?"medio":"bajo"};
+      const sstAll=h.sea_surface_temperature,n=sstAll.length;
+      const hoy=promedio(sstAll.slice(30*24,30*24+24)),antes=promedio(sstAll.slice(0,24));
+      const futuro=ok(h.wave_height.slice(30*24)),marea=ok(h.sea_level_height_msl.slice(30*24));
+      const tend=hoy!=null&&antes!=null?hoy-antes:null;
+      return {nombre:MAR_PTS[i][0],sst:hoy,tend,olaMax:futuro.length?Math.max(...futuro):null,mareaMin:marea.length?Math.min(...marea):null,mareaMax:marea.length?Math.max(...marea):null,
+        nivel:tend==null?"bajo":tend>=2?"alto":tend>=1?"medio":"bajo"};
     });
     MAR.ok=true;
   }catch(e){console.warn("mar",e);MAR.ok=false;}
@@ -691,7 +676,7 @@ async function cargarRios(){
       const prom30=promedio(q.slice(0,30))||0,max7=Math.max(0,...mx.slice(30)),hoy=q[30]||0;
       const ratio=max7/Math.max(prom30,0.5);
       return {nombre:RIO_PTS[i][0],hoy,max7,prom30,ratio,serie:q,
-        nivel:max7<1?"bajo":ratio>=3?"muy-alto":ratio>=2?"alto":ratio>=1.3?"medio":"bajo"};
+        nivel:max7<5?"bajo":(ratio>=3&&max7>=20)?"muy-alto":(ratio>=2&&max7>=10)?"alto":ratio>=1.3?"medio":"bajo"};
     });
     RIOS.ok=true;
   }catch(e){console.warn("ríos",e);RIOS.ok=false;}
@@ -706,17 +691,17 @@ function pintarAmbiente(list){
   const esMar=SEMTAB==="mar",src=esMar?MAR:RIOS;
   if(!src.ok){list.innerHTML='<p class="note">Sin conexión a los datos de '+(esMar?"mar":"ríos")+'. Se mostrarán cuando haya conexión.</p>';$("semNote").textContent="";return;}
   $("semNote").textContent=esMar
-    ?"Mar: temperatura y oleaje de Open-Meteo Marine. Anomalía: ERA5 de hace unos 5 días contra el promedio 2003-2013 del mismo día. Criterio del prototipo."
+    ?"Mar: temperatura, oleaje y marea de Open-Meteo Marine. Tendencia = hoy contra hace 30 días. La anomalía oficial contra el promedio histórico la publica el ENFEN. Criterio del prototipo."
     :"Ríos: caudal previsto a 7 días contra el promedio de los últimos 30 días (GloFAS vía Open-Meteo). Criterio del prototipo.";
   src.datos.forEach((x,i)=>{
     const b=document.createElement("div");b.className="srow lv-"+x.nivel;b.style.animationDelay=(i*35)+"ms";
     let sub,extra;
     if(esMar){
-      sub=(x.sst!=null?"Mar a "+x.sst.toFixed(1)+" °C":"Sin dato de temperatura")+(x.anom!=null?" · "+sgn(x.anom)+" °C sobre lo normal":"")+(x.olaMax!=null?" · olas hasta "+x.olaMax.toFixed(1)+" m":"")+(x.mareaMin!=null?" · marea "+x.mareaMin.toFixed(2)+" a "+x.mareaMax.toFixed(2)+" m":"");
-      extra=x.anom==null?"Sin anomalía disponible":x.anom>=2?"Mar mucho más cálido que lo normal":x.anom>=1?"Mar más cálido que lo normal":"Mar dentro de lo normal";
+      sub=(x.sst!=null?"Mar a "+x.sst.toFixed(1)+" °C":"Sin dato de temperatura")+(x.tend!=null?" · "+sgn(x.tend)+" °C en 30 días":"")+(x.olaMax!=null?" · olas hasta "+x.olaMax.toFixed(1)+" m":"")+(x.mareaMin!=null?" · marea "+x.mareaMin.toFixed(2)+" a "+x.mareaMax.toFixed(2)+" m":"");
+      extra=x.tend==null?"Sin tendencia disponible":x.tend>=2?"Mar calentándose rápido":x.tend>=1?"Mar calentándose":x.tend<=-1?"Mar enfriándose":"Mar estable";
     }else{
       sub="Hoy "+x.hoy.toFixed(1)+" m³/s · máximo en 7 días "+x.max7.toFixed(1)+" m³/s · promedio 30 días "+x.prom30.toFixed(1)+" m³/s";
-      extra=x.max7<1?"Caudal bajo":x.ratio>=2?"Crecida prevista":x.ratio>=1.3?"Caudal subiendo":"Caudal estable";
+      extra=x.max7<5?"Caudal bajo":x.ratio>=2?"Crecida prevista":x.ratio>=1.3?"Caudal subiendo":"Caudal estable";
     }
     b.innerHTML='<span class="sdot"></span><span class="sname"><b></b><small></small></span><span class="spill"></span><span class="sextra">'+(esMar?"":sparkN(x.serie))+'<span></span></span>';
     b.querySelector("b").textContent=x.nombre;b.querySelector("small").textContent=sub;b.querySelector(".spill").textContent=PILL[x.nivel];b.querySelector(".sextra span").textContent=extra;
@@ -1050,7 +1035,7 @@ const CH={hist:[],busy:false};
 function chatDatos(){
   const r=S.riesgo;
   return {distrito:r?{nombre:distName(),provincia:provName(S.prov),departamento:depName(S.dep),nivel:r.nivel,peligro_principal:r.peligro,peligro_secundario:r.secundario||"no tengo ese dato",historial:r.historial,aviso:r.aviso,escenario:r.escenario}:"el usuario aún no eligió distrito",
-    familia:S.perfil,estado_el_nino:ENFEN_ESTADO,avisos_senamhi:AVISOS_SENAMHI,plan_generado:S.plan||"aún no generado",mar:MAR.ok?MAR.datos.map(x=>({punto:x.nombre,temperatura_c:x.sst,anomalia_c:x.anom,olas_max_m:x.olaMax})):"no tengo ese dato",rios:RIOS.ok?RIOS.datos.map(x=>({rio:x.nombre,caudal_hoy_m3s:+x.hoy.toFixed(1),maximo_7_dias_m3s:+x.max7.toFixed(1),promedio_30_dias_m3s:+x.prom30.toFixed(1)})):"no tengo ese dato",pronostico_en_vivo:(()=>{const m=liveDe(S.dist||S.dep||"");return m?{fuente:"Open-Meteo (modelos), actualizado "+hora(),lluvia_mm_24h:+m.sum24.toFixed(1),lluvia_mm_72h:+m.sum72.toFixed(1),prob_max_24h:m.prob24,intensidad_max_mm_h:+m.max.toFixed(1),cuando:cuando(m),nivel_prototipo:PILL[m.nivel]}:"no tengo ese dato";})()};
+    familia:S.perfil,estado_el_nino:ENFEN_ESTADO,avisos_senamhi:AVISOS_SENAMHI,plan_generado:S.plan||"aún no generado",mar:MAR.ok?MAR.datos.map(x=>({punto:x.nombre,temperatura_c:x.sst,tendencia_30_dias_c:x.tend,olas_max_m:x.olaMax})):"no tengo ese dato",rios:RIOS.ok?RIOS.datos.map(x=>({rio:x.nombre,caudal_hoy_m3s:+x.hoy.toFixed(1),maximo_7_dias_m3s:+x.max7.toFixed(1),promedio_30_dias_m3s:+x.prom30.toFixed(1)})):"no tengo ese dato",pronostico_en_vivo:(()=>{const m=liveDe(S.dist||S.dep||"");return m?{fuente:"Open-Meteo (modelos), actualizado "+hora(),lluvia_mm_24h:+m.sum24.toFixed(1),lluvia_mm_72h:+m.sum72.toFixed(1),prob_max_24h:m.prob24,intensidad_max_mm_h:+m.max.toFixed(1),cuando:cuando(m),nivel_prototipo:PILL[m.nivel]}:"no tengo ese dato";})()};
 }
 function chatInput(){
   const first=CHAT_RULES+"\n\nDATOS (única fuente permitida):\n"+JSON.stringify(chatDatos());
