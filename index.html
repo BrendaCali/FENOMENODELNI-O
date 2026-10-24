@@ -460,7 +460,7 @@ footer{font-size:13px;color:var(--muted);display:flex;flex-direction:column;gap:
     </div>
     <p class="note" id="rWhere"></p>
     <div id="rList" class="rgrid" aria-live="polite"></div>
-    <p class="note">Lugares tomados de OpenStreetMap. Los albergues oficiales los define tu municipalidad o INDECI: confírmalos antes de ir.</p>
+    <p class="note">Lugares tomados de OpenStreetMap (Nominatim). Los albergues oficiales los define tu municipalidad o INDECI: confírmalos antes de ir.</p>
   </div>
 </section>
 <button class="sos" id="sos" type="button" aria-label="Emergencia: a quién llamar"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg>Emergencia</button>
@@ -1434,9 +1434,9 @@ $("cLoc").onclick=()=>{
 /* ---- Refugios y puntos de apoyo (OpenStreetMap: Nominatim + Overpass) ---- */
 const REF={init:false,centro:null,nombre:"",cat:"apoyo",cache:{},n:0};
 const REF_CATS={
-  apoyo:{r:9000,f:['["emergency"="assembly_point"]','["emergency"="shelter"]','["social_facility"="shelter"]','["amenity"="community_centre"]','["leisure"="stadium"]','["leisure"="sports_hall"]','["amenity"="townhall"]']},
-  salud:{r:8000,f:['["amenity"="hospital"]','["amenity"="clinic"]']},
-  auxilio:{r:8000,f:['["amenity"="fire_station"]','["amenity"="police"]']}
+  apoyo:{t:[["albergue","Albergue u hospedaje"],["refugio","Refugio"],["estadio","Estadio"],["coliseo","Coliseo"],["centro comunal","Centro comunal"],["municipalidad","Municipalidad"]]},
+  salud:{t:[["hospital","Hospital"],["clínica","Clínica"],["centro de salud","Centro de salud"],["posta médica","Posta médica"]]},
+  auxilio:{t:[["bomberos","Bomberos"],["comisaría","Policía"]]}
 };
 function tipoDe(t){
   if(t.emergency==="assembly_point")return "Punto de reunión";
@@ -1480,47 +1480,57 @@ async function buscarRefugios(){
   if(!REF.centro)return;
   const my=++REF.n,list=$("rList"),cat=REF_CATS[REF.cat];
   document.querySelectorAll("#rChips .chipf").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.c===REF.cat)));
-  $("rWhere").textContent="Mostrando lugares cerca de "+REF.nombre+" (hasta "+Math.round(cat.r/1000)+" km).";
-  list.innerHTML='<div class="loading"><span class="spin"></span>Buscando lugares cercanos… puede tardar unos segundos.</div>';
-  const [la,lo]=REF.centro,key=REF.cat+"|"+la.toFixed(3)+","+lo.toFixed(3);
+  $("rWhere").textContent="Mostrando lugares cerca de "+REF.nombre+" (hasta 15 km).";
+  list.innerHTML='<div class="loading"><span class="spin"></span>Buscando lugares cercanos…</div>';
+  const [la,lo]=REF.centro,key=REF.cat+"|"+la.toFixed(3)+","+lo.toFixed(3),d=0.14;
+  const vb=[lo-d,la+d,lo+d,la-d].map(x=>x.toFixed(4)).join(",");
   try{
-    let els=REF.cache[key];
-    if(!els){
-      const q="[out:json][timeout:20];("+cat.f.map(f=>"nwr"+f+"(around:"+cat.r+","+la.toFixed(4)+","+lo.toFixed(4)+");").join("")+");out center 50;";
-      els=await overpass(q);REF.cache[key]=els;
+    let items=REF.cache[key];
+    if(!items){
+      items=[];const vistos=new Set();
+      for(const [term,tipo] of cat.t){
+        if(my!==REF.n)return;
+        try{
+          const c=new AbortController();const to=setTimeout(()=>c.abort(),9000);
+          const r=await fetch("https://nominatim.openstreetmap.org/search?q="+encodeURIComponent(term)+"&viewbox="+vb+"&bounded=1&format=jsonv2&limit=8&countrycodes=pe&accept-language=es",{signal:c.signal});clearTimeout(to);
+          if(!r.ok)continue;
+          (await r.json()).forEach(x=>{
+            const lat=+x.lat,lon=+x.lon,nombre=x.name||(x.display_name||"").split(",")[0];
+            const k=nombre+lat.toFixed(4)+lon.toFixed(4);
+            if(!nombre||vistos.has(k))return;vistos.add(k);
+            const dist=km(la,lo,lat,lon);if(dist>15)return;
+            items.push({nombre,tipo,lat,lon,d:dist,dir:(x.display_name||"").split(",").slice(1,3).join(",").trim()});
+          });
+        }catch(e){}
+        await new Promise(res=>setTimeout(res,350));
+      }
+      items.sort((a,b)=>a.d-b.d);REF.cache[key]=items;
     }
     if(my!==REF.n)return;
-    const vistos=new Set();
-    const items=els.map(e=>{
-      const t=e.tags||{},lat=e.lat??(e.center&&e.center.lat),lon=e.lon??(e.center&&e.center.lon);
-      const tipo=tipoDe(t),nombre=t.name||(t.emergency==="assembly_point"?"Punto de reunión":"");
-      return {t,lat,lon,tipo,nombre,d:lat==null?1e9:km(la,lo,lat,lon)};
-    }).filter(x=>x.nombre&&x.lat!=null).filter(x=>{const k=x.nombre+x.lat.toFixed(4)+x.lon.toFixed(4);if(vistos.has(k))return false;vistos.add(k);return true;})
-      .sort((a,b)=>a.d-b.d).slice(0,15);
     list.innerHTML="";
-    if(!items.length){list.innerHTML='<p class="note">No encontré lugares de este tipo cerca. Prueba con otra categoría, amplía la búsqueda con otro lugar o consulta a tu municipalidad.</p>';return;}
-    items.forEach((x,i)=>{
+    if(!items.length){
+      list.innerHTML='<p class="note">No encontré lugares de este tipo cerca. Prueba con otra categoría, busca otro lugar o consulta a tu municipalidad.</p>';return;
+    }
+    items.slice(0,18).forEach((x,i)=>{
       const c=document.createElement("article");c.className="rcard";c.style.animationDelay=(i*35)+"ms";
       const tag=document.createElement("span");tag.className="tag";tag.textContent=x.tipo;
       const n=document.createElement("b");n.textContent=x.nombre;
-      const s=document.createElement("small");
-      const dir=x.t["addr:full"]||[x.t["addr:street"],x.t["addr:housenumber"]].filter(Boolean).join(" ");
-      s.textContent="A "+x.d.toFixed(1).replace(".",",")+" km"+(dir?" · "+dir:"")+(x.t.phone?" · Tel. "+x.t.phone:"");
+      const s=document.createElement("small");s.textContent="A "+x.d.toFixed(1).replace(".",",")+" km"+(x.dir?" · "+x.dir:"");
       const acts=document.createElement("div");acts.className="acts";
       const go=document.createElement("a");go.className="go";go.target="_blank";go.rel="noopener";go.textContent="Cómo llegar";
       go.href="https://www.google.com/maps/dir/?api=1&destination="+x.lat.toFixed(6)+","+x.lon.toFixed(6);
       const ver=document.createElement("a");ver.target="_blank";ver.rel="noopener";ver.textContent="Ver mapa";
       ver.href="https://www.openstreetmap.org/?mlat="+x.lat.toFixed(6)+"&mlon="+x.lon.toFixed(6)+"#map=17/"+x.lat.toFixed(6)+"/"+x.lon.toFixed(6);
-      const cp=document.createElement("button");cp.type="button";cp.textContent="Copiar ubicación";
       const link="https://maps.google.com/?q="+x.lat.toFixed(6)+","+x.lon.toFixed(6);
-      cp.onclick=()=>copiar(x.nombre+": "+link,"Ubicación copiada");
+      const cp=document.createElement("button");cp.type="button";cp.textContent="Copiar ubicación";cp.onclick=()=>copiar(x.nombre+": "+link,"Ubicación copiada");
       const wa=document.createElement("a");wa.target="_blank";wa.rel="noopener";wa.textContent="Enviar por WhatsApp";
       wa.href="https://wa.me/?text="+encodeURIComponent(x.tipo+" "+x.nombre+": "+link);
       acts.append(go,ver,cp,wa);c.append(tag,n,s,acts);list.appendChild(c);
     });
   }catch(e){
     console.warn("refugios",e);if(my!==REF.n)return;
-    list.innerHTML='<p class="note">No pude consultar el mapa ahora. El servicio de OpenStreetMap a veces está lento.</p>';const rb=document.createElement("button");rb.type="button";rb.className="btn alt";rb.textContent="Reintentar";rb.onclick=buscarRefugios;list.appendChild(rb);
+    list.innerHTML='<p class="note">No pude consultar el mapa ahora.</p>';
+    const rb=document.createElement("button");rb.type="button";rb.className="btn alt";rb.textContent="Reintentar";rb.onclick=buscarRefugios;list.appendChild(rb);
   }
 }
 $("rForm").addEventListener("submit",async e=>{

@@ -65,4 +65,4 @@ La sección Noticias muestra una lista de notas reales con enlace al medio. Para
 ## Datos reales que ya usa
 - Riesgo histórico: base de emergencias y daños de INDECI 2003-2020 (nivel calculado por el prototipo).
 - Lluvia por horas, mar y ríos: Open-Meteo (Forecast, Marine y Flood), sin clave.
-- Refugios y puntos de apoyo: OpenStreetMap (Nominatim y Overpass). Los albergues oficiales los define INDECI o la municipalidad.
+- Refugios y puntos de apoyo: OpenStreetMap (Nominatim). Los albergues oficiales los define INDECI o la municipalidad.
