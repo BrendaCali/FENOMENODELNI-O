@@ -303,7 +303,7 @@ footer{font-size:13px;color:var(--muted);display:flex;flex-direction:column;gap:
 <section id="mapSlot" class="card" aria-label="Mapa del Perú">
 <div class="sem" id="semaforo"><div class="sem-h"><h3>Semáforo por zona</h3><span class="liveb" id="semBadge">EJEMPLO</span></div>
   <div class="modes stabs" id="stabs" role="group" aria-label="Qué datos ver"><button type="button" data-t="zonas" aria-pressed="true">Lluvia</button><button type="button" data-t="mar" aria-pressed="false">Mar</button><button type="button" data-t="rios" aria-pressed="false">Ríos</button></div><p class="note" id="semNote"></p><div id="semList"></div></div>
-<p class="mapcap">Riesgo histórico: base real de INDECI 2003-2020. Lluvia, mar y ríos: pronóstico en vivo de Open-Meteo. Estado de El Niño: ENFEN (resumen de prensa). No reemplaza a las autoridades; en una emergencia llama a INDECI al 119.</p></section>
+<p class="mapcap">Riesgo histórico: base real de INDECI 2003-2020. Lluvia, mar y ríos: pronóstico en vivo de Open-Meteo. Estado de El Niño: ENFEN (resumen de prensa). No reemplaza a las autoridades; en una emergencia llama a INDECI al 115.</p></section>
 
 
 <!-- PASO 1 -->
@@ -348,7 +348,7 @@ footer{font-size:13px;color:var(--muted);display:flex;flex-direction:column;gap:
 </section>
 
 <footer>
-  <span>El riesgo histórico viene de INDECI 2003-2020 y el pronóstico de Open-Meteo; no reemplazan a las autoridades. En una emergencia llama a INDECI al 119 y sigue sus indicaciones.</span>
+  <span>El riesgo histórico viene de INDECI 2003-2020 y el pronóstico de Open-Meteo; no reemplazan a las autoridades. En una emergencia llama a INDECI al 115 y sigue sus indicaciones.</span>
   <span>Fuentes que se conectarán: ENFEN-IMARPE, CENEPRED (SIGRID), INDECI, SENAMHI y ubigeo INEI.</span>
 </footer>
 </div>
@@ -881,7 +881,7 @@ REGLAS ESTRICTAS:
 1. Usa SOLO los datos de riesgo y el perfil de familia que recibes. No inventes cifras, fechas, teléfonos ni lugares.
 2. Cada dato de riesgo que menciones debe citar su fuente y fecha tal como vienen en los datos. Si un dato falta, escribe "no tengo ese dato".
 3. Los datos vienen de un prototipo (INDECI 2003-2020, Open-Meteo y un resumen de ENFEN): cítalos con su fuente en "fuentes".
-4. Ante una alerta urgente o emergencia, remite a INDECI (llamar al 119) y a los canales oficiales (Defensa Civil local, COER/COEN). No inventes otros números.
+4. Ante una alerta urgente o emergencia, remite a INDECI (llamar al 115) y a los canales oficiales (Defensa Civil local, COER/COEN). No inventes otros números.
 5. No des puntos de reunión ni rutas concretas con nombres de calles: indica cómo elegirlos y practicarlos con la familia.
 6. Responde SOLO con un JSON válido, sin texto extra ni markdown, con esta forma exacta:
 {"resumen":"1 frase","antes":["..."],"durante":["..."],"despues":["..."],"mochila":["..."],"ruta_y_reunion":"texto corto","contactos":["..."],"cuidados_perfil":["..."],"fuentes":[{"dato":"...","fuente":"...","fecha":"..."}],"alerta_urgente":"texto o vacío"}
@@ -946,10 +946,10 @@ function planLocal(){
    despues:["Regresen solo cuando las autoridades lo permitan.","Hiervan o desinfecten el agua antes de beberla.","Revisen que la casa sea segura antes de entrar.","Tomen fotos de los daños y repórtenlos a su municipalidad.","Cuiden la salud de todos y busquen ayuda médica si hace falta."],
    mochila:["Agua y comida que no se malogre","Linterna, radio y pilas","Botiquín y medicinas","Documentos en bolsa plástica","Ropa de cambio y abrigo","Celular con cargador portátil"],
    ruta_y_reunion:"Elijan hoy, en familia, una ruta hacia un lugar alto y un punto de reunión. Confírmenlo con su municipalidad: no tengo ese dato para su zona.",
-   contactos:["INDECI: 119","Defensa Civil de su municipalidad: no tengo ese dato","Un familiar fuera de la zona: anótenlo aquí"],
+   contactos:["INDECI (Defensa Civil): 115","Defensa Civil de su municipalidad: no tengo ese dato","Un familiar fuera de la zona: anótenlo aquí"],
    cuidados_perfil:cuid,
    fuentes:[{dato:"Nivel y peligro de la zona",fuente:r.escenario.fuente,fecha:r.escenario.fecha},{dato:"Historial de emergencias",fuente:r.historial.fuente,fecha:r.historial.fecha},{dato:"Aviso del tiempo",fuente:r.aviso.fuente,fecha:r.aviso.fecha}],
-   alerta_urgente:r.nivel==="muy-alto"?"Si hay una alerta, evacúen y comuníquense con INDECI (119).":""};
+   alerta_urgente:r.nivel==="muy-alto"?"Si hay una alerta, evacúen y comuníquense con INDECI (115).":""};
 }
 
 $("gen").onclick=async()=>{
@@ -969,7 +969,7 @@ function renderPlan(){
   const p=S.plan,r=S.riesgo,[lbl]=NIV[r.nivel];
   $("planOut").innerHTML=`
   <div class="risk ${r.nivel}"><div class="lvl">${esc(distName())} · ${lbl}</div><div>${esc(p.resumen||"")}</div></div>
-  ${p.alerta_urgente?`<div class="alert" role="alert" style="margin-top:12px">${esc(p.alerta_urgente)} INDECI: 119.</div>`:""}
+  ${p.alerta_urgente?`<div class="alert" role="alert" style="margin-top:12px">${esc(p.alerta_urgente)} INDECI (Defensa Civil): 115.</div>`:""}
   <div class="plan two" style="margin-top:14px">
     <article class="pc"><span class="tag">Antes</span><h3>Prepárense</h3>${ul(p.antes)}</article>
     <article class="pc"><span class="tag">Durante</span><h3>Si llega la emergencia</h3>${ul(p.durante)}</article>
@@ -981,7 +981,7 @@ function renderPlan(){
   </div>
   <div class="pc" style="margin-top:14px"><h3>De dónde salen los datos</h3>
     <ul>${(p.fuentes||[]).map(f=>`<li>${esc(f.dato)}: ${esc(f.fuente)} (${esc(f.fecha)})</li>`).join("")||"<li>No tengo ese dato.</li>"}</ul>
-    <p class="note">Datos del prototipo (INDECI 2003-2020, Open-Meteo, ENFEN). Confirma siempre con INDECI (119) y tu municipalidad.</p></div>
+    <p class="note">Datos del prototipo (INDECI 2003-2020, Open-Meteo, ENFEN). Confirma siempre con INDECI (115) y tu municipalidad.</p></div>
   <div class="row" style="margin-top:14px">
     <button class="btn wa" id="bWa">Compartir por WhatsApp</button>
     <button class="btn alt" id="bLink">Copiar enlace</button>
@@ -1001,7 +1001,7 @@ function enlace(){try{return location.href.split("#")[0];}catch(e){return "";}}
 function resumenTexto(){
   const p=S.plan,r=S.riesgo;
   const L=(t,a)=>`*${t}*\n`+(a||[]).slice(0,3).map(x=>"• "+x).join("\n");
-  return `*Plan familiar ante El Niño – ${distName()}* (${NIV[r.nivel][0]}, ${r.peligro})\n\n${L("Antes",p.antes)}\n\n${L("Durante",p.durante)}\n\n${L("Después",p.despues)}\n\n*Emergencias:* INDECI 119\n_Datos del prototipo: INDECI 2003-2020 y Open-Meteo._\nHaz tu plan: ${enlace()}`;
+  return `*Plan familiar ante El Niño – ${distName()}* (${NIV[r.nivel][0]}, ${r.peligro})\n\n${L("Antes",p.antes)}\n\n${L("Durante",p.durante)}\n\n${L("Después",p.despues)}\n\n*Emergencias:* INDECI 115\n_Datos del prototipo: INDECI 2003-2020 y Open-Meteo._\nHaz tu plan: ${enlace()}`;
 }
 async function copiar(t,msg){
   try{await navigator.clipboard.writeText(t);toast(msg);}
@@ -1030,7 +1030,7 @@ document.querySelectorAll(".tabs button").forEach(b=>b.addEventListener("click",
 
 /* ============ AGENTE DE CHAT ============ */
 const CHAT_RULES=`Eres el asistente de una familia peruana ante El Niño. Español simple, cercano y tranquilizador, máximo 70 palabras por respuesta.
-REGLAS: 1) Responde SOLO con los DATOS que recibes; no inventes cifras, fechas, lugares ni teléfonos. 2) Cuando uses un dato, menciona entre paréntesis su fuente y fecha. 3) Si falta información, di "no tengo ese dato" y sugiere confirmarlo con su municipalidad o INDECI. 4) Si hay peligro inmediato o emergencia, indica llamar a INDECI (119) y seguir a las autoridades. 5) Los datos son de un prototipo (INDECI 2003-2020, Open-Meteo, resumen de ENFEN): recuérdalo si preguntan por exactitud. 6) Si la pregunta no es sobre riesgo, prevención o el plan familiar, di amablemente que solo puedes ayudar con eso. Sin markdown, solo texto.`;
+REGLAS: 1) Responde SOLO con los DATOS que recibes; no inventes cifras, fechas, lugares ni teléfonos. 2) Cuando uses un dato, menciona entre paréntesis su fuente y fecha. 3) Si falta información, di "no tengo ese dato" y sugiere confirmarlo con su municipalidad o INDECI. 4) Si hay peligro inmediato o emergencia, indica llamar a INDECI (115) y seguir a las autoridades. 5) Los datos son de un prototipo (INDECI 2003-2020, Open-Meteo, resumen de ENFEN): recuérdalo si preguntan por exactitud. 6) Si la pregunta no es sobre riesgo, prevención o el plan familiar, di amablemente que solo puedes ayudar con eso. Sin markdown, solo texto.`;
 const CH={hist:[],busy:false};
 function chatDatos(){
   const r=S.riesgo;
@@ -1062,14 +1062,14 @@ function chatLocal(q){
   const r=S.riesgo,t=q.toLowerCase();
   if(!r)return "No encontré ese lugar. Escribe el nombre de tu distrito (por ejemplo Catacaos), elige uno de los botones o toca el mapa.";
   const has=(...w)=>w.some(x=>t.includes(x));
-  if(has("urgente","emergencia","ayuda","peligro ahora","socorro"))return "Si hay peligro ahora, llama a INDECI al 119 y sigue las indicaciones de las autoridades. Evacúa si te lo piden.";
+  if(has("urgente","emergencia","ayuda","peligro ahora","socorro"))return "Si hay peligro ahora, llama a INDECI al 115 y sigue las indicaciones de las autoridades. Evacúa si te lo piden.";
   if(has("mochila","llevar","kit"))return "Mochila: agua, comida que no se malogre, linterna y pilas, botiquín y medicinas, documentos en bolsa plástica, ropa de cambio y cargador portátil."+(S.perfil.ninos==="si"?" Agrega pañales, leche y ropa para los niños.":"");
   if(has("hora","cuando","cuándo","cuanto tiempo","cuánto tiempo","falta"))return vivoTxt().trim()||"No tengo ese dato del pronóstico por horas.";
   if(has("riesgo","nivel","peligro"))return distName()+" tiene riesgo "+NIV[r.nivel][0].replace("Riesgo ","")+" y el peligro principal es "+r.peligro.toLowerCase()+" ("+r.escenario.fuente+", "+r.escenario.fecha+").";
   if(has("historial","antes","pasó","emergencias"))return r.historial.texto+" ("+r.historial.fuente+", "+r.historial.fecha+").";
   if(has("aviso","mañana","hoy","lluvia","tiempo","clima"))return r.aviso.texto+" ("+r.aviso.fuente+", "+r.aviso.fecha+"). Para Costa Norte, SENAMHI tiene avisos rojos de lluvia del 23 al 25 de octubre de 2026 (SENAMHI, leído el 23 oct 2026).";
   if(has("ruta","evacu","reunión","reunion","punto"))return "No tengo ese dato para tu calle. Elijan en familia una ruta hacia un lugar alto y un punto de reunión, y confírmenlos con su municipalidad o Defensa Civil.";
-  if(has("teléfono","telefono","número","numero","contacto","llamar"))return "INDECI: 119. El teléfono de Defensa Civil de tu municipalidad: no tengo ese dato.";
+  if(has("teléfono","telefono","número","numero","contacto","llamar"))return "INDECI (Defensa Civil): 115. El teléfono de Defensa Civil de tu municipalidad: no tengo ese dato.";
   return "No tengo ese dato. Puedo ayudarte con el riesgo de tu distrito, la mochila, el aviso del tiempo, la ruta de evacuación o tu plan familiar.";
 }
 function addMsg(r,t,note){

@@ -47,7 +47,7 @@ Forma del `plan` (JSON):
 }
 ```
 
-Reglas del agente (ya escritas en el prompt, conviene mantenerlas): responder solo con los datos recibidos, citar fuente y fecha, decir "no tengo ese dato" si falta, y remitir a INDECI (119) en emergencias.
+Reglas del agente (ya escritas en el prompt, conviene mantenerlas): responder solo con los datos recibidos, citar fuente y fecha, decir "no tengo ese dato" si falta, y remitir a INDECI (115) en emergencias.
 
 ## Fuentes oficiales a conectar
 - ENFEN-IMARPE: comunicado oficial (estado de alerta y pronóstico).
