@@ -1413,12 +1413,12 @@ async function cargarNoticias(k){
 document.querySelectorAll("#nChips .chipf").forEach(b=>b.addEventListener("click",()=>cargarNoticias(b.dataset.k)));
 
 /* ---- WhatsApp: aquí se conecta el bot de Alan ---- */
-const waConfig=()=>Object.assign({numero:"",mensaje:"Hola, quiero mi plan familiar ante El Niño."},window.WHATSAPP_BOT||{},(window.INTEGRACIONES&&window.INTEGRACIONES.whatsapp)||{});
+const waConfig=()=>Object.assign({numero:"59168643730",mensaje:"Hola",incluirLugar:false},window.WHATSAPP_BOT||{},(window.INTEGRACIONES&&window.INTEGRACIONES.whatsapp)||{});
 function waEnlace(conLugar){
   const c=waConfig(),num=String(c.numero||"").replace(/\D/g,"");
   if(num.length<8)return "";
   let msg=c.mensaje;
-  if(conLugar&&S.dep)msg+=" Vivo en "+distName()+(S.prov?", "+provName(S.prov):"")+", "+depName(S.dep)+" (ubigeo "+(S.dist||S.dep)+").";
+  if(conLugar&&c.incluirLugar&&S.dep)msg+=" Vivo en "+distName()+(S.prov?", "+provName(S.prov):"")+", "+depName(S.dep)+" (ubigeo "+(S.dist||S.dep)+").";
   return "https://wa.me/"+num+"?text="+encodeURIComponent(msg);
 }
 function pintarWhatsapp(){
