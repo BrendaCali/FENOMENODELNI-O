@@ -364,6 +364,15 @@ select:disabled{opacity:.5}
 @keyframes bubin{from{opacity:0;transform:translateY(14px) scale(.9)}to{opacity:1;transform:none}}
 @media (max-width:959px){.wabub{bottom:calc(16px + 42px + 12px + env(safe-area-inset-bottom,0px))}}
 @media (prefers-reduced-motion:reduce){.wabub,.en-linea{animation:none!important}}
+.wa-strip{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:10px 14px 0;padding:10px 12px;border-radius:12px;background:#16382a;border:1px solid #1a7f45;color:#f1f4f0}
+.wa-s-txt{display:flex;flex-direction:column;gap:2px;min-width:0}
+.wa-s-txt b{font:800 16px var(--f-display)}
+.wa-s-txt small{font-size:12.5px;color:#c4d6cb}
+.wa-s-btn{position:relative;flex:none;display:inline-flex;align-items:center;gap:7px;min-height:42px;padding:0 16px 0 18px;border-radius:999px;border:0;background:#1a7f45;color:#fff;font-weight:800;font-size:14px;box-shadow:0 0 0 0 rgba(26,127,69,.7);animation:pulseg 2.4s infinite}
+.wa-s-btn:hover{background:#21985a}
+.wa-s-btn .en-linea{top:2px;left:4px}
+@media (min-width:960px){.wafab,.wabub{display:none!important}}
+@media (prefers-reduced-motion:reduce){.wa-s-btn{animation:none!important}}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:12px;font-weight:700;z-index:20}
 footer{font-size:13px;color:var(--muted);display:flex;flex-direction:column;gap:6px}
 @media (min-width:640px){.facts{grid-template-columns:1fr 1fr}.plan.two{grid-template-columns:1fr 1fr}}
@@ -385,6 +394,7 @@ footer{font-size:13px;color:var(--muted);display:flex;flex-direction:column;gap:
 </header>
 <aside class="sheet" id="sheet" hidden aria-labelledby="shT">
   <div class="sh-h"><div><h3 id="shT">Asistente familiar</h3><small id="shS">Responde solo con los datos de tu distrito</small></div><button class="x" id="shX" type="button" aria-label="Cerrar">×</button></div>
+  <div class="wa-strip" id="waStrip"><div class="wa-s-txt"><span class="wabub-tag">Asistente de IA · en línea</span><b>¿Prefieres WhatsApp?</b><small>Escríbenos y te atiende el asistente.</small></div><button type="button" class="wa-s-btn" id="waStripBtn"><i class="en-linea" aria-hidden="true"></i><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/><path d="M9 9.5c0 3 2.5 5.5 5.5 5.5l1.2-1.3-1.8-1-.8.6a3.6 3.6 0 0 1-1.7-1.7l.6-.8-1-1.8z"/></svg>WhatsApp</button></div>
   <div id="msgs" aria-live="polite"></div>
   <div class="chips" id="chips"></div>
   <form class="cf" id="cf"><input id="cin" type="text" autocomplete="off" placeholder="Escribe tu pregunta" aria-label="Tu pregunta"><button class="btn" type="submit">Enviar</button></form>
@@ -1376,6 +1386,7 @@ function togglePanel(p,abrir){
 }
 function irAMas(p){togglePanel(p,true);if(DESK.matches)$("mas").scrollIntoView({behavior:"smooth",block:"start"});}
 document.querySelectorAll(".mtile").forEach(b=>b.addEventListener("click",()=>togglePanel(b.dataset.p)));
+$("waStripBtn").onclick=()=>$("waFab").click();
 $("waFab").onclick=()=>{const u=waEnlace(true);if(u)window.open(u,"_blank","noopener");else irAMas("whatsapp");};
 (function(){
   let visto=false;try{visto=sessionStorage.getItem("wa_bub")==="1";}catch(e){}
