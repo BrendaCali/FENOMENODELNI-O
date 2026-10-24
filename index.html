@@ -197,6 +197,79 @@ select:disabled{opacity:.5}
 .sheet .dots i{background:#b5bdb8}
 .app>header h1{background:var(--accent);color:var(--accent-ink);padding:8px 14px;border-radius:10px;font-size:22px;line-height:1.15}
 .proto{background:var(--accent-soft);border-color:var(--accent)}
+@keyframes glowR{0%,100%{filter:drop-shadow(0 0 1px var(--r-muy))}50%{filter:drop-shadow(0 0 11px var(--r-muy))}}
+@keyframes glowA{0%,100%{filter:drop-shadow(0 0 1px var(--r-alto))}50%{filter:drop-shadow(0 0 9px var(--r-alto))}}
+@keyframes glowY{0%,100%{filter:drop-shadow(0 0 1px var(--r-medio))}50%{filter:drop-shadow(0 0 7px var(--r-medio))}}
+.tile.lv-muy-alto path{animation:glowR 1.9s ease-in-out infinite}
+.tile.lv-alto path{animation:glowA 2.5s ease-in-out infinite}
+.tile.lv-medio path{animation:glowY 3.2s ease-in-out infinite}
+.tile.ctx path{animation:none}
+.modes{display:flex;gap:6px;padding:8px 12px 0}
+.modes button{min-height:40px;padding:0 14px;border-radius:999px;border:2px solid var(--line);background:var(--surface);color:var(--ink);font-weight:700;font-size:14px;display:inline-flex;align-items:center;gap:6px}
+.modes button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.modes button:disabled{opacity:.5;cursor:not-allowed}
+.live{width:8px;height:8px;border-radius:50%;background:var(--r-muy);animation:blink 1.2s infinite}
+@keyframes blink{50%{opacity:.25}}
+.sem{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:8px;min-height:0}
+.sem-h{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.sem-h h3{font-size:18px}
+.liveb{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;letter-spacing:.08em;padding:3px 10px;border-radius:999px;background:var(--tile)}
+#semList{display:flex;flex-direction:column;gap:8px;overflow-y:auto;min-height:0;max-height:360px;padding-right:2px}
+.srow{display:grid;grid-template-columns:14px 1fr auto;gap:2px 10px;align-items:center;text-align:left;width:100%;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink);padding:10px 12px;animation:rowin .45s ease-out both}
+@keyframes rowin{from{opacity:0;transform:translateX(14px)}to{opacity:1;transform:none}}
+.srow:hover,.srow:focus-visible{border-color:var(--ink)}
+.sdot{width:12px;height:12px;border-radius:50%;background:currentColor;grid-row:1}
+.srow.lv-muy-alto{--c:var(--r-muy)}.srow.lv-alto{--c:var(--r-alto)}.srow.lv-medio{--c:var(--r-medio)}.srow.lv-bajo{--c:var(--r-bajo)}
+.sdot{background:var(--c)}
+.srow.lv-muy-alto .sdot,.srow.lv-alto .sdot{animation:pulse 1.4s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 var(--c)}100%{box-shadow:0 0 0 9px transparent}}
+.sname{display:flex;flex-direction:column;min-width:0}
+.sname b{font-size:16px;line-height:1.2}
+.sname small{font-size:12.5px;color:var(--muted);overflow-wrap:anywhere}
+.spill{font-size:12px;font-weight:800;letter-spacing:.06em;padding:3px 10px;border-radius:999px;background:var(--c);color:#fff}
+.srow.lv-medio .spill{color:var(--r-medio-ink)}.srow.lv-alto .spill{color:var(--r-alto-ink)}
+.srow.lv-muy-alto .spill{box-shadow:0 0 12px var(--c)}
+.sextra{grid-column:2/-1;display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:12.5px;font-weight:700;color:var(--c)}
+.sextra svg{width:120px;height:20px;flex:none;fill:var(--c)}
+@media (prefers-reduced-motion:reduce){.tile path,.dot .ring,.sdot,.srow,.live{animation:none!important}}
+@media (min-width:960px){
+  .app{grid-template-columns:minmax(340px,400px) minmax(0,1fr)}
+  #mapSlot{display:grid!important;grid-template-columns:minmax(0,1.3fr) minmax(250px,1fr);grid-template-rows:minmax(0,1fr) auto;gap:10px 12px}
+  #mapSlot .mapbox{grid-column:1;grid-row:1}
+  #mapSlot .sem{grid-column:2;grid-row:1;overflow:hidden}
+  #mapSlot #semList{max-height:none;flex:1}
+  #mapSlot .mapcap{grid-column:1/-1;grid-row:2}
+}
+.dot .core{stroke:#fff;stroke-width:3px}
+.dot.lv-muy-alto .core{fill:var(--r-muy)}.dot.lv-muy-alto .ring{stroke:var(--r-muy);stroke-width:3px}
+.dot.lv-alto .core{fill:var(--r-alto)}.dot.lv-alto .ring{stroke:var(--r-alto);stroke-width:3px}
+.dot.lv-medio .core{fill:var(--r-medio)}.dot.lv-medio .ring{stroke:var(--r-medio)}
+.dot.lv-bajo .core{fill:var(--r-bajo)}
+.dot .halo{fill:none;stroke-width:3px;vector-effect:non-scaling-stroke;opacity:.5}
+.dlbl{font-family:var(--f-body);font-weight:800;fill:var(--ink);paint-order:stroke;stroke:var(--surface);stroke-width:4px;stroke-linejoin:round;vector-effect:non-scaling-stroke;pointer-events:none}
+.alertas{position:absolute;left:10px;top:96px;z-index:2;display:flex;flex-direction:column;gap:6px;max-width:min(210px,52%)}
+.alertas .al{display:flex;align-items:center;gap:8px;border:0;border-radius:12px;padding:7px 10px;background:var(--surface);color:var(--ink);box-shadow:0 2px 10px rgba(0,0,0,.25);font-weight:700;font-size:13px;text-align:left;animation:rowin .45s ease-out both}
+.alertas .al i{flex:none;font-style:normal;font-size:11px;font-weight:800;letter-spacing:.06em;padding:2px 8px;border-radius:999px;background:var(--c);color:#fff}
+.alertas .al.lv-muy-alto{--c:var(--r-muy)}.alertas .al.lv-alto{--c:var(--r-alto)}.alertas .al.lv-medio{--c:var(--r-medio)}.alertas .al.lv-bajo{--c:var(--r-bajo)}
+.alertas .al.lv-medio i{color:var(--r-medio-ink)}.alertas .al.lv-alto i{color:var(--r-alto-ink)}
+.alertas .al.lv-muy-alto{box-shadow:0 0 14px var(--c)}
+.alertas h4{margin:0;font:800 12px var(--f-body);letter-spacing:.08em;text-transform:uppercase;color:var(--ink);background:var(--surface);padding:3px 10px;border-radius:999px;align-self:flex-start;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+.dot.lv-muy-alto .halo{stroke:var(--r-muy)}.dot.lv-alto .halo{stroke:var(--r-alto)}.dot.lv-medio .halo{stroke:var(--r-medio)}.dot.lv-bajo .halo{stroke:var(--r-bajo)}
+.app>header{align-items:center;text-align:center}
+.app>header h1{margin:0 auto}
+.banner{padding:8px 14px;font-size:14px;gap:2px;align-items:center;text-align:center}
+.banner b{font-size:16px}
+@media (max-width:959px){.alertas{display:none}}
+@media (min-width:960px){
+  .app>header .banner{width:100%;max-width:1000px;margin:0 auto}
+  .sheet .m{font-size:15px;padding:8px 12px}
+  .sheet .chip{font-size:13px;min-height:34px;padding:2px 12px}
+  .sheet .cf input{min-height:42px;font-size:15px}
+  .sheet .cf .btn{min-height:42px;font-size:15px;padding:0 16px}
+  .sheet .sh-h{padding:10px 14px}.sheet .sh-h h3{font-size:16px}
+  #mapSlot .legend{display:none}
+  .zoomctl button{width:40px;height:40px;font-size:18px}
+}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:12px;font-weight:700;z-index:20}
 footer{font-size:13px;color:var(--muted);display:flex;flex-direction:column;gap:6px}
 @media (min-width:640px){.facts{grid-template-columns:1fr 1fr}.plan.two{grid-template-columns:1fr 1fr}}
@@ -205,7 +278,6 @@ footer{font-size:13px;color:var(--muted);display:flex;flex-direction:column;gap:
 
 <div class="app">
 <header>
-  <span class="proto">Datos de ejemplo del prototipo</span>
   <h1>Tu plan familiar ante El Niño</h1>
   <p class="lead">Elige dónde vives, cuéntanos de tu familia y recibe un plan simple: qué hacer antes, durante y después de las lluvias.</p>
   <div class="banner" id="banner" role="status"></div>
@@ -224,7 +296,9 @@ footer{font-size:13px;color:var(--muted);display:flex;flex-direction:column;gap:
   <form class="cf" id="cf"><input id="cin" type="text" autocomplete="off" placeholder="Escribe tu pregunta" aria-label="Tu pregunta"><button class="btn" type="submit">Enviar</button></form>
 </aside>
 <div class="wrap">
-<section id="mapSlot" class="card" aria-label="Mapa del Perú"><p class="mapcap">Los puntos marcan zonas con riesgo alto o muy alto (datos de ejemplo del prototipo); se conectarán a los avisos de SENAMHI y ENFEN en tiempo real. En una emergencia llama a INDECI al 119.</p></section>
+<section id="mapSlot" class="card" aria-label="Mapa del Perú">
+<div class="sem" id="semaforo"><div class="sem-h"><h3>Semáforo por zona</h3><span class="liveb" id="semBadge">EJEMPLO</span></div><p class="note" id="semNote"></p><div id="semList"></div></div>
+<p class="mapcap">Los puntos marcan zonas con riesgo alto o muy alto (datos de ejemplo del prototipo); se conectarán a los avisos de SENAMHI y ENFEN en tiempo real. En una emergencia llama a INDECI al 119.</p></section>
 
 
 <!-- PASO 1 -->
@@ -233,11 +307,13 @@ footer{font-size:13px;color:var(--muted);display:flex;flex-direction:column;gap:
   <p class="lead">Toca tu departamento en el mapa y baja por secciones: provincia y luego distrito. En este prototipo hay datos de ejemplo para algunos distritos de Tumbes, Piura y Lambayeque.</p>
   <div class="mapbox">
     <div class="crumbs" id="crumbs" aria-label="Dónde estás"></div>
+    <div class="modes" id="modes" role="group" aria-label="Qué mostrar en el mapa"><button type="button" data-m="riesgo" aria-pressed="true">Riesgo de la zona</button><button type="button" data-m="vivo" aria-pressed="false" disabled><i class="live"></i>Lluvia en vivo</button></div>
     <svg class="map" id="map" viewBox="0 0 500 732" role="group" aria-label="Mapa de los departamentos del Perú"></svg>
+    <div class="alertas" id="alertas" aria-live="polite"></div>
     <div class="zoomctl"><button type="button" id="zIn" aria-label="Acercar">+</button><button type="button" id="zOut" aria-label="Alejar">−</button><button type="button" id="zAll" class="all" aria-label="Ver todo el Perú">Perú</button></div>
     <div class="tip" id="tip" aria-live="polite">Pasa el dedo o el mouse sobre el mapa</div>
     <div class="sw" aria-label="Leyenda de niveles de riesgo"><span><i style="background:var(--r-bajo)"></i>Bajo</span><span><i style="background:var(--r-medio)"></i>Medio</span><span><i style="background:var(--r-alto)"></i>Alto</span><span><i style="background:var(--r-muy)"></i>Muy alto</span></div>
-    <div class="legend">Los colores son niveles de riesgo de ejemplo, no probabilidades. Pellizca para acercar, arrastra para mover y toca para elegir.</div>
+    <div class="legend" id="lg">Los colores son niveles de riesgo de ejemplo, no probabilidades. Pellizca para acercar, arrastra para mover y toca para elegir.</div>
   </div>
   <div class="field"><label for="selDep">Departamento</label><select id="selDep"></select></div>
   <div class="field"><label for="selProv">Provincia</label><select id="selProv" disabled></select></div>
@@ -411,9 +487,9 @@ function fitBox(d,pad){
   return {box:[b.x+b.width/2-w/2,b.y+b.height/2-h/2,w,h],bb:b};
 }
 const ORD={"bajo":1,"medio":2,"alto":3,"muy-alto":4};
-const nivelDep=c=>RIESGO_DEP[c]?RIESGO_DEP[c].nivel:null;
-const nivelProv=k=>{let best=nivelDep(k.slice(0,2)),m=ORD[best]||0;distsOf(k).forEach(u=>{if(RIESGO[u]&&ORD[RIESGO[u].nivel]>m){m=ORD[RIESGO[u].nivel];best=RIESGO[u].nivel;}});return best;};
-const nivelDist=u=>(RIESGO[u]||RIESGO_DEP[u.slice(0,2)]||{}).nivel||null;
+const nivelDep=c=>{if(modoVivo()&&LIVE.datos[c])return LIVE.datos[c].nivel;return RIESGO_DEP[c]?RIESGO_DEP[c].nivel:null;};
+const nivelProv=k=>{let best=nivelDep(k.slice(0,2)),m=ORD[best]||0;if(modoVivo())return best;distsOf(k).forEach(u=>{if(RIESGO[u]&&ORD[RIESGO[u].nivel]>m){m=ORD[RIESGO[u].nivel];best=RIESGO[u].nivel;}});return best;};
+const nivelDist=u=>{if(modoVivo()){const l=liveDe(u);if(l)return l.nivel;}return (RIESGO[u]||RIESGO_DEP[u.slice(0,2)]||{}).nivel||null;};
 function shape(id,name,d,cls,onClick,nivel){
   const g=document.createElementNS(NS,"g"),p=document.createElementNS(NS,"path");
   g.setAttribute("class","tile "+cls+(nivel?" lv-"+nivel:""));p.setAttribute("d",d);g.appendChild(p);
@@ -439,6 +515,7 @@ function render(){
   let target=null;
   if(!S.dep){
     Object.keys(GEO_DEP).forEach(c=>shape(c,depName(c),GEO_DEP[c].d,depHas(c)?"has":"",()=>pickDep(c),nivelDep(c)));
+    Object.keys(GEO_DEP).forEach(c=>label(depName(c),GEO_DEP[c].d,MAP_W/50,MAP_W));
     target=[0,0,MAP_W,MAP_H];
   }else if(!S.prov){
     Object.keys(GEO_DEP).forEach(c=>{if(c!==S.dep)shape(c,depName(c),GEO_DEP[c].d,"ctx"+(depHas(c)?" has":""),()=>pickDep(c),nivelDep(c));});
@@ -456,34 +533,137 @@ function render(){
   renderDots(target);
   zoomTo(target);
   renderCrumbs();
+  renderSem();
 }
 function centro(d){
   const p=document.createElementNS(NS,"path");p.setAttribute("d",d);svg.appendChild(p);
   const b=p.getBBox();p.remove();return [b.x+b.width/2,b.y+b.height/2];
 }
-function addDot(x,y,nivel,r,name,onClick){
+function addDot(x,y,nivel,r,name,onClick,lbl,fs){
   const g=document.createElementNS(NS,"g");g.setAttribute("class","dot lv-"+nivel);
-  g.setAttribute("tabindex","0");g.setAttribute("role","button");g.setAttribute("aria-label",name+" · "+NIV[nivel][0].toLowerCase());
-  const t=document.createElementNS(NS,"title");t.textContent=name+" · "+NIV[nivel][0];g.appendChild(t);
-  const ring=document.createElementNS(NS,"circle"),core=document.createElementNS(NS,"circle");
-  [ring,core].forEach(c=>{c.setAttribute("cx",x);c.setAttribute("cy",y);c.setAttribute("r",r);});
-  ring.setAttribute("class","ring");core.setAttribute("class","core");g.append(ring,core);
+  g.setAttribute("tabindex","0");g.setAttribute("role","button");g.setAttribute("aria-label",name+" · "+PILL[nivel]);
+  const t=document.createElementNS(NS,"title");t.textContent=name+" · peligro "+PILL[nivel].toLowerCase();g.appendChild(t);
+  ["halo","ring","core"].forEach(k=>{const c=document.createElementNS(NS,"circle");c.setAttribute("cx",x);c.setAttribute("cy",y);c.setAttribute("r",k==="halo"?r*1.9:r);c.setAttribute("class",k);g.appendChild(c);});
+  if(lbl){const tx=document.createElementNS(NS,"text");tx.setAttribute("class","dlbl");tx.setAttribute("x",x+r*2.3);tx.setAttribute("y",y+fs*0.35);tx.setAttribute("font-size",fs);tx.textContent=name+" · "+PILL[nivel];g.appendChild(tx);}
   g.addEventListener("click",onClick);
-  g.addEventListener("mouseenter",()=>$("tip").textContent=name+" · "+NIV[nivel][0].toLowerCase());
+  g.addEventListener("mouseenter",()=>$("tip").textContent=name+" · peligro "+PILL[nivel].toLowerCase());
   g.addEventListener("keydown",ev=>{if(ev.key==="Enter"||ev.key===" "){ev.preventDefault();onClick();}});
   svg.appendChild(g);
 }
-/* Puntos: zonas con riesgo alto o muy alto (datos de ejemplo). Reemplazable por avisos SENAMHI/ENFEN en vivo. */
+/* Puntos que brillan con el color del peligro. Con "Lluvia en vivo" usan el pronóstico real. */
 function renderDots(target){
-  const r=target[2]/(S.dep?34:36);
+  const w=target[2],r=w/(S.dep?40:44),fs=w/(S.dep?30:46);
+  const items=[];
   if(!S.dep){
-    Object.keys(RIESGO_DEP).forEach(c=>{const n=RIESGO_DEP[c].nivel;if(ORD[n]>=3)addDot(...centro(GEO_DEP[c].d),n,r,depName(c),()=>pickDep(c));});
-    return;
+    Object.keys(GEO_DEP).forEach(c=>{const n=nivelDep(c);if(ORD[n]>=3)items.push([c,GEO_DEP[c].d,n,depName(c),()=>pickDep(c)]);});
+  }else{
+    const dd=Object.keys(RIESGO).filter(u=>GEO_DIST[u]&&u.slice(0,2)===S.dep&&(!S.prov||GEO_DIST[u].p===S.prov));
+    if(dd.length)dd.forEach(u=>items.push([u,GEO_DIST[u].d,nivelDist(u),GEO_DIST[u].n,()=>irALugar({tipo:"dist",u})]));
+    else if(RIESGO_DEP[S.dep])items.push([S.dep,GEO_DEP[S.dep].d,nivelDep(S.dep),depName(S.dep),()=>pickDep(S.dep)]);
   }
-  const dd=Object.keys(RIESGO).filter(u=>GEO_DIST[u]&&u.slice(0,2)===S.dep&&(!S.prov||GEO_DIST[u].p===S.prov));
-  if(dd.length)dd.forEach(u=>addDot(...centro(GEO_DIST[u].d),RIESGO[u].nivel,r,GEO_DIST[u].n,()=>irALugar({tipo:"dist",u})));
-  else if(RIESGO_DEP[S.dep])addDot(...centro(GEO_DEP[S.dep].d),RIESGO_DEP[S.dep].nivel,r,depName(S.dep),()=>pickDep(S.dep));
+  const orden=items.slice().sort((a,b)=>ORD[b[2]]-ORD[a[2]]).map(x=>x[0]);
+  const conEtiqueta=S.dep?orden:orden.slice(0,3);
+  items.forEach(([id,d,n,name,fn])=>{if(!n)return;const [x,y]=centro(d);addDot(x,y,n,r,name,fn,conEtiqueta.includes(id),fs);});
 }
+/* ============ PRONÓSTICO EN VIVO (Open-Meteo, por horas) + SEMÁFORO ============ */
+const LIVE={datos:{},ok:false,t:null,modo:"riesgo"};
+const PILL={"bajo":"VERDE","medio":"AMARILLO","alto":"NARANJA","muy-alto":"ROJO"};
+const modoVivo=()=>LIVE.modo==="vivo"&&LIVE.ok;
+const liveDe=code=>LIVE.datos[code]||(code&&code.length>2?LIVE.datos[code.slice(0,2)]:null)||null;
+const hora=()=>LIVE.t?LIVE.t.toLocaleTimeString("es-PE",{hour:"2-digit",minute:"2-digit",timeZone:"America/Lima"})+" (hora de Lima)":"sin conexión";
+function bboxCentro(d){
+  const n=d.match(/-?\d+\.?\d*/g).map(Number);let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9;
+  for(let i=0;i<n.length-1;i+=2){x0=Math.min(x0,n[i]);x1=Math.max(x1,n[i]);y0=Math.min(y0,n[i+1]);y1=Math.max(y1,n[i+1]);}
+  return [(x0+x1)/2,(y0+y1)/2];
+}
+const mapToLL=([x,y])=>[GEO_PROJ.maxY-y/GEO_PROJ.S,x/(GEO_PROJ.k*GEO_PROJ.S)+GEO_PROJ.minX];
+/* Criterio del prototipo (no oficial): intensidad máxima por hora y acumulado de 24 h. */
+function metricas(h){
+  const ahora=new Date(Date.now()-5*3600e3).toISOString().slice(0,13)+":00";
+  let i=h.time.findIndex(t=>t>=ahora);if(i<0)i=0;
+  const pr=h.precipitation.slice(i).map(v=>v||0),pb=h.precipitation_probability.slice(i).map(v=>v||0);
+  const sum=a=>a.reduce((x,y)=>x+y,0);
+  const max=Math.max(0,...pr),sum24=sum(pr.slice(0,24)),sum72=sum(pr),prob24=Math.max(0,...pb.slice(0,24));
+  const first=th=>pr.findIndex(v=>v>=th);
+  const m={max,sum24,sum72,prob24,hMod:first(2.5),hFuerte:first(7.6),hAny:first(0.2),bars:pr.slice(0,24)};
+  m.nivel=(max>=7.6||sum24>=50)?"muy-alto":(max>=2.5||sum24>=20)?"alto":(prob24>=50||sum72>=2)?"medio":"bajo";
+  return m;
+}
+function cuando(m){
+  if(!m)return "no tengo ese dato";
+  const h=x=>x<=0?"ahora":"en ~"+x+" h";
+  if(m.hFuerte>=0)return "lluvia fuerte "+h(m.hFuerte);
+  if(m.hMod>=0)return "lluvia moderada "+h(m.hMod);
+  if(m.hAny>=0)return "lluvia ligera "+h(m.hAny);
+  return "sin lluvia en 72 h";
+}
+const vivoTxt=()=>{const m=liveDe(S.dist||S.dep||"");return m?" Pronóstico en vivo (Open-Meteo, "+hora()+"): "+cuando(m)+", "+m.sum24.toFixed(1)+" mm en las próximas 24 h.":"";};
+async function cargarVivo(){
+  try{
+    const pts=[];
+    Object.keys(GEO_DEP).forEach(c=>pts.push([c,...mapToLL(bboxCentro(GEO_DEP[c].d))]));
+    Object.keys(RIESGO).forEach(u=>{if(GEO_DIST[u])pts.push([u,...mapToLL(bboxCentro(GEO_DIST[u].d))]);});
+    const url="https://api.open-meteo.com/v1/forecast?latitude="+pts.map(p=>p[1].toFixed(2)).join(",")+"&longitude="+pts.map(p=>p[2].toFixed(2)).join(",")+"&hourly=precipitation,precipitation_probability&forecast_days=3&timezone=America%2FLima";
+    const res=await fetch(url);if(!res.ok)throw new Error("HTTP "+res.status);
+    const j=await res.json(),arr=Array.isArray(j)?j:[j],datos={};
+    arr.forEach((p,k)=>{datos[pts[k][0]]=metricas(p.hourly);});
+    LIVE.datos=datos;LIVE.ok=true;LIVE.t=new Date();
+  }catch(e){console.warn("pronóstico en vivo",e);LIVE.ok=false;}
+  if(!LIVE.ok&&LIVE.modo==="vivo")LIVE.modo="riesgo";
+  syncModes();render();
+}
+function syncModes(){
+  document.querySelectorAll("#modes button").forEach(b=>{
+    b.setAttribute("aria-pressed",String(b.dataset.m===LIVE.modo));
+    if(b.dataset.m==="vivo")b.disabled=!LIVE.ok;
+  });
+  const lg=$("lg");if(lg)lg.textContent=modoVivo()?"Colores: lluvia prevista en las próximas 72 h (Open-Meteo). Criterio del prototipo, no reemplaza los avisos de SENAMHI.":"Colores: nivel de riesgo de la zona (datos de ejemplo).";
+}
+function semItems(){
+  const base=c=>RIESGO_DEP[c]?RIESGO_DEP[c].nivel:"bajo";
+  let it;
+  if(!S.dep)it=Object.keys(GEO_DEP).map(c=>({code:c,name:depName(c),sub:"Departamento",base:base(c),go:()=>pickDep(c)}));
+  else{
+    const dd=Object.keys(RIESGO).filter(u=>GEO_DIST[u]&&u.slice(0,2)===S.dep&&(!S.prov||GEO_DIST[u].p===S.prov));
+    it=dd.length?dd.map(u=>({code:u,name:GEO_DIST[u].n,sub:provName(GEO_DIST[u].p),base:RIESGO[u].nivel,go:()=>irALugar({tipo:"dist",u})}))
+      :[{code:S.dep,name:depName(S.dep),sub:"Departamento",base:base(S.dep),go:()=>pickDep(S.dep)}];
+  }
+  it.forEach(x=>{x.live=liveDe(x.code);x.nivel=modoVivo()&&x.live?x.live.nivel:x.base;});
+  return it.sort((a,b)=>ORD[b.nivel]-ORD[a.nivel]||((b.live?b.live.sum24:0)-(a.live?a.live.sum24:0)));
+}
+function spark(bars){
+  const mx=8;return '<svg viewBox="0 0 120 20" aria-hidden="true">'+bars.map((v,i)=>{const hh=Math.max(1.5,Math.min(20,v/mx*20));return '<rect x="'+i*5+'" y="'+(20-hh)+'" width="4" height="'+hh+'" rx="1"/>';}).join("")+'</svg>';
+}
+function renderSem(){
+  const list=$("semList");if(!list)return;
+  const it=semItems();
+  const badge=$("semBadge");
+  badge.innerHTML=LIVE.ok?'<i class="live"></i>EN VIVO':'EJEMPLO';
+  $("semNote").textContent=LIVE.ok?"Pronóstico por horas · Open-Meteo · actualizado "+hora()+". Criterio del prototipo; no reemplaza los avisos de SENAMHI.":"Sin conexión al pronóstico: se muestran niveles de ejemplo.";
+  list.innerHTML="";
+  it.forEach((x,i)=>{
+    const b=document.createElement("button");b.type="button";b.className="srow lv-"+x.nivel;b.style.animationDelay=(i*35)+"ms";
+    const m=x.live;
+    const sub=x.sub+(m?" · "+m.sum24.toFixed(1)+" mm en 24 h · prob. "+Math.round(m.prob24)+"%":"");
+    b.innerHTML='<span class="sdot"></span><span class="sname"><b></b><small></small></span><span class="spill"></span>'+(m?'<span class="sextra">'+spark(m.bars)+'<span></span></span>':"");
+    b.querySelector("b").textContent=x.name;b.querySelector("small").textContent=sub;
+    b.querySelector(".spill").textContent=PILL[x.nivel];
+    if(m)b.querySelector(".sextra span").textContent=cuando(m);
+    b.onclick=x.go;list.appendChild(b);
+  });
+  /* tarjetas flotantes sobre el mapa: las 3 zonas con más peligro */
+  const al=$("alertas");al.innerHTML="";
+  const top=it.filter(x=>ORD[x.nivel]>=2).slice(0,3);
+  if(top.length){
+    const h4=document.createElement("h4");h4.textContent="Zonas en peligro";al.appendChild(h4);
+    top.forEach((x,i)=>{const b=document.createElement("button");b.type="button";b.className="al lv-"+x.nivel;b.style.animationDelay=(i*120)+"ms";
+      const t=document.createElement("i");t.textContent=PILL[x.nivel];const n=document.createElement("span");n.textContent=x.name;b.append(t,n);b.onclick=x.go;al.appendChild(b);});
+  }
+}
+document.querySelectorAll("#modes button").forEach(b=>b.addEventListener("click",()=>{
+  if(b.dataset.m==="vivo"&&!LIVE.ok){toast("Sin conexión al pronóstico en vivo.");return;}
+  LIVE.modo=b.dataset.m;syncModes();render();
+}));
 function renderCrumbs(){
   const parts=[["Perú",()=>{S.dep=S.prov=S.dist=S.riesgo=null;selDep.value="";resetSel(selProv,"Elige departamento primero");resetSel(selDist,"Elige provincia primero");hideRisk();$("tip").textContent="Pasa el dedo o el mouse sobre el mapa";render();}]];
   if(S.dep)parts.push([depName(S.dep),()=>{const d=S.dep;S.prov=S.dist=S.riesgo=null;pickDep(d);}]);
@@ -802,7 +982,7 @@ const CH={hist:[],busy:false};
 function chatDatos(){
   const r=S.riesgo;
   return {distrito:r?{nombre:distName(),provincia:provName(S.prov),departamento:depName(S.dep),nivel:r.nivel,peligro_principal:r.peligro,peligro_secundario:r.secundario||"no tengo ese dato",historial:r.historial,aviso:r.aviso,escenario:r.escenario}:"el usuario aún no eligió distrito",
-    familia:S.perfil,estado_el_nino:ENFEN_ESTADO,avisos_senamhi:AVISOS_SENAMHI,plan_generado:S.plan||"aún no generado"};
+    familia:S.perfil,estado_el_nino:ENFEN_ESTADO,avisos_senamhi:AVISOS_SENAMHI,plan_generado:S.plan||"aún no generado",pronostico_en_vivo:(()=>{const m=liveDe(S.dist||S.dep||"");return m?{fuente:"Open-Meteo (modelos), actualizado "+hora(),lluvia_mm_24h:+m.sum24.toFixed(1),lluvia_mm_72h:+m.sum72.toFixed(1),prob_max_24h:m.prob24,intensidad_max_mm_h:+m.max.toFixed(1),cuando:cuando(m),nivel_prototipo:PILL[m.nivel]}:"no tengo ese dato";})()};
 }
 function chatInput(){
   const first=CHAT_RULES+"\n\nDATOS (única fuente permitida):\n"+JSON.stringify(chatDatos());
@@ -831,6 +1011,7 @@ function chatLocal(q){
   const has=(...w)=>w.some(x=>t.includes(x));
   if(has("urgente","emergencia","ayuda","peligro ahora","socorro"))return "Si hay peligro ahora, llama a INDECI al 119 y sigue las indicaciones de las autoridades. Evacúa si te lo piden.";
   if(has("mochila","llevar","kit"))return "Mochila: agua, comida que no se malogre, linterna y pilas, botiquín y medicinas, documentos en bolsa plástica, ropa de cambio y cargador portátil."+(S.perfil.ninos==="si"?" Agrega pañales, leche y ropa para los niños.":"");
+  if(has("hora","cuando","cuándo","cuanto tiempo","cuánto tiempo","falta"))return vivoTxt().trim()||"No tengo ese dato del pronóstico por horas.";
   if(has("riesgo","nivel","peligro"))return distName()+" tiene riesgo "+NIV[r.nivel][0].replace("Riesgo ","")+" y el peligro principal es "+r.peligro.toLowerCase()+" ("+r.escenario.fuente+", "+r.escenario.fecha+").";
   if(has("historial","antes","pasó","emergencias"))return r.historial.texto+" ("+r.historial.fuente+", "+r.historial.fecha+").";
   if(has("aviso","mañana","hoy","lluvia","tiempo","clima"))return r.aviso.texto+" ("+r.aviso.fuente+", "+r.aviso.fecha+"). Para Costa Norte, SENAMHI tiene avisos rojos de lluvia del 23 al 25 de octubre de 2026 (SENAMHI, leído el 23 oct 2026).";
@@ -876,7 +1057,7 @@ function resumenLugar(){
   const r=S.riesgo;if(!r)return "";
   const lugar=distName()+(S.prov?" ("+provName(S.prov)+")":"");
   if(r.general)return lugar+": no tengo datos de riesgo de esta zona, pero te preparo un plan general. Toca Armar mi plan.";
-  return lugar+": "+NIV[r.nivel][0].toLowerCase()+", peligro principal "+r.peligro.toLowerCase()+". "+r.aviso.texto+" ("+r.aviso.fuente+", "+r.aviso.fecha+"). Cuando quieras, toca Armar mi plan.";
+  return lugar+": "+NIV[r.nivel][0].toLowerCase()+", peligro principal "+r.peligro.toLowerCase()+". "+r.aviso.texto+" ("+r.aviso.fuente+", "+r.aviso.fecha+")."+vivoTxt()+" Cuando quieras, toca Armar mi plan.";
 }
 function agentNotify(){
   if(!S.riesgo)return;
@@ -902,7 +1083,7 @@ function chatInit(){
 }
 function renderBanner(){
   const e=ENFEN_ESTADO,p=e.probExtraordinaria.map(([m,v])=>m+" "+v+"%").join(" · ");
-  $("banner").innerHTML="<b>ALERTA · "+esc(e.estado)+"</b><span>"+esc(e.resumen)+"</span><small>Probabilidad de magnitud extraordinaria: "+esc(p)+" · "+esc(e.comunicado)+", "+esc(e.fecha)+" · "+esc(e.probFuente)+"</small>";
+  $("banner").innerHTML="<b>ALERTA · "+esc(e.estado)+"</b><span>Magnitud extraordinaria probable hasta enero de 2027 · Probabilidad: "+esc(p)+"</span><small>"+esc(e.comunicado)+", "+esc(e.fecha)+" (resumen de prensa) · la probabilidad viene de una actualización anterior (RPP)</small>";
 }
 function chatOpen(){
   $("sheet").hidden=false;$("fab").hidden=true;$("cin").focus();
@@ -910,9 +1091,9 @@ function chatOpen(){
 /* ---- Escritorio: mitad IA, mitad mapa ---- */
 const DESK=window.matchMedia("(min-width:960px)");
 function placeMap(){
-  const mb=document.querySelector(".mapbox");
-  if(DESK.matches){if(mb.parentNode.id!=="mapSlot")$("mapSlot").insertBefore(mb,$("mapSlot").querySelector(".mapcap"));}
-  else{const s1=$("s1");if(mb.parentNode!==s1)s1.insertBefore(mb,s1.querySelector(".field"));}
+  const mb=document.querySelector(".mapbox"),sem=$("semaforo");
+  if(DESK.matches){const slot=$("mapSlot");if(sem.parentNode!==slot)slot.insertBefore(sem,slot.querySelector(".mapcap"));if(mb.parentNode!==slot)slot.insertBefore(mb,sem);}
+  else{const s1=$("s1"),f=s1.querySelector(".field");if(mb.parentNode!==s1)s1.insertBefore(mb,f);if(sem.parentNode!==s1)s1.insertBefore(sem,f);}
   setTimeout(render,0);
 }
 DESK.addEventListener("change",placeMap);
@@ -967,6 +1148,6 @@ $("fab").onclick=chatOpen;
 $("shX").onclick=()=>{$("sheet").hidden=true;$("fab").hidden=false;};
 $("cf").addEventListener("submit",e=>{e.preventDefault();chatSend($("cin").value);});
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("sheet").hidden)$("shX").click();});
-renderBanner();placeMap();chatInit();setStep(1);
+renderBanner();placeMap();chatInit();setStep(1);cargarVivo();setInterval(cargarVivo,900000);
 try{if(navigator.permissions)navigator.permissions.query({name:"geolocation"}).then(p=>{if(p.state==="granted")ubicar();});}catch(e){}
 </script>
