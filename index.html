@@ -134,6 +134,13 @@ select:disabled{opacity:.5}
 .tabs button{flex:1;min-height:48px;border:0;border-radius:10px;background:transparent;font-weight:700;font-size:16px;color:var(--muted)}
 .tabs button[aria-selected="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.18)}
 .steps[hidden]{display:none}
+.mapbox{position:relative}
+.zoomctl{position:absolute;right:10px;top:54px;display:flex;flex-direction:column;gap:6px;z-index:2}
+.zoomctl button{width:48px;height:48px;border-radius:12px;border:2px solid var(--line);background:var(--surface);color:var(--ink);font:700 22px var(--f-body);line-height:1;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+.zoomctl button.all{font-size:13px}
+#to2{position:sticky;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:5;box-shadow:0 6px 18px rgba(0,0,0,.28)}
+#riskFull:empty{display:none}
+@media (max-width:640px){.fab{bottom:calc(88px + env(safe-area-inset-bottom,0px));padding:0 16px}}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:12px;font-weight:700;z-index:20}
 footer{font-size:13px;color:var(--muted);display:flex;flex-direction:column;gap:6px}
 @media (min-width:640px){.facts{grid-template-columns:1fr 1fr}.plan.two{grid-template-columns:1fr 1fr}}
@@ -161,8 +168,9 @@ footer{font-size:13px;color:var(--muted);display:flex;flex-direction:column;gap:
   <div class="mapbox">
     <div class="crumbs" id="crumbs" aria-label="Dónde estás"></div>
     <svg class="map" id="map" viewBox="0 0 500 732" role="group" aria-label="Mapa de los departamentos del Perú"></svg>
+    <div class="zoomctl"><button type="button" id="zIn" aria-label="Acercar">+</button><button type="button" id="zOut" aria-label="Alejar">−</button><button type="button" id="zAll" class="all" aria-label="Ver todo el Perú">Perú</button></div>
     <div class="tip" id="tip" aria-live="polite">Pasa el dedo o el mouse sobre el mapa</div>
-    <div class="legend">Toca una sección para acercarte. Las de color con borde tienen detalle por provincia y distrito; las demás muestran datos de ejemplo a nivel de departamento.</div>
+    <div class="legend">Pellizca con dos dedos para acercar, arrastra para mover y toca una sección para elegirla. Las de color con borde tienen detalle por provincia y distrito.</div>
   </div>
   <div class="field"><label for="selDep">Departamento</label><select id="selDep"></select></div>
   <div class="field"><label for="selProv">Provincia</label><select id="selProv" disabled></select></div>
@@ -179,6 +187,7 @@ footer{font-size:13px;color:var(--muted);display:flex;flex-direction:column;gap:
 <!-- PASO 2 -->
 <section id="s2" class="card" aria-labelledby="t2" hidden>
   <h2 id="t2">Cuéntanos de tu familia</h2>
+  <div id="riskFull"></div>
   <p class="lead">Solo toca los botones. Con esto adaptamos el plan a ustedes.</p>
   <div id="qs" style="display:flex;flex-direction:column;gap:18px"></div>
   <div class="row"><button class="btn alt" id="back1">Volver</button><button class="btn" id="gen">Generar mi plan familiar</button></div>
@@ -329,7 +338,7 @@ let vb=[0,0,MAP_W,MAP_H],raf;
 function zoomTo(box){
   const from=vb.slice(),t0=performance.now();cancelAnimationFrame(raf);
   const step=t=>{const k=Math.min(1,(t-t0)/500),e=1-Math.pow(1-k,3);
-    vb=from.map((v,i)=>v+(box[i]-v)*e);svg.setAttribute("viewBox",vb.join(" "));if(k<1)raf=requestAnimationFrame(step);};
+    vb=from.map((v,i)=>v+(box[i]-v)*e);svg.setAttribute("viewBox",vb.join(" "));if(k<1)raf=requestAnimationFrame(step);else syncTouch();};
   raf=requestAnimationFrame(step);
 }
 function fitBox(d,pad){
@@ -444,31 +453,79 @@ async function pickDist(u){
 selDep.onchange=()=>{if(selDep.value)pickDep(selDep.value);};
 selProv.onchange=()=>{if(selProv.value)pickProv(selProv.value);};
 selDist.onchange=()=>pickDist(selDist.value);
+
+/* ---- Gestos del mapa: pellizcar con dos dedos, arrastrar y botones + / − ---- */
+const PT=new Map();let dragMoved=0,pinch0=null;
+const clampW=w=>Math.min(MAP_W*1.15,Math.max(MAP_W/14,w));
+function syncTouch(){svg.style.touchAction=vb[2]<MAP_W*0.9?"none":"pan-y";}
+function setVB(v){cancelAnimationFrame(raf);vb=v;svg.setAttribute("viewBox",vb.map(x=>+x.toFixed(2)).join(" "));syncTouch();}
+function zoomAt(f,cx,cy){
+  const r=svg.getBoundingClientRect();
+  const ux=vb[0]+(cx-r.left)/r.width*vb[2],uy=vb[1]+(cy-r.top)/r.height*vb[3];
+  const nw=clampW(vb[2]/f),k=nw/vb[2];
+  setVB([ux-(ux-vb[0])*k,uy-(uy-vb[1])*k,nw,vb[3]*k]);
+}
+svg.addEventListener("pointerdown",e=>{
+  PT.set(e.pointerId,{x:e.clientX,y:e.clientY});dragMoved=0;
+  if(PT.size===2){const [a,b]=[...PT.values()];pinch0={d:Math.hypot(a.x-b.x,a.y-b.y)};}
+});
+svg.addEventListener("pointermove",e=>{
+  const p=PT.get(e.pointerId);if(!p)return;
+  const nx=e.clientX,ny=e.clientY;
+  if(PT.size===1){
+    const dx=nx-p.x,dy=ny-p.y;dragMoved+=Math.abs(dx)+Math.abs(dy);
+    if(vb[2]<MAP_W*0.9&&dragMoved>6){const r=svg.getBoundingClientRect(),s=vb[2]/r.width;setVB([vb[0]-dx*s,vb[1]-dy*s,vb[2],vb[3]]);}
+    p.x=nx;p.y=ny;
+  }else if(PT.size===2&&pinch0){
+    const other=[...PT.entries()].find(([id])=>id!==e.pointerId)[1];
+    p.x=nx;p.y=ny;
+    const d=Math.hypot(p.x-other.x,p.y-other.y);
+    if(pinch0.d>0){zoomAt(d/pinch0.d,(p.x+other.x)/2,(p.y+other.y)/2);pinch0.d=d;}
+    dragMoved=99;
+  }
+});
+const endP=e=>{PT.delete(e.pointerId);if(PT.size<2)pinch0=null;};
+["pointerup","pointercancel","pointerleave"].forEach(t=>svg.addEventListener(t,endP));
+svg.addEventListener("click",e=>{if(dragMoved>6){e.stopPropagation();e.preventDefault();dragMoved=0;}},true);
+svg.addEventListener("wheel",e=>{if(!(e.ctrlKey||e.metaKey))return;e.preventDefault();zoomAt(Math.exp(-e.deltaY*0.002),e.clientX,e.clientY);},{passive:false});
+const zc=()=>{const r=svg.getBoundingClientRect();return [r.left+r.width/2,r.top+r.height/2];};
+$("zIn").onclick=()=>zoomAt(1.6,...zc());
+$("zOut").onclick=()=>zoomAt(1/1.6,...zc());
+$("zAll").onclick=()=>zoomTo([0,0,MAP_W,MAP_H]);
+syncTouch();
+
 svg.addEventListener("mouseleave",()=>$("tip").textContent=S.dep?"Seleccionado: "+depName(S.dep):"Pasa el dedo o el mouse sobre el mapa");
 
 function renderRisk(){
   const r=S.riesgo;
-  if(!r){ofrecerGeneral("No tengo ese dato: "+distName()+" aún no tiene datos de ejemplo. Puedes seguir con un plan general o elegir un distrito de color en el mapa.");return;}
+  if(!r){ofrecerGeneral("No tengo ese dato: "+distName()+" aún no tiene datos de ejemplo. Puedes seguir con un plan general o elegir otro lugar.");$("riskFull").innerHTML="";return;}
   if(r.general){
-    $("riskArea").innerHTML='<div class="risk sin-dato"><div class="lvl">Plan general de '+esc(distName())+'</div><div>No tengo datos de riesgo de esta zona. Te daremos recomendaciones generales y dónde confirmar con las autoridades.</div></div>';
-    return;
+    const g='<div class="risk sin-dato"><div class="lvl">Plan general de '+esc(distName())+'</div><div>No tengo datos de riesgo de esta zona. Te daremos recomendaciones generales y dónde confirmar con las autoridades.</div></div>';
+    $("riskArea").innerHTML=g;$("riskFull").innerHTML=g;return;
   }
   const [lbl,n]=NIV[r.nivel];
-  $("riskArea").innerHTML=`
+  const place=esc(distName())+(S.prov?" · "+esc(provName(S.prov)):"");
+  const compact='<div class="risk '+r.nivel+'"><small style="font-weight:700;letter-spacing:.06em;text-transform:uppercase">'+place+'</small><div class="lvl">'+lbl+'</div><div><b>Peligro principal:</b> '+esc(r.peligro)+'</div></div>'+
+    '<p class="note" style="margin-top:8px">Listo. Toca Continuar para ver el detalle y contarnos de tu familia.</p>';
+  const head=`
   <div class="risk ${r.nivel}">
-    <div><small style="font-weight:700;letter-spacing:.06em;text-transform:uppercase">${esc(distName())}${S.prov?" · "+esc(provName(S.prov)):""}</small></div>
+    <div><small style="font-weight:700;letter-spacing:.06em;text-transform:uppercase">${place}</small></div>
     <div class="lvl">${lbl}</div>
     <div class="meter" aria-hidden="true">${[1,2,3,4].map(i=>`<i class="${i<=n?"on":""}"></i>`).join("")}</div>
     <div><b>Peligro principal:</b> ${esc(r.peligro)}${r.secundario?` · también: ${esc(r.secundario)}`:""}</div>
     <small>Fuente: ${esc(r.escenario.fuente)} · ${esc(r.escenario.fecha)}</small>
     ${r.aNivelDepto?'<small>Dato orientativo a nivel de departamento; el detalle por distrito llegará con las fuentes oficiales.</small>':""}
-  </div>
+  </div>`;
+  const facts=`
   <div class="facts" style="margin-top:12px">
     <div class="fact"><b>Historial de emergencias</b>${esc(r.historial.texto)}<span class="src">${esc(r.historial.fuente)} · ${esc(r.historial.fecha)}</span></div>
     <div class="fact"><b>Aviso del tiempo</b>${esc(r.aviso.texto)}<span class="src">${esc(r.aviso.fuente)} · ${esc(r.aviso.fecha)}</span></div>
     <div class="fact"><b>Estado de El Niño</b>${esc(r.enfen.valor)}<span class="src">${esc(r.enfen.fuente)} · ${esc(r.enfen.fecha)}</span></div>
   </div>`;
+  $("riskArea").innerHTML=compact;
+  $("riskFull").innerHTML=head+facts;
 }
+
 render();
 
 /* ============ PASO 2: PREGUNTAS ============ */
