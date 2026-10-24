@@ -66,3 +66,21 @@ La sección Noticias muestra una lista de notas reales con enlace al medio. Para
 - Riesgo histórico: base de emergencias y daños de INDECI 2003-2020 (nivel calculado por el prototipo).
 - Lluvia por horas, mar y ríos: Open-Meteo (Forecast, Marine y Flood), sin clave.
 - Refugios y puntos de apoyo: OpenStreetMap (Nominatim). Los albergues oficiales los define INDECI o la municipalidad.
+
+## WhatsApp: dónde se conecta el bot
+La página tiene una tarjeta **WhatsApp** (franja "Más información") y un botón "Hablar por WhatsApp" en el asistente. Se muestran vacías ("Pronto podrás hablar por WhatsApp") hasta que se define el número del bot:
+
+```html
+<script>
+window.WHATSAPP_BOT = {
+  numero: "51999999999",   // con código de país, sin + ni espacios
+  mensaje: "Hola, quiero mi plan familiar ante El Niño."
+};
+</script>
+```
+(o `window.INTEGRACIONES.whatsapp = { numero, mensaje }`). Con eso aparecen el botón "Abrir chat de WhatsApp", el enlace para copiar y un código QR.
+
+El mensaje inicial incluye la zona que eligió la persona, para que el bot arranque sin preguntar de nuevo:
+`... Vivo en {distrito}, {provincia}, {departamento} (ubigeo {código}).`
+
+El bot puede usar las mismas fuentes que la web (Open-Meteo, INDECI, Nominatim) y el mismo formato JSON de plan descrito arriba.

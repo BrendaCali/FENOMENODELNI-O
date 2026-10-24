@@ -318,6 +318,16 @@ select:disabled{opacity:.5}
 @keyframes pulse2{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--r-muy) 60%,transparent)}100%{box-shadow:0 0 0 16px transparent}}
 @media (min-width:960px){.mas{max-width:1500px}.fab{bottom:calc(16px + env(safe-area-inset-bottom,0px))}}
 @media (prefers-reduced-motion:reduce){.sos,.mpanel,.ncard,.rcard{animation:none!important}}
+.wa-box{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:16px;align-items:center}
+.wa-box .wa-txt{display:flex;flex-direction:column;gap:10px}
+.wa-btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:56px;padding:0 22px;border-radius:14px;background:#1a7f45;color:#fff;font-weight:800;font-size:18px;text-decoration:none;align-self:flex-start}
+.wa-qr{width:170px;height:170px;border-radius:12px;border:1px solid var(--line);background:#fff;padding:6px}
+.wa-pend{border:2px dashed var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:8px}
+.wa-pend h3{font-size:18px}
+.mas pre{background:#1f2326;color:#f1f4f0;padding:10px 12px;border-radius:10px;overflow-x:auto;font:13px Consolas,monospace;white-space:pre}
+.mas details{border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:var(--bg)}
+.mas details summary{font-weight:700;cursor:pointer;min-height:32px}
+@media (max-width:640px){.wa-box{grid-template-columns:1fr}}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:12px;font-weight:700;z-index:20}
 footer{font-size:13px;color:var(--muted);display:flex;flex-direction:column;gap:6px}
 @media (min-width:640px){.facts{grid-template-columns:1fr 1fr}.plan.two{grid-template-columns:1fr 1fr}}
@@ -412,6 +422,10 @@ footer{font-size:13px;color:var(--muted);display:flex;flex-direction:column;gap:
       <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/></svg>
       <b>Refugios</b><small>Busca puntos de apoyo y cómo llegar</small>
     </button>
+    <button type="button" class="mtile" data-p="whatsapp" aria-expanded="false" aria-controls="p-whatsapp">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/><path d="M9 9.5c0 3 2.5 5.5 5.5 5.5l1.2-1.3-1.8-1-.8.6a3.6 3.6 0 0 1-1.7-1.7l.6-.8-1-1.8z"/></svg>
+      <b>WhatsApp</b><small>Habla con el asistente desde tu celular</small>
+    </button>
   </div>
 
   <div class="mpanel" id="p-noticias" hidden>
@@ -461,6 +475,8 @@ footer{font-size:13px;color:var(--muted);display:flex;flex-direction:column;gap:
     <p class="note" id="rWhere"></p>
     <div id="rList" class="rgrid" aria-live="polite"></div>
     <p class="note">Lugares tomados de OpenStreetMap (Nominatim). Los albergues oficiales los define tu municipalidad o INDECI: confírmalos antes de ir.</p>
+    <div class="mpanel" id="p-whatsapp" hidden>
+    <div id="waOut"></div>
   </div>
 </section>
 <button class="sos" id="sos" type="button" aria-label="Emergencia: a quién llamar"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg>Emergencia</button>
@@ -1236,13 +1252,14 @@ const LUGARES=[["Tumbes","240101"],["Zarumilla","240301"],["Piura","200101"],["C
 function chatChips(){
   const c=$("chips");c.innerHTML="";
   const add=(t,fn)=>{const b=document.createElement("button");b.type="button";b.className="chip";b.textContent=t;b.onclick=fn;c.appendChild(b);};
-  if(!S.riesgo){add("Usar mi ubicación",ubicar);add("¿Cómo está El Niño hoy?",()=>{addMsg("u","¿Cómo está El Niño hoy?");agentSay(resumenHoy());});LUGARES.forEach(([n,u])=>add(n,()=>{addMsg("u",n);irALugar({tipo:"dist",u});}));add("A quién llamar",()=>{addMsg("u","A quién llamar");agentSay("Te abrí los números de emergencia, más abajo en la página.");irAMas("llamar");});return;}
+  if(!S.riesgo){add("Usar mi ubicación",ubicar);add("¿Cómo está El Niño hoy?",()=>{addMsg("u","¿Cómo está El Niño hoy?");agentSay(resumenHoy());});LUGARES.forEach(([n,u])=>add(n,()=>{addMsg("u",n);irALugar({tipo:"dist",u});}));add("A quién llamar",()=>{addMsg("u","A quién llamar");agentSay("Te abrí los números de emergencia, más abajo en la página.");irAMas("llamar");});add("Hablar por WhatsApp",()=>{addMsg("u","Hablar por WhatsApp");agentSay("Te abrí la sección de WhatsApp, más abajo.");irAMas("whatsapp");});return;}
   if(!S.plan)add("Armar mi plan",()=>{addMsg("u","Armar mi plan");if(DESK.matches)askNext();else{agentSay("Vamos. Cuéntame de tu familia con los botones de la pantalla.");setStep(2);}});
   ["¿Qué riesgo tiene mi distrito?","¿Qué pongo en la mochila?","¿Qué dice el aviso de hoy?","¿Qué pasó antes aquí?","Es una emergencia"].forEach(q=>add(q,()=>chatSend(q)));
   add("¿Cómo está El Niño hoy?",()=>{addMsg("u","¿Cómo está El Niño hoy?");agentSay(resumenHoy());});
   add("Refugios cerca",()=>{addMsg("u","Refugios cerca");agentSay("Abrí la búsqueda de refugios, más abajo. Son lugares de OpenStreetMap; confirma los albergues oficiales con tu municipalidad.");irAMas("refugios");});
   add("A quién llamar",()=>{addMsg("u","A quién llamar");agentSay("Te abrí los números de emergencia, más abajo en la página.");irAMas("llamar");});
   add("Noticias",()=>{addMsg("u","Noticias");agentSay("Te abrí las noticias sobre El Niño, más abajo.");irAMas("noticias");});
+  add("Hablar por WhatsApp",()=>{addMsg("u","Hablar por WhatsApp");agentSay("Te abrí la sección de WhatsApp, más abajo.");irAMas("whatsapp");});
 }
 function chatInit(){
   agentSay("Hola, soy tu asistente. Te ayudo a preparar a tu familia ante El Niño con datos oficiales del Perú.");
@@ -1321,6 +1338,7 @@ function togglePanel(p,abrir){
   document.querySelectorAll(".mpanel").forEach(x=>{x.hidden=!(x.id==="p-"+p&&on);});
   if(on&&p==="noticias"&&!NEWS.cargado)cargarNoticias("semana");
   if(on&&p==="refugios")iniciarRefugios();
+  if(on&&p==="whatsapp")pintarWhatsapp();
 }
 function irAMas(p){togglePanel(p,true);$("mas").scrollIntoView({behavior:"smooth",block:"start"});}
 document.querySelectorAll(".mtile").forEach(b=>b.addEventListener("click",()=>togglePanel(b.dataset.p)));
@@ -1394,6 +1412,36 @@ async function cargarNoticias(k){
 }
 document.querySelectorAll("#nChips .chipf").forEach(b=>b.addEventListener("click",()=>cargarNoticias(b.dataset.k)));
 
+/* ---- WhatsApp: aquí se conecta el bot de Alan ---- */
+const waConfig=()=>Object.assign({numero:"",mensaje:"Hola, quiero mi plan familiar ante El Niño."},window.WHATSAPP_BOT||{},(window.INTEGRACIONES&&window.INTEGRACIONES.whatsapp)||{});
+function waEnlace(conLugar){
+  const c=waConfig(),num=String(c.numero||"").replace(/\D/g,"");
+  if(num.length<8)return "";
+  let msg=c.mensaje;
+  if(conLugar&&S.dep)msg+=" Vivo en "+distName()+(S.prov?", "+provName(S.prov):"")+", "+depName(S.dep)+" (ubigeo "+(S.dist||S.dep)+").";
+  return "https://wa.me/"+num+"?text="+encodeURIComponent(msg);
+}
+function pintarWhatsapp(){
+  const box=$("waOut"),url=waEnlace(true);
+  box.innerHTML="";
+  const ayuda=document.createElement("details");
+  ayuda.innerHTML='<summary>Para el equipo: cómo conectar el bot</summary><p class="note">Define el número del bot, con código de país y sin signos, antes del script principal:</p><pre>window.WHATSAPP_BOT = {\n  numero: "51999999999",\n  mensaje: "Hola, quiero mi plan familiar ante El Niño."\n};</pre><p class="note">El botón abre WhatsApp con un mensaje que incluye el distrito elegido y su ubigeo, para que el bot arranque con esa zona. El bot puede usar los mismos datos y el mismo formato de plan del README.</p>';
+  if(url){
+    const wrap=document.createElement("div");wrap.className="wa-box";
+    const t=document.createElement("div");t.className="wa-txt";
+    t.innerHTML='<h3>Chatea con el asistente por WhatsApp</h3><p>Es el mismo asistente de esta página: te pregunta dónde vives y cómo es tu familia, y te manda tu plan y los avisos de tu zona.</p>';
+    const a=document.createElement("a");a.className="wa-btn";a.href=url;a.target="_blank";a.rel="noopener";a.textContent="Abrir chat de WhatsApp";
+    const cp=document.createElement("button");cp.type="button";cp.className="btn alt";cp.textContent="Copiar enlace del chat";cp.onclick=()=>copiar(url,"Enlace copiado");
+    t.append(a,cp);
+    const qr=document.createElement("img");qr.className="wa-qr";qr.alt="Código QR para abrir el chat de WhatsApp";qr.width=170;qr.height=170;
+    qr.src="https://api.qrserver.com/v1/create-qr-code/?size=340x340&margin=0&data="+encodeURIComponent(url.split("?")[0]);
+    wrap.append(t,qr);box.append(wrap,ayuda);
+  }else{
+    const p=document.createElement("div");p.className="wa-pend";
+    p.innerHTML='<h3>Pronto podrás hablar con el asistente por WhatsApp</h3><p>Estamos conectando el bot. Cuando esté listo, aquí aparecerá el botón para abrir el chat y un código QR.</p><p class="note">Mientras tanto, usa el asistente de esta página o los números de emergencia.</p>';
+    box.append(p,ayuda);
+  }
+}
 /* ---- A quién llamar ---- */
 const NUMEROS=[["INDECI · Defensa Civil","115","Inundaciones, huaicos y desastres",true],["Bomberos","116","Incendios y rescates",false],["SAMU · emergencias médicas","106","Ambulancia y atención urgente",false],["Policía Nacional","105","Seguridad y auxilio",false]];
 (function(){
