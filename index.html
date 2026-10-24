@@ -947,8 +947,15 @@ function histSvg(y){
     y.map((v,i)=>{const h=Math.round(v/mx*50),c=(2003+i===2017)?'var(--r-muy)':'var(--accent)';return '<rect x="'+(i*16+2)+'" y="'+(56-Math.max(h,v?2:0))+'" width="12" height="'+Math.max(h,v?2:0)+'" rx="2" fill="'+c+'"><title>'+(2003+i)+': '+v+'</title></rect>';}).join("")+
     [0,7,14,17].map(i=>'<text x="'+(i*16+8)+'" y="70" text-anchor="middle" font-size="9" fill="currentColor">'+(2003+i)+'</text>').join("")+'</svg>';
 }
+function resetPeru(){
+  S.dep=S.prov=S.dist=S.riesgo=null;selDep.value="";
+  resetSel(selProv,"Elige departamento primero");resetSel(selDist,"Elige provincia primero");
+  hideRisk();$("tip").textContent="Pasa el dedo o el mouse sobre el mapa";
+  try{CH.last=null;}catch(e){}
+  render();
+}
 function renderCrumbs(){
-  const parts=[["Perú",()=>{S.dep=S.prov=S.dist=S.riesgo=null;selDep.value="";resetSel(selProv,"Elige departamento primero");resetSel(selDist,"Elige provincia primero");hideRisk();$("tip").textContent="Pasa el dedo o el mouse sobre el mapa";render();}]];
+  const parts=[["Perú",resetPeru]];
   if(S.dep)parts.push([depName(S.dep),()=>{const d=S.dep;S.prov=S.dist=S.riesgo=null;pickDep(d);}]);
   if(S.prov)parts.push([provName(S.prov),()=>{const p=S.prov;S.dist=null;S.riesgo=null;selProv.value=p;pickProv(p);}]);
   if(S.dist)parts.push([distName(),null]);
@@ -1050,7 +1057,7 @@ svg.addEventListener("wheel",e=>{if(!(e.ctrlKey||e.metaKey))return;e.preventDefa
 const zc=()=>{const r=svg.getBoundingClientRect();return [r.left+r.width/2,r.top+r.height/2];};
 $("zIn").onclick=()=>zoomAt(1.6,...zc());
 $("zOut").onclick=()=>zoomAt(1/1.6,...zc());
-$("zAll").onclick=()=>zoomTo([0,0,MAP_W,MAP_H]);
+$("zAll").onclick=resetPeru;
 syncTouch();
 
 svg.addEventListener("mouseleave",()=>$("tip").textContent=S.dep?"Seleccionado: "+depName(S.dep):"Pasa el dedo o el mouse sobre el mapa");
