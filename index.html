@@ -397,6 +397,41 @@ select:disabled{opacity:.5}
 @media (max-width:640px){.wa-hero small{display:none}.wa-hero{padding:8px 14px 8px 20px}}
 .chips{flex-wrap:nowrap!important;overflow-x:auto!important;overflow-y:hidden;padding:0 14px 8px;scrollbar-width:thin;scroll-snap-type:x proximity}
 .chips .chip{white-space:nowrap;scroll-snap-align:start;min-height:34px;font-size:13px;padding:2px 12px}
+.mg{margin:12px 0 6px;font:700 13px var(--f-body);color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+#printDoc{display:none}
+@media print{
+  @page{size:A4;margin:12mm}
+  body>*:not(#printDoc){display:none!important}
+  html,body{background:#fff!important;margin:0!important;padding:0!important;color:#1f2326}
+  #printDoc{display:block!important;--bg:#fff;--surface:#fff;--ink:#1f2326;--muted:#555e57;--line:#d9dfd6;--r-muy:#c8312b;font:10.5pt/1.4 "Figtree","Segoe UI",Arial,sans-serif;color:#1f2326}
+  #printDoc *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .pd-head{display:flex;justify-content:space-between;align-items:center;gap:12px;border-bottom:3px solid #97bd3d;padding-bottom:8px;margin-bottom:10px}
+  .pd-t{font:800 20pt "Bricolage Grotesque","Segoe UI",Arial,sans-serif}
+  .pd-sub0{color:#555e57;font-size:10pt}
+  .pd-badge{padding:6px 14px;border-radius:999px;font-weight:800;color:#fff;background:#555e57;white-space:nowrap}
+  .pd-bajo{background:#2e8b57}.pd-medio{background:#f2c230;color:#2b2200}.pd-alto{background:#ee8a1e;color:#2b1500}.pd-muy-alto{background:#c8312b}
+  .pd-fam{background:#f3f5f2;border-radius:8px;padding:6px 10px}
+  .pd-al{background:#c8312b;color:#fff;border-radius:8px;padding:8px 10px;font-weight:700}
+  #printDoc h2{font:800 13pt "Bricolage Grotesque","Segoe UI",Arial,sans-serif;margin:14px 0 6px;padding:3px 10px;background:#97bd3d;color:#17210a;border-radius:6px}
+  #printDoc h3{font:700 11pt "Segoe UI",Arial,sans-serif;margin:8px 0 4px}
+  #printDoc ul{margin:4px 0;padding-left:18px}
+  #printDoc li{margin:2px 0}
+  #printDoc section{break-inside:avoid-page}
+  .pd-3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;font-size:9.5pt}
+  .pd-3 h3{margin-top:0}
+  #printDoc .scene{border:1px solid #d9dfd6;border-radius:8px}
+  .pd-chk{display:grid;grid-template-columns:repeat(2,1fr);gap:4px 14px}
+  .pd-it{display:flex;align-items:center;gap:8px;padding:3px 0;break-inside:avoid;font-size:10pt}
+  .pd-box{flex:none;width:13px;height:13px;border:1.8px solid #1f2326;border-radius:3px}
+  #printDoc .ic{width:30px;height:30px}
+  .pd-n{font-size:9pt;color:#555e57}
+  .pd-line{display:flex;gap:6px;align-items:flex-end;margin:10px 0;font-weight:700}
+  .pd-line span{flex:1;border-bottom:1.5px solid #1f2326;height:16px}
+  .pd-tel{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:6px 0}
+  .pd-tel div{border:2px solid #c8312b;border-radius:8px;padding:6px;text-align:center;font-size:9pt}
+  .pd-tel b{display:block;font:800 20pt "Segoe UI",Arial,sans-serif;color:#c8312b}
+  .pd-src{font-size:9pt;color:#555e57}
+}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:12px;font-weight:700;z-index:20}
 footer{font-size:13px;color:var(--muted);display:flex;flex-direction:column;gap:6px}
 @media (min-width:640px){.facts{grid-template-columns:1fr 1fr}.plan.two{grid-template-columns:1fr 1fr}}
@@ -1208,15 +1243,53 @@ function escena(k){
   if(k==="ninos")return base+'Dibujo: una niña con su mochila de emergencia y una tarjeta con datos de contacto"><rect width="240" height="130" rx="10" fill="#d4537e" opacity=".13"/><rect y="108" width="240" height="22" fill="#7fa45a"/><rect x="82" y="62" width="14" height="34" rx="5" fill="#ee8a1e"/><rect x="100" y="60" width="38" height="42" rx="12" fill="#2b7bd6"/><circle cx="119" cy="42" r="15" fill="#f1c27d"/><path d="M104 40q2-16 15-16t15 16q-8-8-15-6t-15 6z" fill="#4a2c17"/><circle cx="114" cy="44" r="1.8" fill="#1f2326"/><circle cx="124" cy="44" r="1.8" fill="#1f2326"/><path d="M114 50q5 4 10 0" stroke="#1f2326" stroke-width="1.8" fill="none" stroke-linecap="round"/><rect x="105" y="100" width="10" height="12" fill="#1f2326"/><rect x="123" y="100" width="10" height="12" fill="#1f2326"/><path d="M168 30c0-7 10-7 10 0 0 5-5 8-5 10 0-2-5-5-5-10z" fill="#c8312b"/><rect x="170" y="62" width="52" height="34" rx="5" fill="#fff" stroke="#1f2326" stroke-width="1.5"/><circle cx="180" cy="73" r="4" fill="#f1c27d"/><path d="M190 70h24M190 78h24M176 88h38" stroke="#1f2326" stroke-width="2" stroke-linecap="round"/></svg>';
   return "";
 }
+/* ---- Mochila por grupos (según la familia) y plan en PDF ---- */
+ICO.baston='<path d="M9 21V8a4 4 0 1 1 8 0"/><path d="M5 21h8"/>';
+ICO_COL.baston="#7d4fc4";
+function mochilaGrupos(items){
+  const p=S.perfil,g=[];
+  const base=(items||[]).map(x=>typeof x==="string"?x:JSON.stringify(x)).map(t=>[t,iconoPara(t)]);
+  g.push({t:"Para toda la familia"+(p.personas?" ("+p.personas.replace("-"," a ")+" personas)":""),items:base.length?base:[["No tengo ese dato","mochila"]]});
+  if(p.ninos==="si")g.push({t:"Para los niños",items:[["Pañales, toallitas y ropa de cambio","bebe"],["Leche, fórmula o comida que ya conocen","bebe"],["Un juguete o libro pequeño y una manta","mochila"],["Tarjeta o pulsera con nombre, edad y teléfono","documentos"],["Medicinas de los niños, con la receta","medicina"]]});
+  if(p.mayores==="si")g.push({t:"Para los adultos mayores",items:[["Medicinas de uso diario para varios días y copia de la receta","medicina"],["Lentes, audífonos y dentadura de repuesto","botiquin"],["Bastón o andador si lo usan","baston"],["Abrigo, manta y calzado cómodo","ropa"],["DNI y carné del seguro de salud","documentos"]]});
+  if(p.disc==="si")g.push({t:"Para quien necesita cuidados",items:[["Medicinas y equipos que necesitan, con pilas y cargadores","medicina"],["Apoyos para moverse y quién ayudará a cada persona","manos"],["Informe médico o indicaciones escritas","documentos"]]});
+  if(p.mascotas==="si")g.push({t:"Para las mascotas",items:[["Comida y agua para varios días","mascota"],["Correa, jaula o transportador y bolsas","mascota"],["Carné de vacunas y una foto de tu mascota","documentos"]]});
+  return g;
+}
 function mochilaGrid(items){
-  const arr=(items&&items.length?items:[]).map(x=>typeof x==="string"?x:JSON.stringify(x));
-  const p=S.perfil,extra=[];
-  if(p.ninos==="si")extra.push(["Pañales, leche o comida de los niños y un juguete","bebe"]);
-  if(p.mayores==="si")extra.push(["Medicinas, lentes y documentos de los adultos mayores","medicina"]);
-  if(p.disc==="si")extra.push(["Medicinas y apoyos de quien necesita cuidados","botiquin"]);
-  if(p.mascotas==="si")extra.push(["Comida, agua y correa de las mascotas","mascota"]);
-  if(!arr.length&&!extra.length)return '<p class="note">No tengo ese dato.</p>';
-  return '<div class="mgrid">'+arr.map(t=>'<div class="mi">'+icono(iconoPara(t),true)+'<span>'+esc(t)+'</span></div>').join("")+extra.map(([t,k])=>'<div class="mi extra">'+icono(k,true)+'<span>'+esc(t)+'</span><em>Por tu familia</em></div>').join("")+'</div>';
+  return mochilaGrupos(items).map(g=>'<h4 class="mg">'+esc(g.t)+'</h4><div class="mgrid">'+g.items.map(([t,k])=>'<div class="mi">'+icono(k,true)+'<span>'+esc(t)+'</span></div>').join("")+'</div>').join("");
+}
+function plantillaPDF(){
+  const p=S.plan,r=S.riesgo,pf=S.perfil,[lbl]=NIV[r.nivel];
+  const hoy=new Date().toLocaleDateString("es-PE",{day:"numeric",month:"long",year:"numeric"});
+  const lista=a=>'<ul>'+((a&&a.length)?a:["No tengo ese dato."]).map(x=>'<li>'+esc(typeof x==="string"?x:JSON.stringify(x))+'</li>').join("")+'</ul>';
+  const fam=[pf.personas?pf.personas.replace("-"," a ")+" personas":"",pf.ninos==="si"?"con niños":"",pf.mayores==="si"?"con adultos mayores":"",pf.disc==="si"?"con personas que necesitan cuidados":"",pf.mascotas==="si"?"con mascotas":"",pf.rio==="si"?"cerca de un río o quebrada":""].filter(Boolean).join(" · ");
+  const grupos=mochilaGrupos(p.mochila).map(g=>'<h3 class="pd-sub">'+esc(g.t)+'</h3><div class="pd-chk">'+g.items.map(([t,k])=>'<div class="pd-it"><span class="pd-box"></span>'+icono(k,false)+'<span>'+esc(t)+'</span></div>').join("")+'</div>').join("");
+  const refs=(S.refPlan&&S.refPlan.length)?'<ul>'+S.refPlan.map(x=>'<li><b>'+esc(x.nombre)+'</b> ('+esc(x.tipo)+'), a '+x.d.toFixed(1).replace(".",",")+' km'+(x.dir?'. '+esc(x.dir):'')+'. Ubicación: maps.google.com/?q='+x.lat.toFixed(5)+','+x.lon.toFixed(5)+'</li>').join("")+'</ul><p class="pd-n">Lugares de OpenStreetMap. Los albergues oficiales los define tu municipalidad o INDECI: confírmalos.</p>':'<p>Busca refugios cerca en la página del plan, en la sección Refugios.</p>';
+  let contacto="";try{contacto=localStorage.getItem("contacto_emergencia")||"";}catch(e){}
+  const nin=pf.ninos==="si"?'<section><h2>Qué hacer con los niños</h2><div style="max-width:300px">'+escena("ninos")+'</div><ul><li>Dejen que cada niño elija un juguete o libro pequeño para su mochila.</li><li>Pongan nombre, edad y teléfono de un adulto en una tarjeta o pulsera.</li><li>Dibujen juntos la ruta hacia el lugar alto y el punto de reunión.</li><li>Al evacuar, los niños pequeños van de la mano de un adulto.</li><li>Para calmarse: inhalar despacio como inflando un globo y soltar el aire.</li></ul></section>':"";
+  return '<div class="pd-head"><div><div class="pd-t">Plan familiar ante El Niño</div><div class="pd-sub0">'+esc(distName())+(S.prov?', '+esc(provName(S.prov)):'')+', '+esc(depName(S.dep))+' · '+hoy+'</div></div><div class="pd-badge pd-'+r.nivel+'">'+esc(lbl)+'</div></div>'
+   +(fam?'<p class="pd-fam"><b>Tu familia:</b> '+esc(fam)+'</p>':'')
+   +'<p>'+esc(p.resumen||"")+'</p>'
+   +(p.alerta_urgente?'<p class="pd-al">'+esc(p.alerta_urgente)+' INDECI (Defensa Civil): 115.</p>':'')
+   +'<section><h2>Qué hacer</h2><div class="pd-3"><div><h3>Antes</h3>'+escena("antes")+lista(p.antes)+'</div><div><h3>Durante</h3>'+escena("durante")+lista(p.durante)+'</div><div><h3>Después</h3>'+escena("despues")+lista(p.despues)+'</div></div></section>'
+   +'<section><h2>Mochila de emergencia: qué llevar</h2><p class="pd-n">Prepárenla para al menos 3 días y déjenla cerca de la puerta. Marquen cada cosa cuando la guarden.</p>'+grupos+'</section>'
+   +nin
+   +'<section><h2>Prevenciones en casa</h2><ul><li>Limpien canaletas, desagües y techos antes de las lluvias.</li><li>Guarden documentos, medicinas y celular en bolsas plásticas bien cerradas.</li><li>Suban objetos de valor y alimentos a un lugar alto de la casa.</li><li>Revisen y practiquen la ruta de evacuación con toda la familia.</li><li>Si entra agua a la casa, corten la luz antes de tocar nada.</li><li>No crucen ríos, quebradas ni calles inundadas.</li><li>Escuchen los avisos oficiales de SENAMHI e INDECI.</li></ul></section>'
+   +'<section><h2>Ruta y punto de reunión</h2><p>'+esc(p.ruta_y_reunion||"No tengo ese dato.")+'</p><div class="pd-line">Nuestro punto de reunión: <span></span></div><div class="pd-line">Ruta para llegar: <span></span></div><div class="pd-line">Adulto que se encarga de cada niño: <span></span></div></section>'
+   +'<section><h2>Refugios y puntos de apoyo cerca</h2>'+refs+'</section>'
+   +'<section><h2>A quién llamar</h2><div class="pd-tel"><div><b>115</b>INDECI · Defensa Civil</div><div><b>116</b>Bomberos</div><div><b>106</b>SAMU · emergencias médicas</div><div><b>105</b>Policía</div></div>'+(contacto?'<p><b>Contacto de la familia:</b> '+esc(contacto)+'</p>':'<div class="pd-line">Contacto de la familia: <span></span></div>')+'<p class="pd-n">Confirma el número de INDECI en portal.indeci.gob.pe.</p>'+lista(p.contactos)+'</section>'
+   +(p.cuidados_perfil&&p.cuidados_perfil.length?'<section><h2>Cuidados según tu familia</h2>'+lista(p.cuidados_perfil)+'</section>':'')
+   +'<section class="pd-src"><h2>De dónde salen los datos</h2><ul>'+((p.fuentes||[]).map(f=>'<li>'+esc(f.dato)+': '+esc(f.fuente)+' ('+esc(f.fecha)+')</li>').join("")||"<li>No tengo ese dato.</li>")+'</ul><p class="pd-n">Riesgo histórico: INDECI 2003-2020 (nivel calculado por el prototipo). Lluvia, mar y ríos: Open-Meteo. Estado de El Niño: ENFEN. No reemplaza las indicaciones de INDECI ni de tu municipalidad.</p></section>';
+}
+function descargarPDF(){
+  let d=$("printDoc");if(!d){d=document.createElement("div");d.id="printDoc";document.body.appendChild(d);}
+  d.innerHTML=plantillaPDF();
+  const t0=document.title;document.title="Plan familiar - "+distName();
+  const volver=()=>{document.title=t0;window.removeEventListener("afterprint",volver);};
+  window.addEventListener("afterprint",volver);
+  toast("Elige “Guardar como PDF” en la ventana de impresión.");
+  setTimeout(()=>{try{window.print();}catch(e){toast("Abre la web en tu navegador para guardar el PDF.");}},350);
 }
 function ninosHtml(){
   const t=[["mochila","Su propia mochila","Deja que cada niño elija un juguete o libro pequeño y lo guarde en su mochila."],["documentos","Tarjeta con sus datos","Escribe su nombre, su edad y el teléfono de un adulto en una tarjeta o pulsera."],["lapiz","Dibujen el camino","Dibujen juntos la ruta hacia el lugar alto y el punto de reunión."],["manos","De la mano","Al evacuar, los niños pequeños van de la mano de un adulto. Practíquenlo como un juego."],["aire","Respirar para calmarse","Inhalen despacio como si inflaran un globo y suelten el aire. Ayuda a bajar el miedo."]];
@@ -1261,7 +1334,7 @@ async function pintarRefugiosPlan(){
       }catch(e){}
       await new Promise(res=>setTimeout(res,350));
     }
-    items.sort((a,b)=>a.d-b.d);
+    items.sort((a,b)=>a.d-b.d);S.refPlan=items.slice(0,6);
     box.innerHTML="";
     if(!items.length){box.innerHTML='<p class="note">No encontré lugares cerca. Consulta a tu municipalidad por los albergues oficiales.</p>';return;}
     const grid=document.createElement("div");grid.className="rgrid";items.slice(0,6).forEach(x=>grid.appendChild(tarjetaLugar(x)));box.appendChild(grid);
@@ -1288,7 +1361,8 @@ function renderPlan(){
   <div class="pc" style="margin-top:14px"><h3>De dónde salen los datos</h3>
     <ul>${(p.fuentes||[]).map(f=>`<li>${esc(f.dato)}: ${esc(f.fuente)} (${esc(f.fecha)})</li>`).join("")||"<li>No tengo ese dato.</li>"}</ul>
     <p class="note">Datos del prototipo (INDECI 2003-2020, Open-Meteo, ENFEN). Confirma siempre con INDECI (115) y tu municipalidad.</p></div>
-  <div class="row" style="margin-top:14px">
+  <div class="row" style="margin-top:14px"><button class="btn" id="bPdf">Descargar plan en PDF</button></div>
+  <div class="row" style="margin-top:10px">
     <button class="btn wa" id="bWa">Compartir por WhatsApp</button>
     <button class="btn alt" id="bLink">Copiar enlace</button>
   </div>
@@ -1299,6 +1373,7 @@ function renderPlan(){
     const u="https://wa.me/?text="+encodeURIComponent(resumenTexto());
     const a=document.createElement("a");a.href=u;a.target="_blank";a.rel="noopener";document.body.appendChild(a);a.click();a.remove();
   };
+  $("bPdf").onclick=descargarPDF;
   $("bLink").onclick=()=>copiar(enlace(),"Enlace copiado");
   $("bTxt").onclick=()=>copiar(resumenTexto(),"Plan copiado");
   $("bNew").onclick=()=>{if(DESK.matches)nuevoPlan();else setStep(1);};
