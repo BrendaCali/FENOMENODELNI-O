@@ -24,7 +24,7 @@
 [hidden]{display:none!important}
 body{background:var(--bg);color:var(--ink);font:400 18px/1.5 var(--f-body);
   padding-block:0 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
-.wrap{max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+.wrap{width:100%;display:flex;flex-direction:column;gap:18px}
 h1,h2,h3{font-family:var(--f-display);line-height:1.15;margin:0;text-wrap:balance}
 h1{font-size:30px;font-weight:800}
 h2{font-size:24px;font-weight:800}
@@ -142,7 +142,7 @@ select:disabled{opacity:.5}
 #to2{position:sticky;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:5;box-shadow:0 6px 18px rgba(0,0,0,.28)}
 #riskFull:empty{display:none}
 @media (max-width:640px){.fab{bottom:calc(88px + env(safe-area-inset-bottom,0px));padding:0 16px}}
-.app{max-width:1180px;margin:0 auto}
+.app{max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
 .banner{background:var(--r-muy);color:var(--r-muy-ink);border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:4px;font-size:16px}
 .banner b{font-family:var(--f-display);font-size:18px;line-height:1.2}
 .banner small{font-size:13px;opacity:.95}
@@ -157,11 +157,30 @@ select:disabled{opacity:.5}
 .sw{display:flex;gap:10px;flex-wrap:wrap;padding:0 12px 8px;font-size:14px;font-weight:700}
 .sw span{display:inline-flex;align-items:center;gap:6px}
 .sw i{width:16px;height:16px;border-radius:5px;display:inline-block}
+.dot{cursor:pointer}
+.dot .core{fill:var(--ink);stroke:var(--surface);stroke-width:2px;vector-effect:non-scaling-stroke}
+.dot .ring{fill:none;stroke:var(--ink);stroke-width:2px;vector-effect:non-scaling-stroke;transform-box:fill-box;transform-origin:center;animation:ping 2.2s ease-out infinite}
+.dot.lv-medio .ring,.dot.lv-bajo .ring{animation:none;opacity:0}
+@keyframes ping{0%{transform:scale(.6);opacity:.9}100%{transform:scale(2.8);opacity:0}}
+.m.wide{max-width:100%;width:100%}
+.m.wide .plan.two{grid-template-columns:1fr}
+.mapcap{font-size:13px;color:var(--muted);padding:2px 12px 10px}
+#mapSlot{display:none}
 @media (min-width:960px){
-  .app{display:grid;grid-template-columns:minmax(340px,400px) minmax(0,1fr);gap:24px;align-items:start}
-  .sheet,.sheet[hidden]{display:flex!important;position:sticky;top:12px;left:auto;right:auto;bottom:auto;margin:0;max-width:none;width:auto;height:calc(100dvh - 24px);border-radius:18px;border:1px solid var(--line);box-shadow:none;z-index:1}
+  body{padding-block:10px 0}
+  .app{max-width:1500px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:auto minmax(0,1fr);gap:14px 20px;align-items:stretch;height:calc(100dvh - 20px);min-height:560px}
+  .app>header{grid-column:1/-1;flex-direction:row;flex-wrap:wrap;align-items:center;gap:8px 16px;padding-top:0}
+  .app>header h1{font-size:24px}
+  .app>header .lead,.app>header .tabs,.app>header .steps{display:none}
+  .app>header .banner{flex:1 1 420px}
+  .sheet,.sheet[hidden]{display:flex!important;position:static;height:auto;min-height:0;max-width:none;width:auto;margin:0;border-radius:18px;border:1px solid var(--line);box-shadow:none}
   .fab,.fab[hidden],.x{display:none!important}
-  .wrap{max-width:none}
+  .chips{flex-wrap:wrap;overflow:visible}
+  .wrap{min-height:0;display:flex;flex-direction:column;gap:0}
+  .wrap>section:not(#mapSlot),.wrap>footer{display:none!important}
+  #mapSlot{display:flex;flex-direction:column;flex:1;min-height:0;gap:8px;padding:12px}
+  #mapSlot .mapbox{flex:1;min-height:0;display:flex;flex-direction:column}
+  #mapSlot svg.map{flex:1 1 0;height:0;min-height:0;max-height:none;width:100%}
 }
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:12px;font-weight:700;z-index:20}
 footer{font-size:13px;color:var(--muted);display:flex;flex-direction:column;gap:6px}
@@ -170,13 +189,6 @@ footer{font-size:13px;color:var(--muted);display:flex;flex-direction:column;gap:
 </style>
 
 <div class="app">
-<aside class="sheet" id="sheet" hidden aria-labelledby="shT">
-  <div class="sh-h"><div><h3 id="shT">Asistente familiar</h3><small id="shS">Responde solo con los datos de tu distrito</small></div><button class="x" id="shX" type="button" aria-label="Cerrar">×</button></div>
-  <div id="msgs" aria-live="polite"></div>
-  <div class="chips" id="chips"></div>
-  <form class="cf" id="cf"><input id="cin" type="text" autocomplete="off" placeholder="Escribe tu pregunta" aria-label="Tu pregunta"><button class="btn" type="submit">Enviar</button></form>
-</aside>
-<div class="wrap">
 <header>
   <span class="proto">Datos de ejemplo del prototipo</span>
   <h1>Tu plan familiar ante El Niño</h1>
@@ -190,6 +202,15 @@ footer{font-size:13px;color:var(--muted);display:flex;flex-direction:column;gap:
     <li data-s="1">1. Zona</li><li data-s="2">2. Tu familia</li><li data-s="3">3. Tu plan</li>
   </ol>
 </header>
+<aside class="sheet" id="sheet" hidden aria-labelledby="shT">
+  <div class="sh-h"><div><h3 id="shT">Asistente familiar</h3><small id="shS">Responde solo con los datos de tu distrito</small></div><button class="x" id="shX" type="button" aria-label="Cerrar">×</button></div>
+  <div id="msgs" aria-live="polite"></div>
+  <div class="chips" id="chips"></div>
+  <form class="cf" id="cf"><input id="cin" type="text" autocomplete="off" placeholder="Escribe tu pregunta" aria-label="Tu pregunta"><button class="btn" type="submit">Enviar</button></form>
+</aside>
+<div class="wrap">
+<section id="mapSlot" class="card" aria-label="Mapa del Perú"><p class="mapcap">Los puntos marcan zonas con riesgo alto o muy alto (datos de ejemplo del prototipo); se conectarán a los avisos de SENAMHI y ENFEN en tiempo real. En una emergencia llama a INDECI al 119.</p></section>
+
 
 <!-- PASO 1 -->
 <section id="s1" class="card" aria-labelledby="t1">
@@ -370,7 +391,7 @@ function zoomTo(box){
 function fitBox(d,pad){
   const p=document.createElementNS(NS,"path");p.setAttribute("d",d);svg.appendChild(p);
   const b=p.getBBox();p.remove();
-  let w=b.width+pad*2,h=b.height+pad*2;const ratio=MAP_W/MAP_H;
+  let w=b.width+pad*2,h=b.height+pad*2;const rr=svg.getBoundingClientRect(),ratio=rr.width&&rr.height?rr.width/rr.height:MAP_W/MAP_H;
   if(w/h<ratio)w=h*ratio;else h=w/ratio;
   return {box:[b.x+b.width/2-w/2,b.y+b.height/2-h/2,w,h],bb:b};
 }
@@ -417,8 +438,36 @@ function render(){
     const f=fitBox(GEO_PROV[S.prov].d,16);target=f.box;
     distsOf(S.prov).forEach(u=>label(GEO_DIST[u].n,GEO_DIST[u].d,target[2]/38,target[2]));
   }
+  renderDots(target);
   zoomTo(target);
   renderCrumbs();
+}
+function centro(d){
+  const p=document.createElementNS(NS,"path");p.setAttribute("d",d);svg.appendChild(p);
+  const b=p.getBBox();p.remove();return [b.x+b.width/2,b.y+b.height/2];
+}
+function addDot(x,y,nivel,r,name,onClick){
+  const g=document.createElementNS(NS,"g");g.setAttribute("class","dot lv-"+nivel);
+  g.setAttribute("tabindex","0");g.setAttribute("role","button");g.setAttribute("aria-label",name+" · "+NIV[nivel][0].toLowerCase());
+  const t=document.createElementNS(NS,"title");t.textContent=name+" · "+NIV[nivel][0];g.appendChild(t);
+  const ring=document.createElementNS(NS,"circle"),core=document.createElementNS(NS,"circle");
+  [ring,core].forEach(c=>{c.setAttribute("cx",x);c.setAttribute("cy",y);c.setAttribute("r",r);});
+  ring.setAttribute("class","ring");core.setAttribute("class","core");g.append(ring,core);
+  g.addEventListener("click",onClick);
+  g.addEventListener("mouseenter",()=>$("tip").textContent=name+" · "+NIV[nivel][0].toLowerCase());
+  g.addEventListener("keydown",ev=>{if(ev.key==="Enter"||ev.key===" "){ev.preventDefault();onClick();}});
+  svg.appendChild(g);
+}
+/* Puntos: zonas con riesgo alto o muy alto (datos de ejemplo). Reemplazable por avisos SENAMHI/ENFEN en vivo. */
+function renderDots(target){
+  const r=target[2]/(S.dep?60:70);
+  if(!S.dep){
+    Object.keys(RIESGO_DEP).forEach(c=>{const n=RIESGO_DEP[c].nivel;if(ORD[n]>=3)addDot(...centro(GEO_DEP[c].d),n,r,depName(c),()=>pickDep(c));});
+    return;
+  }
+  const dd=Object.keys(RIESGO).filter(u=>GEO_DIST[u]&&u.slice(0,2)===S.dep&&(!S.prov||GEO_DIST[u].p===S.prov));
+  if(dd.length)dd.forEach(u=>addDot(...centro(GEO_DIST[u].d),RIESGO[u].nivel,r,GEO_DIST[u].n,()=>irALugar({tipo:"dist",u})));
+  else if(RIESGO_DEP[S.dep])addDot(...centro(GEO_DEP[S.dep].d),RIESGO_DEP[S.dep].nivel,r,depName(S.dep),()=>pickDep(S.dep));
 }
 function renderCrumbs(){
   const parts=[["Perú",()=>{S.dep=S.prov=S.dist=S.riesgo=null;selDep.value="";resetSel(selProv,"Elige departamento primero");resetSel(selDist,"Elige provincia primero");hideRisk();$("tip").textContent="Pasa el dedo o el mouse sobre el mapa";render();}]];
@@ -490,9 +539,10 @@ const PT=new Map();let dragMoved=0,pinch0=null;
 const clampW=w=>Math.min(MAP_W*1.15,Math.max(MAP_W/14,w));
 function syncTouch(){svg.style.touchAction=vb[2]<MAP_W*0.9?"none":"pan-y";}
 function setVB(v){cancelAnimationFrame(raf);vb=v;svg.setAttribute("viewBox",vb.map(x=>+x.toFixed(2)).join(" "));syncTouch();}
+function meet(){const r=svg.getBoundingClientRect(),s=Math.min(r.width/vb[2],r.height/vb[3]);return {r,s,ox:(r.width-vb[2]*s)/2,oy:(r.height-vb[3]*s)/2};}
 function zoomAt(f,cx,cy){
-  const r=svg.getBoundingClientRect();
-  const ux=vb[0]+(cx-r.left)/r.width*vb[2],uy=vb[1]+(cy-r.top)/r.height*vb[3];
+  const {r,s,ox,oy}=meet();
+  const ux=vb[0]+(cx-r.left-ox)/s,uy=vb[1]+(cy-r.top-oy)/s;
   const nw=clampW(vb[2]/f),k=nw/vb[2];
   setVB([ux-(ux-vb[0])*k,uy-(uy-vb[1])*k,nw,vb[3]*k]);
 }
@@ -505,7 +555,7 @@ svg.addEventListener("pointermove",e=>{
   const nx=e.clientX,ny=e.clientY;
   if(PT.size===1){
     const dx=nx-p.x,dy=ny-p.y;dragMoved+=Math.abs(dx)+Math.abs(dy);
-    if(vb[2]<MAP_W*0.9&&dragMoved>6){const r=svg.getBoundingClientRect(),s=vb[2]/r.width;setVB([vb[0]-dx*s,vb[1]-dy*s,vb[2],vb[3]]);}
+    if(vb[2]<MAP_W*0.9&&dragMoved>6){const s=1/meet().s;setVB([vb[0]-dx*s,vb[1]-dy*s,vb[2],vb[3]]);}
     p.x=nx;p.y=ny;
   }else if(PT.size===2&&pinch0){
     const other=[...PT.entries()].find(([id])=>id!==e.pointerId)[1];
@@ -662,7 +712,7 @@ $("gen").onclick=async()=>{
   let plan,motor;
   try{({plan,motor}=await llamarIA(buildPrompt()));}
   catch(e){plan=planLocal();motor="Plan de respaldo (sin conexión a la IA)";}
-  S.plan=plan;S.motor=motor;renderPlan();agentSay("Tu plan está listo. Pregúntame sobre la mochila, la ruta o qué hacer si hay alerta.");
+  S.plan=plan;S.motor=motor;renderPlan();agentSay("Tu plan está listo. Pregúntame sobre la mochila, la ruta o qué hacer si hay alerta.");chatChips();
 };
 
 /* ============ RENDER DEL PLAN ============ */
@@ -697,7 +747,7 @@ function renderPlan(){
   };
   $("bLink").onclick=()=>copiar(enlace(),"Enlace copiado");
   $("bTxt").onclick=()=>copiar(resumenTexto(),"Plan copiado");
-  $("bNew").onclick=()=>setStep(1);
+  $("bNew").onclick=()=>{if(DESK.matches)nuevoPlan();else setStep(1);};
 }
 function enlace(){try{return location.href.split("#")[0];}catch(e){return "";}}
 function resumenTexto(){
@@ -786,7 +836,8 @@ async function chatSend(q){
   CH.hist.push({r:"u",t:q});
   const w=addMsg("a","");w.innerHTML='<span class="dots"><i></i><i></i><i></i></span>';
   let ans=null,note="";
-  if(!S.riesgo)ans=chatLocal(q);
+  if(/nino|hoy|alerta|enfen/.test(norm(q))&&!S.riesgo)ans=resumenHoy();
+  else if(!S.riesgo)ans=chatLocal(q);
   else{ans=await chatIA();if(!ans){ans=chatLocal(q);note="Respuesta de respaldo sin conexión a la IA";}}
   w.textContent=ans;if(note){const s=document.createElement("small");s.textContent=note;w.appendChild(s);}
   CH.hist.push({r:"a",t:ans});CH.busy=false;$("msgs").scrollTop=$("msgs").scrollHeight;
@@ -816,16 +867,17 @@ function agentNotify(){
   if(!S.riesgo)return;
   const key=(S.dist||S.dep)+"|"+S.riesgo.nivel;
   if(CH.last===key)return;CH.last=key;
-  agentSay(resumenLugar());chatChips();
+  agentSay(resumenLugar());if(DESK.matches&&!S.plan)askNext();else chatChips();
   $("shS").textContent="Datos de "+distName()+" · ejemplo del prototipo";
 }
 const LUGARES=[["Tumbes","240101"],["Zarumilla","240301"],["Piura","200101"],["Catacaos","200105"],["Sullana","200601"],["Chiclayo","140101"],["Lambayeque","140301"]];
 function chatChips(){
   const c=$("chips");c.innerHTML="";
   const add=(t,fn)=>{const b=document.createElement("button");b.type="button";b.className="chip";b.textContent=t;b.onclick=fn;c.appendChild(b);};
-  if(!S.riesgo){LUGARES.forEach(([n,u])=>add(n,()=>{addMsg("u",n);irALugar({tipo:"dist",u});}));return;}
-  add("Armar mi plan",()=>{addMsg("u","Armar mi plan");agentSay("Vamos. Cuéntame de tu familia con los botones de la pantalla.");setStep(2);});
+  if(!S.riesgo){add("Usar mi ubicación",ubicar);add("¿Cómo está El Niño hoy?",()=>{addMsg("u","¿Cómo está El Niño hoy?");agentSay(resumenHoy());});LUGARES.forEach(([n,u])=>add(n,()=>{addMsg("u",n);irALugar({tipo:"dist",u});}));return;}
+  if(!S.plan)add("Armar mi plan",()=>{addMsg("u","Armar mi plan");if(DESK.matches)askNext();else{agentSay("Vamos. Cuéntame de tu familia con los botones de la pantalla.");setStep(2);}});
   ["¿Qué riesgo tiene mi distrito?","¿Qué pongo en la mochila?","¿Qué dice el aviso de hoy?","¿Qué pasó antes aquí?","Es una emergencia"].forEach(q=>add(q,()=>chatSend(q)));
+  add("¿Cómo está El Niño hoy?",()=>{addMsg("u","¿Cómo está El Niño hoy?");agentSay(resumenHoy());});
 }
 function chatInit(){
   agentSay("Hola, soy tu asistente. Te ayudo a preparar a tu familia ante El Niño con datos oficiales del Perú.");
@@ -840,11 +892,66 @@ function renderBanner(){
 function chatOpen(){
   $("sheet").hidden=false;$("fab").hidden=true;$("cin").focus();
 }
+/* ---- Escritorio: mitad IA, mitad mapa ---- */
+const DESK=window.matchMedia("(min-width:960px)");
+function placeMap(){
+  const mb=document.querySelector(".mapbox");
+  if(DESK.matches){if(mb.parentNode.id!=="mapSlot")$("mapSlot").insertBefore(mb,$("mapSlot").querySelector(".mapcap"));}
+  else{const s1=$("s1");if(mb.parentNode!==s1)s1.insertBefore(mb,s1.querySelector(".field"));}
+  setTimeout(render,0);
+}
+DESK.addEventListener("change",placeMap);
+
+/* ---- Ubicación del usuario (solo con su permiso; no se guarda) ---- */
+const GEO_PROJ={minX:-81.32810348723024,maxY:-0.038605968668117,k:0.9871362650729879,S:40};
+const llToMap=(lat,lon)=>[(lon-GEO_PROJ.minX)*GEO_PROJ.k*GEO_PROJ.S,(GEO_PROJ.maxY-lat)*GEO_PROJ.S];
+function hitPath(d,pt){
+  const p=document.createElementNS(NS,"path");p.setAttribute("d",d);svg.appendChild(p);
+  let ok=false;try{ok=p.isPointInFill(new DOMPoint(pt[0],pt[1]));}catch(e){}
+  p.remove();return ok;
+}
+function ubicar(){
+  addMsg("u","Usar mi ubicación");
+  if(!navigator.geolocation){agentSay("Tu navegador no permite usar la ubicación. Escribe tu distrito o toca el mapa.");return;}
+  navigator.geolocation.getCurrentPosition(pos=>{
+    const pt=llToMap(pos.coords.latitude,pos.coords.longitude);
+    const dep=Object.keys(GEO_DEP).find(c=>hitPath(GEO_DEP[c].d,pt));
+    if(!dep){agentSay("No pude ubicarte dentro del Perú. Escribe tu distrito o toca el mapa.");return;}
+    const dist=Object.keys(GEO_DIST).find(u=>GEO_DIST[u].p.startsWith(dep)&&hitPath(GEO_DIST[u].d,pt));
+    agentSay("Te ubiqué cerca de "+(dist?GEO_DIST[dist].n+", ":"")+depName(dep)+". Usé tu ubicación solo para elegir la zona; no se guarda.");
+    irALugar(dist?{tipo:"dist",u:dist}:{tipo:"dep",c:dep});
+  },()=>agentSay("No pude usar tu ubicación (permiso negado o sin señal). Escribe tu distrito o toca el mapa."),{timeout:10000,maximumAge:600000});
+}
+
+/* ---- Conversación guiada ---- */
+function addChip(t,fn){const b=document.createElement("button");b.type="button";b.className="chip";b.textContent=t;b.onclick=fn;$("chips").appendChild(b);}
+function syncOpts(){document.querySelectorAll(".opt").forEach(b=>b.setAttribute("aria-pressed",String(S.perfil[b.dataset.k]===b.dataset.v)));}
+function resumenHoy(){
+  const e=ENFEN_ESTADO,a=AVISOS_SENAMHI;
+  return e.estado+" ("+e.comunicado+", "+e.fecha+"). "+e.resumen+" Avisos de SENAMHI para "+a.zona+" (leídos el "+a.leido+"): lluvias y calor del día en nivel rojo del 23 al 25 de octubre, viento rojo hasta el 23. Probabilidad de magnitud extraordinaria: "+e.probExtraordinaria.map(([m,v])=>m+" "+v+"%").join(", ")+" ("+e.probFuente+").";
+}
+function askNext(){
+  const q=QS.find(x=>!S.perfil[x.k]);
+  $("chips").innerHTML="";
+  if(!q){agentSay("Con eso ya puedo armar tu plan. ¿Lo genero?");addChip("Generar mi plan",genEnChat);return;}
+  agentSay(q.t);
+  q.o.forEach(([v,l])=>addChip(l,()=>{addMsg("u",l);S.perfil[q.k]=v;syncOpts();askNext();}));
+}
+function genEnChat(){
+  addMsg("u","Generar mi plan");
+  const slot=addMsg("a","");slot.classList.add("wide");slot.appendChild($("planOut"));
+  $("gen").click();
+}
+function nuevoPlan(){
+  S.plan=null;Object.keys(S.perfil).forEach(k=>S.perfil[k]=null);syncOpts();
+  S.dep=S.prov=S.dist=S.riesgo=null;CH.last=null;selDep.value="";
+  resetSel(selProv,"Elige departamento primero");resetSel(selDist,"Elige provincia primero");hideRisk();render();
+  agentSay("Listo, empecemos de nuevo. ¿En qué distrito vives?");chatChips();
+}
 $("fab").onclick=chatOpen;
 $("shX").onclick=()=>{$("sheet").hidden=true;$("fab").hidden=false;};
 $("cf").addEventListener("submit",e=>{e.preventDefault();chatSend($("cin").value);});
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("sheet").hidden)$("shX").click();});
-chatInit();
-renderBanner();
-setStep(1);
+renderBanner();placeMap();chatInit();setStep(1);
+try{if(navigator.permissions)navigator.permissions.query({name:"geolocation"}).then(p=>{if(p.state==="granted")ubicar();});}catch(e){}
 </script>
